@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { NavHeaderSearch } from "./NavHeaderSearch";
 import { Button } from "./Button";
 import { useAuth } from "../auth/AuthContext";
@@ -7,7 +7,7 @@ import { ButtonForm } from "./ButtonForm";
 export const NavHeader = () => {
   const navigate = useNavigate();
 
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
