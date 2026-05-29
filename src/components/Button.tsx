@@ -5,22 +5,40 @@ interface ButtonProps {
   className?: string;
   icon?: IconProps;
   route?: string;
+  onClick?: () => void;
+  type?: "button" | "submit" | "reset";
 }
 
 interface IconProps {
   icon: string;
 }
-export const Button = (props: ButtonProps) => {
+
+export const Button = ({
+  text,
+  className,
+  icon,
+  route,
+  onClick,
+  type = "button",
+}: ButtonProps) => {
+  const content = (
+    <>
+      {icon && <i className={icon.icon}></i>}
+      <span>{text}</span>
+    </>
+  );
+
+  if (route) {
+    return (
+      <Link className={className} to={route}>
+        {content}
+      </Link>
+    );
+  }
+
   return (
-    <Link className={`${props.className}`} to={props.route || "#"}>
-      {props.icon ? (
-        <>
-          <i className={`${props.icon.icon}`}></i>
-          <>{props.text}</>
-        </>
-      ) : (
-        <>{props.text}</>
-      )}
+    <Link className={className} onClick={onClick} type={type} to="#">
+      {content}
     </Link>
   );
 };

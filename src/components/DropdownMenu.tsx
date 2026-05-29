@@ -11,15 +11,15 @@ interface OptionProps {
 export const DropdownMenu = ({ options }: DropdownMenuProps) => {
   return (
     <ul className="dropdown-menu animated fadeInRight m-t-xs">
-      {options.map((option) => (
-        <>
+      {options.map((option, index) => (
+        <div key={index}>
           {option.divider && <li className="dropdown-divider"></li>}
-          <li key={option.route}>
+          <li>
             <a className="dropdown-item" href={option.route}>
               {option.label}
             </a>
           </li>
-        </>
+        </div>
       ))}
     </ul>
   );
