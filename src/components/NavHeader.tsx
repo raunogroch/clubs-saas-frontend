@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router";
 import { NavHeaderSearch } from "./NavHeaderSearch";
 import { Button } from "./Button";
 import { useAuth } from "../auth/AuthContext";
+import { ButtonForm } from "./ButtonForm";
 
 export const NavHeader = () => {
   const navigate = useNavigate();
@@ -14,6 +15,10 @@ export const NavHeader = () => {
     navigate("/login");
   };
 
+  const handleMinimize = () => {
+    document.body.classList.toggle("mini-navbar");
+  };
+
   return (
     <div className="row border-bottom">
       <nav
@@ -22,12 +27,13 @@ export const NavHeader = () => {
         style={{ marginBottom: "0" }}
       >
         <div className="navbar-header">
-          <Link
+          <ButtonForm
             className="navbar-minimalize minimalize-styl-2 btn btn-primary"
-            to="#"
+            type="button"
+            onClick={handleMinimize}
           >
             <i className="fa fa-bars"></i>
-          </Link>
+          </ButtonForm>
           <NavHeaderSearch />
         </div>
         <ul className="nav navbar-top-links navbar-right">
