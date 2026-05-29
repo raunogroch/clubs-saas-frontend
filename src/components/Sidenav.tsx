@@ -1,7 +1,23 @@
+import { useEffect } from "react";
 import { MenuMultiOption, MenuProfile, MenuSingleOption } from ".";
+
+declare global {
+  interface JQuery {
+    metisMenu: () => JQuery;
+  }
+}
 
 export const Sidenav = () => {
   const location = window.location.pathname;
+
+  useEffect(() => {
+    // Reinitialize MetisMenu after React renders
+    const $ = (window as any).$;
+    if ($) {
+      $('#side-menu').metisMenu();
+    }
+  }, []);
+
   return (
     <>
       <nav className="navbar-default navbar-static-side" role="navigation">
