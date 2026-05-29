@@ -14,7 +14,7 @@ export const Sidenav = () => {
     // Reinitialize MetisMenu after React renders
     const $ = (window as any).$;
     if ($) {
-      $('#side-menu').metisMenu();
+      $("#side-menu").metisMenu();
     }
   }, []);
 
