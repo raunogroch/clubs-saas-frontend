@@ -1,6 +1,4 @@
-import { MenuMultiOption } from "../layouts/MenuMultiOption";
-import { MenuProfile } from "../layouts/MenuProfile";
-import { MenuSingleOption } from "../layouts/MenuSingleOption";
+import { MenuMultiOption, MenuProfile, MenuSingleOption } from ".";
 
 export const Sidenav = () => {
   const location = window.location.pathname;
