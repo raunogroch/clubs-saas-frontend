@@ -1,35 +1,67 @@
 import { useNavigate } from "react-router-dom";
-
-import { useAuth } from "../auth/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ButtonForm } from "../components";
+import { useAuthManager } from "../features/auth/authHooks";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const { login, loading, error, isAuthenticated } = useAuthManager();
 
-  const { login } = useAuth();
+  // Estados del formulario
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationError, setValidationError] = useState("");
 
-  const handleLogin = () => {
-    login();
+  // Efecto para redirigir si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
-    navigate("/dashboard");
-  };
-
+  // Efecto para estilos de la página
   useEffect(() => {
     document.body.classList.add("gray-bg");
-
     return () => {
       document.body.classList.remove("gray-bg");
     };
   }, []);
 
-  // return (
-  //   <div>
-  //     <h1>Login</h1>
+  // Validar formulario
+  const validateForm = () => {
+    setValidationError("");
 
-  //     <button onClick={handleLogin}>Entrar</button>
-  //   </div>
-  // );
+    if (!username.trim()) {
+      setValidationError("El usuario es requerido");
+      return false;
+    }
+
+    if (!password.trim()) {
+      setValidationError("La contraseña es requerida");
+      return false;
+    }
+
+    if (password.length < 8) {
+      setValidationError("La contraseña debe tener al menos 8 caracteres");
+      return false;
+    }
+
+    return true;
+  };
+
+  // Manejar submit del formulario
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    try {
+      await login({ username, password });
+      // La redirección ocurre en el useEffect cuando isAuthenticated cambia
+    } catch {
+      // El error se maneja en authHooks y se muestra en el estado 'error'
+    }
+  };
 
   return (
     <div className="loginColumns animated fadeInDown">
@@ -59,30 +91,47 @@ export const LoginPage = () => {
 
         <div className="col-md-6">
           <div className="ibox-content">
-            <form className="m-t" role="form">
+            <form className="m-t" role="form" onSubmit={handleSubmit}>
+              {/* Mostrar errores */}
+              {(validationError || error) && (
+                <div className="alert alert-danger" role="alert">
+                  {validationError || error}
+                </div>
+              )}
+
+              {/* Campo usuario */}
               <div className="form-group">
                 <input
-                  type="email"
+                  type="text"
                   className="form-control"
-                  placeholder="Correo electrónico"
-                  required={true}
+                  placeholder="Usuario"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={loading}
+                  required
                 />
               </div>
 
+              {/* Campo contraseña */}
               <div className="form-group">
                 <input
                   type="password"
                   className="form-control"
                   placeholder="Contraseña"
-                  required={true}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  required
                 />
               </div>
 
+              {/* Botón de envío */}
               <ButtonForm
-                onClick={handleLogin}
+                type="submit"
                 className="btn btn-primary block full-width m-b"
+                disabled={loading}
               >
-                Iniciar sesión
+                {loading ? "Autenticando..." : "Iniciar sesión"}
               </ButtonForm>
 
               <a href="#">
@@ -100,13 +149,6 @@ export const LoginPage = () => {
                 Crear una cuenta
               </a>
             </form>
-
-            <p className="m-t">
-              <small>
-                ClubSphere SaaS+ &copy; 2026 | Plataforma de gestión para clubes
-                deportivos
-              </small>
-            </p>
           </div>
         </div>
       </div>

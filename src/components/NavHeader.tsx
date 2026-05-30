@@ -1,22 +1,38 @@
 import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
 import { NavHeaderSearch } from "./NavHeaderSearch";
 import { Button } from "./Button";
-import { useAuth } from "../auth/AuthContext";
+import { useAuthManager } from "../features/auth/authHooks";
 import { ButtonForm } from "./ButtonForm";
 
 export const NavHeader = () => {
   const navigate = useNavigate();
+  const { logout } = useAuthManager();
 
-  const { logout } = useAuth();
+  // Estado para controlar si el navbar está minimizado
+  const [isMinimized, setIsMinimized] = useState(() => {
+    return localStorage.getItem("navbar_minimized") === "true";
+  });
+
+  // Sincronizar estado con el DOM
+  useEffect(() => {
+    const body = document.body;
+    if (isMinimized) {
+      body.classList.add("mini-navbar");
+    } else {
+      body.classList.remove("mini-navbar");
+    }
+    // Persistir la preferencia
+    localStorage.setItem("navbar_minimized", isMinimized.toString());
+  }, [isMinimized]);
 
   const handleLogout = () => {
     logout();
-
     navigate("/login");
   };
 
   const handleMinimize = () => {
-    document.body.classList.toggle("mini-navbar");
+    setIsMinimized((prev) => !prev);
   };
 
   return (

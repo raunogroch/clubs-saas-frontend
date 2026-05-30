@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { MenuMultiOption, MenuProfile, MenuSingleOption } from ".";
+import { useAuthManager } from "../features/auth/authHooks";
 
 declare global {
   interface JQuery {
@@ -9,6 +10,7 @@ declare global {
 
 export const Sidenav = () => {
   const location = window.location.pathname;
+  const { user } = useAuthManager();
 
   useEffect(() => {
     // Reinitialize MetisMenu after React renders
@@ -18,6 +20,12 @@ export const Sidenav = () => {
     }
   }, []);
 
+  // Mostrar nombre completo o un valor por defecto
+  const displayName = user?.name
+    ? `${user.name} ${user.lastname || ""}`.trim()
+    : "Usuario";
+  const displayRoles = user?.roles || [];
+
   return (
     <>
       <nav className="navbar-default navbar-static-side" role="navigation">
@@ -26,8 +34,8 @@ export const Sidenav = () => {
             <li className="nav-header">
               <MenuProfile
                 imageUrl="assets/img/profile_small.jpg"
-                name="David Williams"
-                roles={["Art Director"]}
+                name={displayName}
+                roles={displayRoles}
               />
               <div className="logo-element">
                 <img
