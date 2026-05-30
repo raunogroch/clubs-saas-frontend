@@ -2,6 +2,7 @@ import { Button } from "./Button";
 
 interface BeadcumbsProps {
   title: string;
+  children?: React.ReactNode;
 }
 
 export const Beadcumbs = (props: BeadcumbsProps) => {
@@ -19,9 +20,7 @@ export const Beadcumbs = (props: BeadcumbsProps) => {
         </ol>
       </div>
       <div className="col-sm-8">
-        <div className="title-action">
-          <Button className="btn btn-primary" text="This is action area" />
-        </div>
+        <div className="title-action">{props.children}</div>
       </div>
     </div>
   );

@@ -1,9 +1,20 @@
 import { Beadcumbs } from "../components";
+import { AssignmentModal } from "../modals/AssignmentModal";
 
 export const AssignmentPage = () => {
   return (
     <>
-      <Beadcumbs title="Asignaciones" />
+      <Beadcumbs title="Asignaciones">
+        <button
+          type="button"
+          className="btn btn-primary"
+          data-toggle="modal"
+          data-target="#myModal2"
+        >
+          Abrir modal
+        </button>
+        <AssignmentModal />
+      </Beadcumbs>
       <div className="wrapper wrapper-content animated fadeInRight">
         <div className="row">
           <div className="col-lg-12">
