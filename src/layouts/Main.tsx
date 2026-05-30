@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Beadcumbs, Footer, NavHeader, Sidenav } from "../components";
+import { Footer, NavHeader, Sidenav } from "../components";
 
 interface MainProps {
   children: ReactNode;

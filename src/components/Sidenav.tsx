@@ -49,7 +49,7 @@ export const Sidenav = () => {
             <MenuSingleOption
               route={"/dashboard"}
               icon={"th-large"}
-              name={"Dashboard"}
+              name={"Inicio"}
               active={location === "/dashboard"}
             />
 

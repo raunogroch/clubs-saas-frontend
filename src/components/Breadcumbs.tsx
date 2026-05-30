@@ -11,10 +11,10 @@ export const Beadcumbs = (props: BeadcumbsProps) => {
         <h2>{props.title}</h2>
         <ol className="breadcrumb">
           <li className="breadcrumb-item">
-            <Button text="This is" route="/dashboard" />
+            <Button text="Inicio" route="/dashboard" />
           </li>
           <li className="breadcrumb-item active">
-            <strong>Breadcrumb</strong>
+            <strong>{props.title}</strong>
           </li>
         </ol>
       </div>
