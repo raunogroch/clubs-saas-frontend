@@ -3,7 +3,7 @@ export const NavHeaderSearch = () => {
     <div className=" navbar-form-custom form-group">
       <input
         type="text"
-        placeholder="Search for something..."
+        placeholder="Escribe para buscar..."
         className="form-control"
         name="top-search"
         id="top-search"

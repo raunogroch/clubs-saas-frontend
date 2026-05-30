@@ -4,9 +4,12 @@ import { ProtectedRoute } from "../auth/ProtectedRoute";
 import { GuestRoute } from "../auth/GuestRoute";
 
 import { DashboardLayout } from "../layouts/DashboardLayout";
-import { LoginPage } from "../pages/LoginPage";
-import { DashboardPage } from "../pages/DashboardPage";
-import { NotFoundPage } from "../pages/NotFoundPage";
+import {
+  AssignmentPage,
+  DashboardPage,
+  LoginPage,
+  NotFoundPage,
+} from "../pages";
 
 export const router = createBrowserRouter([
   // PUBLICAS
@@ -22,15 +25,19 @@ export const router = createBrowserRouter([
 
   // PRIVADAS
   {
+    path: "/",
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/dashboard",
         element: <DashboardLayout />,
         children: [
           {
-            index: true,
+            path: "dashboard",
             element: <DashboardPage />,
+          },
+          {
+            path: "assignments",
+            element: <AssignmentPage />,
           },
         ],
       },

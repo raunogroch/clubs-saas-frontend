@@ -53,6 +53,12 @@ export const Sidenav = () => {
               active={location === "/dashboard"}
             />
 
+            <MenuSingleOption
+              route={"/assignments"}
+              icon={"fa fa-tasks"}
+              name={"Asignaciones"}
+            />
+
             <MenuMultiOption
               route={"/mailbox"}
               icon="envelope"
@@ -80,12 +86,6 @@ export const Sidenav = () => {
                 { label: "Peity Charts", route: "/graph_peity" },
                 { label: "Sparkline Charts", route: "/graph_sparkline" },
               ]}
-            />
-
-            <MenuSingleOption
-              route={"/layouts"}
-              icon={"fa fa-diamond"}
-              name={"Layouts"}
             />
           </ul>
         </div>

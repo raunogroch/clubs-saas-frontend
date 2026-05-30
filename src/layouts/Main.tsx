@@ -13,8 +13,6 @@ export const Main = ({ children }: MainProps) => {
       <div id="page-wrapper" className="gray-bg">
         <NavHeader />
 
-        <Beadcumbs title="Principal" />
-
         {children}
 
         <Footer companyName="CoderSoft" range="2024-2027" />
