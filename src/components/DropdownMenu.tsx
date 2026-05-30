@@ -5,7 +5,8 @@ interface DropdownMenuProps {
 interface OptionProps {
   divider?: boolean;
   label: string;
-  route: string;
+  route?: string;
+  onClick?: () => void;
 }
 
 export const DropdownMenu = ({ options }: DropdownMenuProps) => {
@@ -18,7 +19,13 @@ export const DropdownMenu = ({ options }: DropdownMenuProps) => {
             <a
               style={{ color: "grey" }}
               className="dropdown-item"
-              href={option.route}
+              href={option.route || "#"}
+              onClick={(e) => {
+                if (option.onClick) {
+                  e.preventDefault();
+                  option.onClick();
+                }
+              }}
             >
               {option.label}
             </a>

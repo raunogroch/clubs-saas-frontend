@@ -1,6 +1,7 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { DropdownMenu } from "./DropdownMenu";
 import { Roles } from "../common";
+import { useAuthManager } from "../features/auth/authHooks";
 
 interface MenuProfileProps {
   imageUrl: string;
@@ -9,6 +10,14 @@ interface MenuProfileProps {
 }
 
 export const MenuProfile = (props: MenuProfileProps) => {
+  const navigate = useNavigate();
+  const { logout } = useAuthManager();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <div className="dropdown profile-element">
       <img alt="image" className="rounded-circle" src={props.imageUrl} />
@@ -26,7 +35,7 @@ export const MenuProfile = (props: MenuProfileProps) => {
           { label: "Profile", route: "/profile" },
           { label: "Contacts", route: "/contacts" },
           { label: "Mailbox", route: "/mailbox" },
-          { label: "Logout", route: "/logout", divider: true },
+          { label: "Logout", onClick: handleLogout, divider: true },
         ]}
       />
     </div>
