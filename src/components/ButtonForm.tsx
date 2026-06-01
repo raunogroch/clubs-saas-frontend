@@ -16,7 +16,12 @@ export const ButtonForm = ({
   disabled = false,
 }: ButtonProps) => {
   return (
-    <button type={type} className={className} onClick={onClick}>
+    <button
+      type={type}
+      className={className}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

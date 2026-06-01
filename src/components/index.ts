@@ -9,3 +9,5 @@ export * from "./MenuProfile";
 export * from "./MenuSingleOption";
 export * from "./NavHeaderSearch";
 export * from "./ButtonForm";
+export * from "./Modal";
+export * from "./InputForm";

@@ -9,11 +9,11 @@ export const AssignmentPage = () => {
           type="button"
           className="btn btn-primary"
           data-toggle="modal"
-          data-target="#myModal2"
+          data-target="#assignmentModal"
         >
-          Abrir modal
+          Crear asignacion
         </button>
-        <AssignmentModal />
+        <AssignmentModal identifier="assignmentModal" />
       </Beadcumbs>
       <div className="wrapper wrapper-content animated fadeInRight">
         <div className="row">

@@ -1,49 +1,48 @@
-export const AssignmentModal = () => {
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { InputForm, Modal } from "../components";
+
+type Inputs = {
+  name: string;
+  admins: string;
+};
+
+interface AssignmentModalProps {
+  identifier: string;
+}
+
+export const AssignmentModal = (props: AssignmentModalProps) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>();
+
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log(data);
+  };
+
   return (
-    <div
-      className="modal inmodal"
-      id="myModal2"
-      //   tabindex="-1"
-      role="dialog"
-      aria-hidden="true"
-    >
-      <div className="modal-dialog">
-        <div className="modal-content animated flipInY">
-          <div className="modal-header">
-            <button type="button" className="close" data-dismiss="modal">
-              <span aria-hidden="true">&times;</span>
-              <span className="sr-only">Close</span>
-            </button>
-            <h4 className="modal-title">Modal title</h4>
-            <small className="font-bold">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry.
-            </small>
-          </div>
-          <div className="modal-body">
-            <p>
-              <strong>Lorem Ipsum is simply dummy</strong> text of the printing
-              and typesetting industry. Lorem Ipsum has been the industry's
-              standard dummy text ever since the 1500s, when an unknown printer
-              took a galley of type and scrambled it to make a type specimen
-              book. It has survived not only five centuries, but also the leap
-              into electronic typesetting, remaining essentially unchanged.
-            </p>
-          </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-white"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" className="btn btn-primary">
-              Save changes
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Modal
+        title="Crear asignacion"
+        identifier={props.identifier}
+        buttonName="Crear"
+      >
+        <InputForm
+          title="Nombre"
+          name="name"
+          register={register}
+          errors={errors}
+          required="El nombre es obligatorio"
+        />
+
+        <InputForm
+          title="Propietarios"
+          name="admins"
+          register={register}
+          errors={errors}
+        />
+      </Modal>
+    </form>
   );
 };
