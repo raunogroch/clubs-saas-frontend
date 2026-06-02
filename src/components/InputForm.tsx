@@ -11,6 +11,7 @@ interface InputFormProps<T extends FieldValues> {
   register: UseFormRegister<T>;
   errors: FieldErrors<T>;
   required?: string;
+  disabled?: boolean;
 }
 
 export const InputForm = <T extends FieldValues>({
@@ -19,6 +20,7 @@ export const InputForm = <T extends FieldValues>({
   register,
   errors,
   required,
+  disabled = false,
 }: InputFormProps<T>) => {
   return (
     <div className="form-group row">
@@ -31,6 +33,7 @@ export const InputForm = <T extends FieldValues>({
           {...register(name, {
             required,
           })}
+          disabled={disabled}
         />
 
         {errors[name] && (

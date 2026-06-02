@@ -11,3 +11,6 @@ export * from "./NavHeaderSearch";
 export * from "./ButtonForm";
 export * from "./Modal";
 export * from "./InputForm";
+export * from "./PaginationTable";
+export * from "./PaginationOptions";
+export * from "./IBox";
