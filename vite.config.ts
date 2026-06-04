@@ -7,5 +7,11 @@ export default defineConfig({
     // Ensure fonts and assets are served with correct MIME types
     middlewareMode: false,
   },
-  assetsInclude: ["**/*.woff", "**/*.woff2", "**/*.ttf", "**/*.eot", "**/*.svg"],
+  assetsInclude: [
+    "**/*.woff",
+    "**/*.woff2",
+    "**/*.ttf",
+    "**/*.eot",
+    "**/*.svg",
+  ],
 });
