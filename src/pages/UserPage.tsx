@@ -29,8 +29,6 @@ export const UserPage = () => {
     limit: pageSize,
   });
 
-  console.log("Users:", users);
-
   const totalPages =
     meta?.totalPages ??
     meta?.lastPage ??
@@ -108,11 +106,13 @@ export const UserPage = () => {
                         <td>{user.address || "N/A"}</td>
                         <td>
                           {user.roles?.map((role: any) => (
-                            <LabelHighlight
-                              text={getRoleLabel(role.role)}
-                              type="info"
-                              location="center"
-                            />
+                            <div key={role.id}>
+                              <LabelHighlight
+                                text={getRoleLabel(role.role)}
+                                type="info"
+                                location="center"
+                              />
+                            </div>
                           ))}
                         </td>
                         <td>{getStatusLabel(user.status)}</td>
