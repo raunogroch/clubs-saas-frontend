@@ -11,6 +11,7 @@
  */
 
 import { Link } from "react-router";
+import { LabelHighlight } from "./LabelHighlight";
 
 interface SubItem {
   label: string;
@@ -46,11 +47,7 @@ export const MenuMultiOption = ({
 
         <span className="nav-label">{name}</span>
 
-        {label && (
-          <span className={`label label-${label.type} float-right`}>
-            {label.text}
-          </span>
-        )}
+        {label && <LabelHighlight text={label.text} type={label.type} />}
       </Link>
 
       <ul className="nav nav-second-level collapse">

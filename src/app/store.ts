@@ -4,6 +4,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/authSlice";
 import authApi from "../features/auth/authApi";
 import assignmentApi from "../features/assignments/assignmentApi";
+import userApi from "../features/users/userApi";
 
 /**
  * Configuración centralizada de Redux Store
@@ -23,6 +24,8 @@ const reducers = {
   [authApi.reducerPath]: authApi.reducer,
   // Cache de datos de asignaciones desde el servidor
   [assignmentApi.reducerPath]: assignmentApi.reducer,
+  // Cache de datos de usuarios desde el servidor
+  [userApi.reducerPath]: userApi.reducer,
 };
 
 // === MIDDLEWARE ===
@@ -33,6 +36,8 @@ const getMiddleware = (getDefaultMiddleware: any) => {
     authApi.middleware,
     // Middleware para manejar peticiones de asignaciones
     assignmentApi.middleware,
+    // Middleware para manejar peticiones de usuarios
+    userApi.middleware,
   );
 };
 

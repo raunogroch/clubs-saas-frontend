@@ -12,6 +12,8 @@ interface InputFormProps<T extends FieldValues> {
   errors: FieldErrors<T>;
   required?: string;
   disabled?: boolean;
+  type?: "text" | "date" | "select";
+  options?: Array<{ value: string; label: string }>;
 }
 
 export const InputForm = <T extends FieldValues>({
@@ -21,20 +23,39 @@ export const InputForm = <T extends FieldValues>({
   errors,
   required,
   disabled = false,
+  type = "text",
+  options = [],
 }: InputFormProps<T>) => {
   return (
     <div className="form-group row">
       <label className="col-sm-2 col-form-label">{title}</label>
 
       <div className="col-sm-10">
-        <input
-          type="text"
-          className="form-control"
-          {...register(name, {
-            required,
-          })}
-          disabled={disabled}
-        />
+        {type === "select" ? (
+          <select
+            className="form-control"
+            {...register(name, {
+              required,
+            })}
+            disabled={disabled}
+          >
+            <option value="">Seleccionar...</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type={type}
+            className="form-control"
+            {...register(name, {
+              required,
+            })}
+            disabled={disabled}
+          />
+        )}
 
         {errors[name] && (
           <span className="text-danger">{String(errors[name]?.message)}</span>

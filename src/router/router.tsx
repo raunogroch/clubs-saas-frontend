@@ -9,6 +9,7 @@ import {
   DashboardPage,
   LoginPage,
   NotFoundPage,
+  UserPage,
 } from "../pages";
 
 export const router = createBrowserRouter([
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
           {
             path: "assignments",
             element: <AssignmentPage />,
+          },
+          {
+            path: "users",
+            element: <UserPage />,
           },
         ],
       },

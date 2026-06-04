@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { MenuMultiOption, MenuProfile, MenuSingleOption } from ".";
+import { useLocation } from "react-router-dom";
+import { MenuProfile, MenuSingleOption } from ".";
 import { useAuthManager } from "../features/auth/authHooks";
 
 declare global {
@@ -9,7 +10,7 @@ declare global {
 }
 
 export const Sidenav = () => {
-  const location = window.location.pathname;
+  const { pathname } = useLocation();
   const { user } = useAuthManager();
 
   useEffect(() => {
@@ -50,42 +51,28 @@ export const Sidenav = () => {
               route={"/dashboard"}
               icon={"th-large"}
               name={"Inicio"}
-              active={location === "/dashboard"}
+              active={pathname === "/dashboard"}
             />
 
             <MenuSingleOption
               route={"/assignments"}
               icon={"fa fa-tasks"}
               name={"Asignaciones"}
+              active={pathname === "/assignments"}
             />
 
-            <MenuMultiOption
-              route={"/mailbox"}
-              icon="envelope"
-              name="Mailbox"
-              subItems={[
-                { label: "Inbox", route: "/mailbox" },
-                { label: "Email view", route: "/mail_detail" },
-                { label: "Compose email", route: "/mail_compose" },
-                { label: "Email templates", route: "/email_template" },
-              ]}
+            <MenuSingleOption
+              route={"/users"}
+              icon={"users"}
+              name={"Usuarios"}
+              active={pathname === "/users"}
             />
 
-            <MenuMultiOption
-              route={"/graphs"}
-              icon={"bar-chart-o"}
-              name={"Graphs"}
-              label={{ text: "NEW", type: "warning" }}
-              subItems={[
-                { label: "Flot Charts", route: "/graph_flot" },
-                { label: "Morris.js Charts", route: "/graph_morris" },
-                { label: "Rickshaw Charts", route: "/graph_rickshaw" },
-                { label: "Chart.js", route: "/graph_chartjs" },
-                { label: "Chartist", route: "/graph_chartist" },
-                { label: "c3 charts", route: "/c3" },
-                { label: "Peity Charts", route: "/graph_peity" },
-                { label: "Sparkline Charts", route: "/graph_sparkline" },
-              ]}
+            <MenuSingleOption
+              route={"/admins"}
+              icon={"users"}
+              name={"Administradores"}
+              active={pathname === "/admins"}
             />
           </ul>
         </div>
