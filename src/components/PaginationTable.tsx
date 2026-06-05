@@ -12,6 +12,7 @@ export const PaginationTable = ({
   total,
   onPageChange,
 }: PaginationProps) => {
+  if (totalPages <= 1) return null;
   return (
     <div className="d-flex justify-content-between align-items-center gap-2">
       <small>

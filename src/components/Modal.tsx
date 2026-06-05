@@ -6,6 +6,7 @@ interface ModalProps {
   description?: string;
   children: React.ReactNode;
   buttonName: string;
+  size?: "sm" | "lg" | "xl";
 }
 
 export const Modal = (props: ModalProps) => {
@@ -16,7 +17,9 @@ export const Modal = (props: ModalProps) => {
       role="dialog"
       aria-hidden="true"
     >
-      <div className="modal-dialog">
+      <div
+        className={`modal-dialog ${props.size ? `modal-${props.size}` : ""}`}
+      >
         <div className="modal-content animated flipInY">
           <div className="modal-header">
             <button type="button" className="close" data-dismiss="modal">

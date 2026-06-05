@@ -102,8 +102,7 @@ export const AssignmentPage = () => {
                 page={page}
                 totalPages={totalPages}
                 total={meta?.total}
-                onPageChange={setPage}
-                onPageSizeChange={setPageSize}
+                onPageChange={(newPage) => setPage(newPage)}
               />
             </>
           )}
