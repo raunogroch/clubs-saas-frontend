@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import { Footer, NavHeader, Sidenav } from "../components";
+import {
+  Footer,
+  NavHeader,
+  Sidenav,
+  TokenExpirationWarning,
+} from "../components";
 
 interface MainProps {
   children: ReactNode;
@@ -17,6 +22,9 @@ export const Main = ({ children }: MainProps) => {
 
         <Footer companyName="CoderSoft" range="2024-2027" />
       </div>
+
+      {/* Mostrar advertencia cuando el token está próximo a expirar */}
+      <TokenExpirationWarning />
     </div>
   );
 };

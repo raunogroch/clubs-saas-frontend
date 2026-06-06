@@ -17,13 +17,6 @@ const api = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
   }),
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({

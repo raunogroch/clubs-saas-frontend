@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { DropdownMenu } from "./DropdownMenu";
-import { Roles } from "../common";
 import { useAuthManager } from "../features/auth/authHooks";
+import { getRoleLabel } from "../common/translations";
 
 interface MenuProfileProps {
   imageUrl: string;
@@ -24,9 +24,7 @@ export const MenuProfile = (props: MenuProfileProps) => {
       <Link data-toggle="dropdown" className="dropdown-toggle" to="#">
         <span className="block m-t-xs font-bold">{props.name}</span>
         <span className="text-muted text-xs block">
-          {props.roles
-            .map((role) => Roles[role as keyof typeof Roles])
-            .join(", ")}
+          {props.roles.map((role: any) => getRoleLabel(role)).join(", ")}
           <b className="caret"></b>
         </span>
       </Link>

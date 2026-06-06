@@ -1,52 +1,69 @@
-// app/store.ts
+/**
+ * app/store.ts
+ *
+ * Configuración centralizada de Redux Store
+ *
+ * Principios SOLID:
+ * - SRP: Una responsabilidad - configurar el store
+ * - Middleware centralizado
+ * - Persistencia automática con redux-persist
+ * - Validación de token automática
+ */
 
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "./storage";
 import authReducer from "../features/auth/authSlice";
 import authApi from "../features/auth/authApi";
 import assignmentApi from "../features/assignments/assignmentApi";
 import userApi from "../features/users/userApi";
+import persistenceReducer from "./persistenceSlice";
+import authMiddleware from "./middleware/authMiddleware";
 
-/**
- * Configuración centralizada de Redux Store
- *
- * Incluye:
- * - Reducers: gestión del estado local (auth)
- * - APIs: endpoints y caché de datos (authApi, assignmentApi)
- * - Middleware: interceptores para peticiones API
- */
-
-// === REDUCERS ===
-// Almacén de estado local de la aplicación
-const reducers = {
-  // Estado de autenticación (login, usuario actual, token)
-  auth: authReducer,
-  // Cache de datos de autenticación desde el servidor
-  [authApi.reducerPath]: authApi.reducer,
-  // Cache de datos de asignaciones desde el servidor
-  [assignmentApi.reducerPath]: assignmentApi.reducer,
-  // Cache de datos de usuarios desde el servidor
-  [userApi.reducerPath]: userApi.reducer,
+// === PERSISTENCIA REDUX ===
+// Configuración de redux-persist
+// IMPORTANTE: El whitelist debe aplicarse al reducer global, no a slices individuales
+const persistConfig = {
+  key: "root", // redux-persist lo guardará como "persist:root" automáticamente
+  storage,
+  whitelist: ["auth"], // Solo persistir el slice de auth
+  throttle: 1000, // Debounce de 1s
 };
 
+// === REDUCERS ===
+// Crear un reducer global ANTES de aplicar persistReducer
+const rootReducer = combineReducers({
+  persistence: persistenceReducer,
+  auth: authReducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [assignmentApi.reducerPath]: assignmentApi.reducer,
+  [userApi.reducerPath]: userApi.reducer,
+});
+
+// Aplicar persistReducer al reducer global
+// Ahora el whitelist funciona correctamente: solo persistirá el slice "auth"
+const persistedRootReducer = persistReducer(persistConfig, rootReducer);
+
 // === MIDDLEWARE ===
-// Funciones que interceptan y procesan las acciones
 const getMiddleware = (getDefaultMiddleware: any) => {
-  return getDefaultMiddleware().concat(
-    // Middleware para manejar peticiones de autenticación
-    authApi.middleware,
-    // Middleware para manejar peticiones de asignaciones
-    assignmentApi.middleware,
-    // Middleware para manejar peticiones de usuarios
-    userApi.middleware,
-  );
+  return getDefaultMiddleware({
+    serializableCheck: {
+      // redux-persist usa acciones que no son serializables
+      ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+    },
+  })
+    .concat(authApi.middleware, assignmentApi.middleware, userApi.middleware)
+    .concat(authMiddleware); // Agregar middleware de autenticación
 };
 
 // === STORE ===
-// Creación de la tienda de Redux
 export const store = configureStore({
-  reducer: reducers,
+  reducer: persistedRootReducer,
   middleware: getMiddleware,
 });
+
+// === PERSISTOR ===
+export const persistor = persistStore(store);
 
 // === TIPOS ===
 // Tipos TypeScript para usar en componentes

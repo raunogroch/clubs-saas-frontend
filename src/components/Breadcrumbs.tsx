@@ -1,11 +1,11 @@
 import { Button } from "./Button";
 
-interface BeadcumbsProps {
+interface BreadcrumbsProps {
   title: string;
   children?: React.ReactNode;
 }
 
-export const Beadcumbs = (props: BeadcumbsProps) => {
+export const Breadcrumbs = (props: BreadcrumbsProps) => {
   return (
     <div className="row wrapper border-bottom white-bg page-heading">
       <div className="col-sm-4">

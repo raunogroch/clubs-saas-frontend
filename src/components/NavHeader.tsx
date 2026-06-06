@@ -4,6 +4,10 @@ import { NavHeaderSearch } from "./NavHeaderSearch";
 import { Button } from "./Button";
 import { useAuthManager } from "../features/auth/authHooks";
 import { ButtonForm } from "./ButtonForm";
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from "../core/utils/localStorage";
 
 export const NavHeader = () => {
   const navigate = useNavigate();
@@ -11,7 +15,7 @@ export const NavHeader = () => {
 
   // Estado para controlar si el navbar está minimizado
   const [isMinimized, setIsMinimized] = useState(() => {
-    return localStorage.getItem("navbar_minimized") === "true";
+    return getLocalStorageItem("navbar_minimized") === "true";
   });
 
   // Sincronizar estado con el DOM
@@ -23,7 +27,7 @@ export const NavHeader = () => {
       body.classList.remove("mini-navbar");
     }
     // Persistir la preferencia
-    localStorage.setItem("navbar_minimized", isMinimized.toString());
+    setLocalStorageItem("navbar_minimized", isMinimized.toString());
   }, [isMinimized]);
 
   const handleLogout = () => {

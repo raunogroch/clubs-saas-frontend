@@ -1,5 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { Gender, Status, Roles } from "../../common/enums";
+import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
 
 export interface User {
   id: string;
@@ -29,16 +30,9 @@ export interface PaginatedResponse<User> {
 const api = createApi({
   reducerPath: "userApi",
   tagTypes: ["Users"],
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: createBaseQueryWithAuth(
+    import.meta.env.VITE_API_URL || "http://localhost:3000/api",
+  ),
   endpoints: (builder) => ({
     getUsers: builder.query<
       PaginatedResponse<User>,

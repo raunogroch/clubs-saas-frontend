@@ -1,5 +1,5 @@
 export * from "./Button";
-export * from "./Breadcumbs";
+export * from "./Breadcrumbs";
 export * from "./Footer";
 export * from "./NavHeader";
 export * from "./Sidenav";
@@ -14,3 +14,5 @@ export * from "./InputForm";
 export * from "./PaginationTable";
 export * from "./PaginationOptions";
 export * from "./IBox";
+export * from "./SplashScreen";
+export * from "./TokenExpirationWarning";

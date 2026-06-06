@@ -1,41 +1,21 @@
-// features/auth/authSlice.ts
+/**
+ * features/auth/authSlice.ts
+ *
+ * Redux slice para autenticación
+ *
+ * Principios SOLID aplicados:
+ * - SRP: Una sola responsabilidad - manejar estado de auth
+ * - Tipos centralizados en core/types (no duplicados aquí)
+ * - Persistencia delegada a redux-persist (no localStorage manual)
+ */
 
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-
-export interface User {
-  id: string;
-  name: string;
-  lastname: string;
-  username: string;
-  roles: string[];
-}
-
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
-}
-
-// Funciones auxiliares para persistencia
-const getStoredUser = (): User | null => {
-  try {
-    const stored = localStorage.getItem("auth_user");
-    return stored ? JSON.parse(stored) : null;
-  } catch {
-    return null;
-  }
-};
-
-const getStoredToken = (): string | null => {
-  return localStorage.getItem("auth_token");
-};
+import type { AuthState, User } from "../../core/types";
 
 const initialState: AuthState = {
-  user: getStoredUser(),
-  token: getStoredToken(),
-  isAuthenticated: !!(getStoredToken() && getStoredUser()),
+  user: null,
+  token: null,
+  isAuthenticated: false,
   loading: false,
   error: null,
 };
@@ -44,7 +24,11 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // Actions para manejar login exitoso
+    /**
+     * Action para login exitoso
+     *
+     * redux-persist automáticamente persistirá este estado
+     */
     loginSuccess: (
       state,
       action: PayloadAction<{ user: User; token: string }>,
@@ -54,41 +38,62 @@ export const authSlice = createSlice({
       state.isAuthenticated = true;
       state.loading = false;
       state.error = null;
-      // Persistir tanto token como usuario
-      localStorage.setItem("auth_token", action.payload.token);
-      localStorage.setItem("auth_user", JSON.stringify(action.payload.user));
     },
 
-    // Action para manejar error en login
+    /**
+     * Action para error en login
+     */
     loginFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
       state.error = action.payload;
+      state.isAuthenticated = false;
     },
 
-    // Action para establecer loading
+    /**
+     * Action para establecer estado loading
+     */
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
 
-    // Action para logout
+    /**
+     * Action para logout
+     *
+     * redux-persist automáticamente sincronizará con localStorage
+     */
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.loading = false;
       state.error = null;
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("auth_user");
     },
 
-    // Action para limpiar errores
+    /**
+     * Action para limpiar errores
+     */
     clearError: (state) => {
       state.error = null;
+    },
+
+    /**
+     * Action para actualizar datos del usuario
+     */
+    updateUser: (state, action: PayloadAction<User>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
     },
   },
 });
 
-export const { loginSuccess, loginFailure, setLoading, logout, clearError } =
-  authSlice.actions;
+export const {
+  loginSuccess,
+  loginFailure,
+  setLoading,
+  logout,
+  clearError,
+  updateUser,
+} = authSlice.actions;
 
 export default authSlice.reducer;

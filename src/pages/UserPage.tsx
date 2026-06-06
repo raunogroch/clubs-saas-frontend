@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Beadcumbs, IBox, PaginationOptions } from "../components";
+import { Breadcrumbs, IBox, PaginationOptions } from "../components";
 import { UserModal } from "../modals/UserModal";
 import { useUsers } from "../features/users/userHooks";
 import { PaginationTable } from "../components/PaginationTable";
@@ -36,7 +36,7 @@ export const UserPage = () => {
 
   return (
     <>
-      <Beadcumbs title="Usuarios">
+      <Breadcrumbs title="Usuarios">
         <button
           className="btn btn-primary"
           data-toggle="modal"
@@ -53,7 +53,7 @@ export const UserPage = () => {
             refetch();
           }}
         />
-      </Beadcumbs>
+      </Breadcrumbs>
       <div className="wrapper wrapper-content animated fadeInRight">
         <IBox title="Usuarios">
           {isLoading && <p>Cargando usuarios...</p>}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Beadcumbs, IBox, PaginationOptions } from "../components";
+import { Breadcrumbs, IBox, PaginationOptions } from "../components";
 import { AssignmentModal } from "../modals/AssignmentModal";
 import { useAssignments } from "../features/assignments/assignmentHooks";
 import { PaginationTable } from "../components/PaginationTable";
@@ -30,7 +30,7 @@ export const AssignmentPage = () => {
 
   return (
     <>
-      <Beadcumbs title="Asignaciones">
+      <Breadcrumbs title="Asignaciones">
         <button
           className="btn btn-primary"
           data-toggle="modal"
@@ -47,7 +47,7 @@ export const AssignmentPage = () => {
             refetch();
           }}
         />
-      </Beadcumbs>
+      </Breadcrumbs>
       <div className="wrapper wrapper-content animated fadeInRight">
         <IBox title="Asignaciones">
           {isLoading && <p>Cargando asignaciones...</p>}
