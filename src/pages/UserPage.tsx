@@ -3,6 +3,7 @@ import { Breadcrumbs, IBox, PaginationOptions } from "../components";
 import { UserModal } from "../modals/UserModal";
 import { useUsers } from "../features/users/userHooks";
 import { PaginationTable } from "../components/PaginationTable";
+import { useSearchSetup } from "../core/hooks/useSearchSetup";
 import type { User } from "../features/users/userApi";
 import {
   getGenderLabel,
@@ -15,6 +16,7 @@ export const UserPage = () => {
   const [selectedUser, setSelectedUser] = useState<User | undefined>();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const { searchValue } = useSearchSetup();
 
   const {
     users,
@@ -24,7 +26,7 @@ export const UserPage = () => {
     refetch,
   } = useUsers({
     role: "ADMIN",
-    search: "",
+    search: searchValue,
     page,
     limit: pageSize,
   });

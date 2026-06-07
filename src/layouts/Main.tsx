@@ -5,6 +5,7 @@ import {
   Sidenav,
   TokenExpirationWarning,
 } from "../components";
+import { SearchProvider } from "../core/context/SearchContext";
 
 interface MainProps {
   children: ReactNode;
@@ -16,14 +17,15 @@ export const Main = ({ children }: MainProps) => {
       <Sidenav />
 
       <div id="page-wrapper" className="gray-bg">
-        <NavHeader />
+        <SearchProvider>
+          <NavHeader />
 
-        {children}
+          {children}
+        </SearchProvider>
 
         <Footer companyName="CoderSoft" range="2024-2027" />
       </div>
 
-      {/* Mostrar advertencia cuando el token está próximo a expirar */}
       <TokenExpirationWarning />
     </div>
   );

@@ -4,6 +4,7 @@ import { NavHeaderSearch } from "./NavHeaderSearch";
 import { Button } from "./Button";
 import { useAuthManager } from "../features/auth/authHooks";
 import { ButtonForm } from "./ButtonForm";
+import { useSearch } from "../core/context/SearchContext";
 import {
   getLocalStorageItem,
   setLocalStorageItem,
@@ -12,6 +13,7 @@ import {
 export const NavHeader = () => {
   const navigate = useNavigate();
   const { logout } = useAuthManager();
+  const { isSearchEnabled } = useSearch();
 
   // Estado para controlar si el navbar está minimizado
   const [isMinimized, setIsMinimized] = useState(() => {
@@ -54,7 +56,7 @@ export const NavHeader = () => {
           >
             <i className="fa fa-bars"></i>
           </ButtonForm>
-          <NavHeaderSearch />
+          {isSearchEnabled && <NavHeaderSearch />}
         </div>
         <ul className="nav navbar-top-links navbar-right">
           <li>
