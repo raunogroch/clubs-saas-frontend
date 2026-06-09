@@ -68,7 +68,7 @@ export const AssignmentPage = () => {
           aria-label="Crear nueva asignación"
         >
           <i className="fa fa-plus me-2" />
-          Crear asignación
+          &nbsp;Crear asignación
         </button>
       </Breadcrumbs>
 
@@ -124,7 +124,7 @@ export const AssignmentPage = () => {
                             aria-label={`Editar asignación ${assignment.name}`}
                           >
                             <i className="fa fa-edit me-1" />
-                            Editar
+                            &nbsp;Editar
                           </button>
                         </td>
                       </tr>

@@ -41,8 +41,8 @@ export const router = createBrowserRouter([
             element: <AssignmentPage />,
           },
           {
-            path: "users",
-            element: <UserPage />,
+            path: "admins",
+            element: <UserPage role="ADMIN" />,
           },
         ],
       },

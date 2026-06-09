@@ -57,10 +57,10 @@ export const Sidenav = () => {
           />
 
           <MenuSingleOption
-            route="/users"
+            route="/admins"
             icon="users"
             name="Administradores"
-            active={pathname === "/users"}
+            active={pathname === "/admins"}
           />
         </ul>
       </div>

@@ -72,3 +72,7 @@ export interface UserModalProps {
   data?: User;
   onSaved?: () => void;
 }
+
+export interface UserPageProps {
+  role: string;
+}

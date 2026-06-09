@@ -12,8 +12,9 @@ import {
 import type { User } from "../features/users/userApi";
 import { getGenderLabel, getStatusLabel } from "../common/translations";
 import { RolesHighlight } from "../components/RolesHighlight";
+import type { UserPageProps } from "../core/interfaces";
 
-export const UserPage = () => {
+export const UserPage = (props: UserPageProps) => {
   const {
     isOpen: isModalOpen,
     selectedItem: selectedUser,
@@ -40,7 +41,7 @@ export const UserPage = () => {
   const { searchValue } = useSearchSetup();
 
   const { users, meta, isLoading, error, refetch } = useUsers({
-    role: "ADMIN",
+    role: props.role,
     search: searchValue,
     page,
     limit: pageSize,
