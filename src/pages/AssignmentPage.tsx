@@ -1,17 +1,38 @@
-import { useCallback, useState } from "react";
-import { Breadcrumbs, IBox, PaginationOptions } from "../components";
+import { Breadcrumbs, IBox, PaginationOptions, Alert } from "../components";
 import { AssignmentModal } from "../modals/AssignmentModal";
 import { useAssignments } from "../features/assignments/assignmentHooks";
 import { PaginationTable } from "../components/PaginationTable";
+import {
+  useModalManagement,
+  useAlert,
+  usePaginationState,
+  useModalSaveHandler,
+} from "../core/hooks";
 import type { Assignment } from "../core/interfaces";
 
 export const AssignmentPage = () => {
-  const [selectedAssignment, setSelectedAssignment] = useState<
-    Assignment | undefined
-  >();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const {
+    isOpen: isModalOpen,
+    selectedItem: selectedAssignment,
+    isCreating,
+    handleCreate,
+    handleEdit,
+    handleClose: handleCloseModal,
+  } = useModalManagement<Assignment>();
+
+  const {
+    isVisible: showAlert,
+    message: alertMessage,
+    showAlert: showAlertMessage,
+  } = useAlert(5000);
+
+  const {
+    page,
+    pageSize,
+    onPageChange,
+    onPageSizeChange,
+    calculateTotalPages,
+  } = usePaginationState();
 
   const {
     assignments,
@@ -24,30 +45,19 @@ export const AssignmentPage = () => {
     limit: pageSize,
   });
 
-  const totalPages =
-    meta?.totalPages ??
-    meta?.lastPage ??
-    (meta?.limit ? Math.ceil((meta?.total || 0) / meta.limit) : 1);
+  const totalPages = calculateTotalPages(meta?.total, {
+    totalPages: meta?.totalPages,
+    lastPage: meta?.lastPage,
+    limit: meta?.limit,
+  });
 
-  const handleCreate = useCallback(() => {
-    setSelectedAssignment(undefined);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleEdit = useCallback((assignment: Assignment) => {
-    setSelectedAssignment(assignment);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedAssignment(undefined);
-  }, []);
-
-  const handleSaved = useCallback(async () => {
-    await refetch();
-    handleCloseModal();
-  }, [refetch, handleCloseModal]);
+  const handleSaved = useModalSaveHandler({
+    isCreating,
+    selectedItem: selectedAssignment,
+    refetch,
+    onModalClose: handleCloseModal,
+    onShowAlert: showAlertMessage,
+  });
 
   return (
     <>
@@ -62,7 +72,6 @@ export const AssignmentPage = () => {
         </button>
       </Breadcrumbs>
 
-      {/* Modal de crear/editar asignación */}
       <AssignmentModal
         open={isModalOpen}
         onClose={handleCloseModal}
@@ -70,6 +79,7 @@ export const AssignmentPage = () => {
         onSaved={handleSaved}
       />
       <div className="wrapper wrapper-content animated fadeInRight">
+        {showAlert && <Alert type="success" message={alertMessage} />}
         <IBox title="Asignaciones">
           {isLoading && <p>Cargando asignaciones...</p>}
           {isError && (
@@ -84,8 +94,8 @@ export const AssignmentPage = () => {
                 <div className="d-flex justify-content-end mb-2">
                   <PaginationOptions
                     pageSize={pageSize}
-                    setPageSize={setPageSize}
-                    setPage={setPage}
+                    setPageSize={onPageSizeChange}
+                    setPage={onPageChange}
                   />
                 </div>
                 <table className="table table-striped">
@@ -100,10 +110,14 @@ export const AssignmentPage = () => {
                   <tbody>
                     {assignments.map((assignment, index) => (
                       <tr key={assignment.id}>
-                        <td>{(page - 1) * pageSize + index + 1}</td>
-                        <td>{assignment.name}</td>
-                        <td>{assignment.owners?.join(", ") || "N/A"}</td>
-                        <td>
+                        <td className="align-middle">
+                          {(page - 1) * pageSize + index + 1}
+                        </td>
+                        <td className="align-middle">{assignment.name}</td>
+                        <td className="align-middle">
+                          {assignment.owners?.join(", ") || "N/A"}
+                        </td>
+                        <td className="align-middle">
                           <button
                             className="btn btn-sm btn-primary"
                             onClick={() => handleEdit(assignment)}
@@ -123,7 +137,7 @@ export const AssignmentPage = () => {
                 page={page}
                 totalPages={totalPages}
                 total={meta?.total}
-                onPageChange={(newPage) => setPage(newPage)}
+                onPageChange={(newPage) => onPageChange(newPage)}
               />
             </>
           )}

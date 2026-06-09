@@ -29,7 +29,7 @@ export const PaginationTable = ({
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
           <button
             key={num}
-            className={`btn btn-sm ${page === num ? "btn-warning" : "btn-light"}`}
+            className={`btn btn-sm ${page === num ? "btn-primary" : "btn-light"}`}
             onClick={() => onPageChange(num)}
           >
             {num}
