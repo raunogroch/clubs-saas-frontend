@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuthManager } from "../features/auth/authHooks";
 import { getRoleLabel } from "../common/translations";
+import { useActiveRole } from "../core/context/ActiveRoleContext";
 import type { Roles } from "../common";
 
 export const RolesDropdown = () => {
   const { user } = useAuthManager();
+  const { activeRole, setActiveRole } = useActiveRole();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -13,16 +15,14 @@ export const RolesDropdown = () => {
 
   const rolesArray: any[] = user?.roles ?? [];
 
-  const [selectedRole, setSelectedRole] = useState<Roles | undefined>();
-
   useEffect(() => {
     if (
       rolesArray.length > 0 &&
-      (!selectedRole || !rolesArray.includes(selectedRole))
+      (!activeRole || !rolesArray.includes(activeRole))
     ) {
-      setSelectedRole(rolesArray[0]);
+      setActiveRole(rolesArray[0]);
     }
-  }, [rolesArray, selectedRole]);
+  }, [rolesArray, activeRole, setActiveRole]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -46,28 +46,25 @@ export const RolesDropdown = () => {
   }
 
   const handleRoleSelect = (role: Roles) => {
-    setSelectedRole(role);
+    setActiveRole(role);
     setIsOpen(false);
-
-    // TODO:
-    // dispatch(setActiveRole(role));
   };
 
   if (import.meta.env.DEV) {
     console.log("Usuario:", user);
     console.log("Roles:", rolesArray);
-    console.log("Rol seleccionado:", selectedRole);
+    console.log("Rol activo:", activeRole);
   }
 
   return (
     <div ref={dropdownRef} style={{ position: "relative" }}>
       <button
         type="button"
-        className="btn btn-xs btn-white"
+        className="btn btn-white"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        title={`Rol actual: ${getRoleLabel(selectedRole)}`}
+        title={`Rol actual: ${getRoleLabel(activeRole)}`}
         style={{
           display: "flex",
           alignItems: "center",
@@ -76,14 +73,7 @@ export const RolesDropdown = () => {
       >
         <i className="fa fa-exchange" />
 
-        <span
-          className="label label-primary"
-          style={{
-            fontSize: "11px",
-          }}
-        >
-          {getRoleLabel(selectedRole)}
-        </span>
+        <span className="label label-danger">{getRoleLabel(activeRole)}</span>
       </button>
 
       {isOpen && (
@@ -112,13 +102,13 @@ export const RolesDropdown = () => {
                   padding: "8px 12px",
                   cursor: "pointer",
                   backgroundColor:
-                    selectedRole === role ? "#f3f3f3" : "transparent",
-                  fontWeight: selectedRole === role ? "bold" : "normal",
+                    activeRole === role ? "#f3f3f3" : "transparent",
+                  fontWeight: activeRole === role ? "bold" : "normal",
                 }}
               >
                 <i
                   className={`fa ${
-                    selectedRole === role ? "fa-check-circle" : "fa-circle-o"
+                    activeRole === role ? "fa-check-circle" : "fa-circle-o"
                   }`}
                   style={{
                     marginRight: "8px",

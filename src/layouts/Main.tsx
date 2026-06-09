@@ -6,6 +6,7 @@ import {
   TokenExpirationWarning,
 } from "../components";
 import { SearchProvider } from "../core/context/SearchContext";
+import { ActiveRoleProvider } from "../core/context/ActiveRoleContext";
 
 interface MainProps {
   children: ReactNode;
@@ -14,19 +15,21 @@ interface MainProps {
 export const Main = ({ children }: MainProps) => {
   return (
     <div id="wrapper">
-      <Sidenav />
+      <ActiveRoleProvider>
+        <Sidenav />
 
-      <div id="page-wrapper" className="gray-bg">
-        <SearchProvider>
-          <NavHeader />
+        <div id="page-wrapper" className="gray-bg">
+          <SearchProvider>
+            <NavHeader />
 
-          {children}
-        </SearchProvider>
+            {children}
+          </SearchProvider>
 
-        <Footer companyName="CoderSoft" range="2024-2027" />
-      </div>
+          <Footer companyName="CoderSoft" range="2024-2027" />
+        </div>
 
-      <TokenExpirationWarning />
+        <TokenExpirationWarning />
+      </ActiveRoleProvider>
     </div>
   );
 };

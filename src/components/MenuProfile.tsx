@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router";
 import { DropdownMenu } from "./DropdownMenu";
 import { useAuthManager } from "../features/auth/authHooks";
+import { useActiveRole } from "../core/context/ActiveRoleContext";
 import { getRoleLabel } from "../common/translations";
 import type { MenuProfileProps } from "../core/interfaces";
 
 export const MenuProfile = (props: MenuProfileProps) => {
   const navigate = useNavigate();
   const { logout } = useAuthManager();
+  const { activeRole } = useActiveRole();
 
   const handleLogout = () => {
     logout();
@@ -19,7 +21,7 @@ export const MenuProfile = (props: MenuProfileProps) => {
       <Link data-toggle="dropdown" className="dropdown-toggle" to="#">
         <span className="block m-t-xs font-bold">{props.name}</span>
         <span className="text-muted text-xs block">
-          {props.roles.map((role: any) => getRoleLabel(role)).join(", ")}
+          {getRoleLabel(activeRole)}
           <b className="caret"></b>
         </span>
       </Link>
