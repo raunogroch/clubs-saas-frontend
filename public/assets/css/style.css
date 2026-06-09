@@ -4721,7 +4721,7 @@ ol.unstyled {
 }
 /* FOOTER */
 .footer {
-  background: none repeat scroll 0 0 white;
+  background: none repeat scroll 0 0 #f3f3f4;
   border-top: 1px solid #e7eaec;
   bottom: 0;
   left: 0;
@@ -4736,7 +4736,7 @@ ol.unstyled {
   right: 0;
   z-index: 1000;
   padding: 10px 20px;
-  background: white;
+  background: #f3f3f4;
   border-top: 1px solid #e7eaec;
 }
 .footer.fixed {

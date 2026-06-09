@@ -42,7 +42,7 @@ export const NavHeader = () => {
   };
 
   return (
-    <div className="row border-bottom">
+    <div className="row ">
       <nav
         className="navbar navbar-static-top  "
         role="navigation"
