@@ -1,0 +1,11 @@
+services:
+  frontend:
+    container_name: clubs-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=${VITE_API_URL}

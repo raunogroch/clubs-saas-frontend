@@ -8,6 +8,13 @@
 import type { Storage } from "redux-persist";
 
 /**
+ * Interfaz extendida que incluye el método clear()
+ */
+interface ExtendedStorage extends Storage {
+  clear(): Promise<void>;
+}
+
+/**
  * Storage en memoria (fallback cuando localStorage no está disponible)
  * Se usa si localStorage no está definido (SSR, tests, etc.)
  */
@@ -18,7 +25,7 @@ const inMemoryStorage: Record<string, string> = {};
  * Si no está disponible, usa un almacenamiento en memoria
  * Implementa la interfaz de Storage de redux-persist
  */
-const storage: Storage = {
+const storage: ExtendedStorage = {
   getItem: (key: string) => {
     try {
       // Si localStorage está disponible, úsalo
