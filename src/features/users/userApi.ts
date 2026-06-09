@@ -1,31 +1,12 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { Gender, Status, Roles } from "../../common/enums";
 import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
-
-export interface User {
-  id: string;
-  name: string;
-  lastname: string;
-  dni: string;
-  username: string;
-  roles: Roles[];
-  gender?: Gender;
-  birthDate?: Date;
-  phone?: string;
-  address?: string;
-  status?: Status;
-}
-
-export interface PaginatedResponse<User> {
-  data: User[];
-  meta: {
-    total: number;
-    page: number;
-    limit?: number;
-    totalPages?: number;
-    lastPage?: number;
-  };
-}
+import type {
+  User,
+  UserRole,
+  CreateUserDto,
+  UpdateUserDto,
+  PaginatedResponse,
+} from "../../core/interfaces";
 
 const api = createApi({
   reducerPath: "userApi",
@@ -60,10 +41,7 @@ const api = createApi({
       providesTags: ["Users"],
     }),
 
-    createUser: builder.mutation<
-      User,
-      Omit<User, "id"> & { password?: string }
-    >({
+    createUser: builder.mutation<User, CreateUserDto>({
       query: (body) => ({
         url: "/users",
         method: "POST",
@@ -72,14 +50,12 @@ const api = createApi({
       invalidatesTags: ["Users"],
     }),
 
-    updateUser: builder.mutation<User, User>({
-      query: (body) => {
-        return {
-          url: `/users/${body.id}`,
-          method: "PATCH",
-          body: body,
-        };
-      },
+    updateUser: builder.mutation<User, UpdateUserDto>({
+      query: (body) => ({
+        url: `/users/${body.id}`,
+        method: "PATCH",
+        body,
+      }),
       invalidatesTags: ["Users"],
     }),
   }),
@@ -92,3 +68,6 @@ export const {
 } = api;
 export const userApi = api;
 export default api;
+
+// Re-export tipos para compatibilidad hacia atrás
+export type { User, UserRole, CreateUserDto, UpdateUserDto, PaginatedResponse };

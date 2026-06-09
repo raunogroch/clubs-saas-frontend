@@ -9,6 +9,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from "../core/utils/localStorage";
+import { RolesDropdown } from "./RolesDropdown";
 
 export const NavHeader = () => {
   const navigate = useNavigate();
@@ -28,7 +29,6 @@ export const NavHeader = () => {
     } else {
       body.classList.remove("mini-navbar");
     }
-    // Persistir la preferencia
     setLocalStorageItem("navbar_minimized", isMinimized.toString());
   }, [isMinimized]);
 
@@ -57,6 +57,16 @@ export const NavHeader = () => {
             <i className="fa fa-bars"></i>
           </ButtonForm>
           {isSearchEnabled && <NavHeaderSearch />}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          <RolesDropdown />
         </div>
         <ul className="nav navbar-top-links navbar-right">
           <li>

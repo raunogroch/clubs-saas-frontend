@@ -1,5 +1,9 @@
 import { Link } from "react-router";
 
+interface IconProps {
+  icon: string;
+}
+
 interface ButtonProps {
   text: string;
   className?: string;
@@ -7,10 +11,6 @@ interface ButtonProps {
   route?: string;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
-}
-
-interface IconProps {
-  icon: string;
 }
 
 export const Button = ({

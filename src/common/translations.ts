@@ -26,8 +26,8 @@ export const getGenderLabel = (gender?: Gender): string => {
   return gender ? genderLabels[gender] : "N/A";
 };
 
-export const getRoleLabel = (role: Roles): string => {
-  return rolesLabels[role] || role;
+export const getRoleLabel = (role?: Roles): string => {
+  return role ? rolesLabels[role] : "Sin rol";
 };
 
 export const getStatusLabel = (status?: Status): string => {

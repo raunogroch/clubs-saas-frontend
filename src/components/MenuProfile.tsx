@@ -2,12 +2,7 @@ import { Link, useNavigate } from "react-router";
 import { DropdownMenu } from "./DropdownMenu";
 import { useAuthManager } from "../features/auth/authHooks";
 import { getRoleLabel } from "../common/translations";
-
-interface MenuProfileProps {
-  imageUrl: string;
-  name: string;
-  roles: string[];
-}
+import type { MenuProfileProps } from "../core/interfaces";
 
 export const MenuProfile = (props: MenuProfileProps) => {
   const navigate = useNavigate();

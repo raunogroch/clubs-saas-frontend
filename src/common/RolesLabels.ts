@@ -1,5 +1,5 @@
 export const RolesLabels = {
-  SUPER_ADMIN: "Super",
+  SUPER_ADMIN: "Superadministrador",
   ADMIN: "Administrador",
   ASSISTANT: "Asistente",
   COACH: "Entrenador",

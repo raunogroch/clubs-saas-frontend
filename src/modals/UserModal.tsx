@@ -1,35 +1,83 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
-import { InputForm, Modal } from "../components";
-import { useCreateUser, useUpdateUser } from "../features/users/userHooks";
-import type { User } from "../features/users/userApi";
-import {
-  genderLabels,
-  statusLabels,
-  rolesLabels,
-} from "../common/translations";
-import { Roles } from "../common/enums";
 
-type Inputs = {
-  name: string;
-  lastname: string;
-  dni: string;
-  username: string;
-  roles: Array<{ id: string; role: Roles }>;
-  gender?: string;
-  birthDate?: string;
-  phone?: string;
-  address?: string;
-  status?: string;
+import { InputForm, Modal } from "../components";
+import { RolesFieldArray } from "../components/RolesFieldArray";
+
+import { useCreateUser, useUpdateUser } from "../features/users/userHooks";
+import type {
+  User,
+  CreateUserDto,
+  UpdateUserDto,
+} from "../features/users/userApi";
+
+import { genderLabels, statusLabels } from "../common/translations";
+import type { Gender, Roles, Status } from "../common/enums";
+import type { UserFormInputs } from "../core/types";
+import type { UserModalProps } from "../core/interfaces";
+
+// Opciones de selects - Memoizadas fuera del componente
+const genderOptions = Object.entries(genderLabels).map(([value, label]) => ({
+  value,
+  label,
+}));
+
+const statusOptions = Object.entries(statusLabels).map(([value, label]) => ({
+  value,
+  label,
+}));
+
+// Valores por defecto
+const emptyForm: UserFormInputs = {
+  name: "",
+  lastname: "",
+  dni: "",
+  username: "",
+  roles: [{ role: "" }],
+  gender: "",
+  birthDate: "",
+  phone: "",
+  address: "",
+  status: "",
 };
 
-interface UserModalProps {
-  identifier: string;
-  data?: User;
-  onSaved?: () => void;
-}
+/**
+ * Transforma un usuario de la API al formato del formulario
+ * Maneja conversiones de tipos y values vacíos
+ */
+const mapUserToForm = (user?: User): UserFormInputs => {
+  if (!user) {
+    return emptyForm;
+  }
 
-export const UserModal = (props: UserModalProps) => {
+  return {
+    name: user.name ?? "",
+    lastname: user.lastname ?? "",
+    dni: user.dni ?? "",
+    username: user.username ?? "",
+
+    // Transformar roles: UserRole[] → { role: Roles | "" }[]
+    roles:
+      user.roles && user.roles.length > 0
+        ? user.roles.map((userRole) => ({
+            role: userRole.role as Roles, // UserRole.role es siempre Roles
+          }))
+        : [{ role: "" }],
+
+    gender: user.gender ?? "",
+
+    // Manejo seguro de dates (usar ISO string sin conversión)
+    birthDate: user.birthDate
+      ? new Date(user.birthDate).toISOString().split("T")[0]
+      : "",
+
+    phone: user.phone ?? "",
+    address: user.address ?? "",
+    status: user.status ?? "",
+  };
+};
+
+export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
   const {
     createUser,
     isLoading: isCreating,
@@ -41,35 +89,21 @@ export const UserModal = (props: UserModalProps) => {
     error: updateError,
   } = useUpdateUser();
 
-  const isEdit = Boolean(props.data?.id);
+  const isEdit = Boolean(data?.id);
   const isSaving = isCreating || isUpdating;
   const error = createError || updateError;
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
     control,
-  } = useForm<Inputs>({
-    defaultValues: {
-      name: props.data?.name ?? "",
-      lastname: props.data?.lastname ?? "",
-      dni: props.data?.dni ?? "",
-      username: props.data?.username ?? "",
-      roles:
-        props.data?.roles?.map((roleObj: any) => ({
-          id: roleObj.id,
-          role: roleObj.role,
-        })) ?? [],
-      gender: props.data?.gender ?? "",
-      birthDate: props.data?.birthDate
-        ? new Date(props.data.birthDate).toISOString().split("T")[0]
-        : "",
-      phone: props.data?.phone ?? "",
-      address: props.data?.address ?? "",
-      status: props.data?.status ?? "",
-    },
+    setError,
+    clearErrors,
+  } = useForm<UserFormInputs>({
+    mode: "onBlur", // Validar solo cuando pierde el foco
+    defaultValues: emptyForm,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -77,105 +111,125 @@ export const UserModal = (props: UserModalProps) => {
     name: "roles",
   });
 
+  /**
+   * Reset del formulario cuando cambia el usuario a editar
+   * Optimizado: solo resetea cuando open=true y cambia data
+   */
   useEffect(() => {
-    reset({
-      name: props.data?.name ?? "",
-      lastname: props.data?.lastname ?? "",
-      dni: props.data?.dni ?? "",
-      username: props.data?.username ?? "",
-      roles:
-        props.data?.roles?.map((roleObj: any) => ({
-          id: roleObj.id,
-          role: roleObj.role,
-        })) ?? [],
-      gender: props.data?.gender ?? "",
-      birthDate: props.data?.birthDate
-        ? new Date(props.data.birthDate).toISOString().split("T")[0]
-        : "",
-      phone: props.data?.phone ?? "",
-      address: props.data?.address ?? "",
-      status: props.data?.status ?? "",
-    });
-  }, [props.data, reset]);
-
-  const hideModal = () => {
-    const $ = (window as any).jQuery || (window as any).$;
-    if ($) {
-      $(`#${props.identifier}`).modal("hide");
-      return;
+    if (open) {
+      reset(mapUserToForm(data));
+      clearErrors(); // Limpiar errores previos
     }
+  }, [open, data, reset, clearErrors]);
 
-    const modal = document.getElementById(props.identifier);
-    if (modal) {
-      modal.classList.remove("in");
-      modal.style.display = "none";
-    }
-    const backdrop = document.querySelector(".modal-backdrop");
-    if (backdrop) {
-      backdrop.remove();
-    }
-    document.body.classList.remove("modal-open");
-  };
+  /**
+   * Lógica de envío del formulario
+   * Incluye validaciones, transformaciones y manejo de errores
+   */
+  const onSubmit: SubmitHandler<UserFormInputs> = useCallback(
+    async (formData) => {
+      try {
+        // Validar roles (al menos uno debe estar seleccionado)
+        const roles = formData.roles
+          .map((r) => r.role)
+          .filter((role): role is Roles => role !== "");
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    try {
-      const rolesArray = data.roles
-        .map((r) => r.role)
-        .filter((r) => r && String(r).trim().length > 0);
+        if (roles.length === 0) {
+          setError("roles", {
+            type: "manual",
+            message: "Debe seleccionar al menos un rol",
+          });
+          return;
+        }
 
-      const userData: any = {
-        name: data.name,
-        lastname: data.lastname,
-        dni: data.dni,
-        username: data.username,
-        roles: rolesArray,
-      };
+        // Construir payload con transformaciones
+        const basePayload = {
+          name: formData.name.trim(),
+          lastname: formData.lastname.trim(),
+          dni: formData.dni.trim(),
+          username: formData.username.trim(),
+          roles,
+          ...(formData.gender && { gender: formData.gender as Gender }),
+          ...(formData.status && { status: formData.status as Status }),
+          ...(formData.phone && { phone: formData.phone.trim() }),
+          ...(formData.address && { address: formData.address.trim() }),
+          ...(formData.birthDate && {
+            birthDate: new Date(formData.birthDate),
+          }),
+        };
 
-      // Agregar campos opcionales si existen
-      if (data.gender) userData.gender = data.gender;
-      if (data.birthDate) userData.birthDate = new Date(data.birthDate);
-      if (data.phone) userData.phone = data.phone;
-      if (data.address) userData.address = data.address;
-      if (data.status) userData.status = data.status;
+        // Crear o actualizar según contexto
+        if (isEdit && data?.id) {
+          const updatePayload: UpdateUserDto = {
+            id: data.id,
+            ...basePayload,
+          };
+          await updateUser(updatePayload);
+        } else {
+          const createPayload: CreateUserDto = {
+            ...basePayload,
+            password: formData.dni.trim(), // Password = DNI inicial
+          };
+          await createUser(createPayload);
+        }
 
-      if (isEdit && props.data?.id) {
-        await updateUser({ id: props.data.id, ...userData });
-      } else {
-        // Cuando se crea un nuevo usuario, usar el DNI como contraseña
-        await createUser({ ...userData, password: data.dni });
+        // Éxito: resetear y cerrar
+        reset(emptyForm);
+        onSaved?.();
+        onClose();
+      } catch (error) {
+        console.error("Error al guardar usuario:", error);
+        // Los errores se manejan via createError/updateError en RTK Query
       }
-
-      reset();
-      hideModal();
-      props.onSaved?.();
-    } catch (err) {
-      console.error("Error al guardar usuario:", err);
-    }
-  };
+    },
+    [
+      isEdit,
+      data?.id,
+      updateUser,
+      createUser,
+      onSaved,
+      onClose,
+      reset,
+      setError,
+    ],
+  );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Modal
-        title={isEdit ? "Actualizar usuario" : "Crear usuario"}
-        description={
-          isEdit
-            ? "Modifica los campos que deseas actualizar y haz clic en 'Actualizar'."
-            : "Completa los campos para crear un nuevo usuario. El DNI se usará como contraseña inicial."
-        }
-        identifier={props.identifier}
-        buttonName={isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
-        size="lg"
-      >
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={isEdit ? "Actualizar usuario" : "Crear usuario"}
+      description={
+        isEdit
+          ? "Modifica los datos del usuario seleccionado"
+          : "El DNI será utilizado como contraseña inicial"
+      }
+      size="lg"
+    >
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Error global del API */}
         {error && (
-          <div className="alert alert-danger" role="alert">
-            {typeof error === "string" ? error : "Error al guardar usuario"}
+          <div className="alert alert-danger alert-dismissible" role="alert">
+            <button
+              type="button"
+              className="close"
+              onClick={() => clearErrors()}
+              aria-label="Cerrar"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Error:</strong>{" "}
+            {typeof error === "string"
+              ? error
+              : "No se pudo guardar el usuario"}
           </div>
         )}
 
+        {/* Contenido del formulario en dos columnas */}
+
         <div className="row">
-          {/* Columna Izquierda - Información Personal */}
           <div className="col-md-6">
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Nombre"
               name="name"
               register={register}
@@ -184,7 +238,7 @@ export const UserModal = (props: UserModalProps) => {
               disabled={isSaving}
             />
 
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Apellido"
               name="lastname"
               register={register}
@@ -193,16 +247,16 @@ export const UserModal = (props: UserModalProps) => {
               disabled={isSaving}
             />
 
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Carnet"
               name="dni"
               register={register}
               errors={errors}
-              required="El DNI es obligatorio"
+              required="El carnet es obligatorio"
               disabled={isSaving}
             />
 
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Usuario"
               name="username"
               register={register}
@@ -211,110 +265,93 @@ export const UserModal = (props: UserModalProps) => {
               disabled={isSaving}
             />
 
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Género"
               name="gender"
               register={register}
               errors={errors}
               type="select"
-              required="El género es obligatorio"
-              options={Object.entries(genderLabels).map(([value, label]) => ({
-                value,
-                label,
-              }))}
+              options={genderOptions}
               disabled={isSaving}
             />
           </div>
 
-          {/* Columna Derecha - Información Adicional */}
           <div className="col-md-6">
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Nacimiento"
               name="birthDate"
               register={register}
               errors={errors}
               type="date"
-              required="La fecha de nacimiento es obligatoria"
               disabled={isSaving}
             />
 
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Teléfono"
               name="phone"
               register={register}
               errors={errors}
-              required="El teléfono es obligatorio"
               disabled={isSaving}
             />
 
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Dirección"
               name="address"
               register={register}
               errors={errors}
-              required="La dirección es obligatoria"
               disabled={isSaving}
             />
 
-            <InputForm
+            <InputForm<UserFormInputs>
               title="Estado"
               name="status"
               register={register}
               errors={errors}
               type="select"
-              required="El estado es obligatorio"
-              options={Object.entries(statusLabels).map(([value, label]) => ({
-                value,
-                label,
-              }))}
+              options={statusOptions}
               disabled={isSaving}
             />
-            <div className="form-group row mt-3">
-              <label className="col-sm-2 col-form-label">Roles</label>
-              <div className="col-sm-10">
-                {fields.map((field, index) => (
-                  <div key={field.id} className="input-group mb-2">
-                    <select
-                      className="form-control"
-                      {...register(`roles.${index}.role` as const, {
-                        required: "El rol es obligatorio",
-                      })}
-                      disabled={isSaving}
-                    >
-                      <option value="">Seleccionar rol...</option>
-                      {Object.entries(Roles).map(([value]) => (
-                        <option key={value} value={value}>
-                          {rolesLabels[value as Roles]}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="input-group-append">
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        onClick={() => remove(index)}
-                        disabled={isSaving}
-                      >
-                        <i className="fa fa-trash" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  className="btn btn-sm btn-success"
-                  onClick={() =>
-                    append({ id: String(fields.length), role: "" as any })
-                  }
-                  disabled={isSaving}
-                >
-                  <i className="fa fa-plus" aria-hidden="true"></i> agregar rol
-                </button>
-              </div>
-            </div>
+
+            <RolesFieldArray
+              fields={fields}
+              append={append}
+              remove={remove}
+              register={register}
+              isSaving={isSaving}
+              error={errors.roles?.message}
+            />
           </div>
         </div>
-      </Modal>
-    </form>
+
+        {/* Footer con botones */}
+        <div className="modal-footer">
+          <button
+            type="button"
+            className="btn btn-white"
+            onClick={onClose}
+            disabled={isSaving}
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isSaving || isSubmitting}
+          >
+            {isSaving ? (
+              <>
+                <span className="fa fa-spinner fa-spin me-2" />
+                Guardando...
+              </>
+            ) : isEdit ? (
+              "Actualizar"
+            ) : (
+              "Crear"
+            )}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 };

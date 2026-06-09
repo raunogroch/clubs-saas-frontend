@@ -1,104 +1,76 @@
 /**
  * core/hooks/usePermissions.ts
  *
- * Hook para validar roles y permisos del usuario actual
+ * Hook para validar roles del usuario actual
  *
  * Principios SOLID:
- * - SRP: Una responsabilidad - validar permisos
- * - ISP: Interfaz específica para permisos, no mezclar con autenticación
+ * - SRP: Una responsabilidad - validar roles
+ * - ISP: Interfaz específica para roles
  *
  * Uso:
  * ```typescript
- * const { hasRole, hasPermission, can } = usePermissions();
+ * const { hasRole, isAdmin } = usePermissions();
  *
  * if (hasRole('ADMIN')) {
  *   // Mostrar UI de admin
  * }
- *
- * if (can('delete:users')) {
- *   // Mostrar botón delete
- * }
  * ```
  */
 
+import type { Roles } from "../../common";
+import type { UsePermissionsReturn } from "../interfaces";
 import { useAuth } from "./useAuth";
 
-export interface UsePermissionsReturn {
-  hasRole: (role: string) => boolean;
-  hasAnyRole: (roles: string[]) => boolean;
-  hasAllRoles: (roles: string[]) => boolean;
-  hasPermission: (permission: string) => boolean;
-  hasAnyPermission: (permissions: string[]) => boolean;
-  can: (permission: string) => boolean; // Alias para hasPermission
-  isAdmin: () => boolean;
-  isModerator: () => boolean;
-  isUser: () => boolean;
-}
-
 /**
- * Hook que proporciona métodos para validar roles y permisos
+ * Hook que proporciona métodos para validar roles
  *
  * Características:
  * - Validación de roles individuales
  * - Validación de múltiples roles (ANY / ALL)
- * - Validación de permisos específicos
- * - Helpers predefinidos (isAdmin, isModerator, etc.)
+ * - Helpers predefinidos (isAdmin, isParent, isAthlete, etc.)
  *
  * @returns {UsePermissionsReturn}
  */
 export const usePermissions = (): UsePermissionsReturn => {
   const { user } = useAuth();
 
-  const hasRole = (role: string): boolean => {
-    if (!user) return false;
-    return user.roles.includes(role);
+  const hasRole = (role: Roles): boolean => {
+    if (!user || !user.roles) return false;
+    return user.roles.some((userRole) => userRole.role === role);
   };
 
-  const hasAnyRole = (roles: string[]): boolean => {
-    if (!user) return false;
-    return roles.some((role) => user.roles.includes(role));
+  const hasAnyRole = (roles: Roles[]): boolean => {
+    if (!user || !user.roles) return false;
+    return roles.some((role) =>
+      user.roles.some((userRole) => userRole.role === role),
+    );
   };
 
-  const hasAllRoles = (roles: string[]): boolean => {
-    if (!user) return false;
-    return roles.every((role) => user.roles.includes(role));
-  };
-
-  const hasPermission = (permission: string): boolean => {
-    if (!user || !user.permissions) return false;
-    return user.permissions.includes(permission);
-  };
-
-  const hasAnyPermission = (permissions: string[]): boolean => {
-    if (!user || !user.permissions) return false;
-    return permissions.some((p) => user.permissions?.includes(p));
-  };
-
-  const can = (permission: string): boolean => {
-    return hasPermission(permission);
+  const hasAllRoles = (roles: Roles[]): boolean => {
+    if (!user || !user.roles) return false;
+    return roles.every((role) =>
+      user.roles.some((userRole) => userRole.role === role),
+    );
   };
 
   const isAdmin = (): boolean => {
     return hasRole("ADMIN");
   };
 
-  const isModerator = (): boolean => {
-    return hasRole("MODERATOR");
+  const isParent = (): boolean => {
+    return hasRole("PARENT");
   };
 
-  const isUser = (): boolean => {
-    return hasRole("USER");
+  const isAthlete = (): boolean => {
+    return hasRole("ATHLETE");
   };
 
   return {
     hasRole,
     hasAnyRole,
     hasAllRoles,
-    hasPermission,
-    hasAnyPermission,
-    can,
     isAdmin,
-    isModerator,
-    isUser,
+    isParent,
+    isAthlete,
   };
 };

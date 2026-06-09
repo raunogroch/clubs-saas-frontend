@@ -1,17 +1,7 @@
 // features/auth/authApi.ts
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { User } from "./authSlice";
-
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  user: User;
-  token: string;
-}
+import type { LoginRequest, LoginResponse } from "../../core/interfaces";
 
 const api = createApi({
   reducerPath: "authApi",
@@ -39,3 +29,6 @@ const api = createApi({
 export const { useLoginMutation, useValidateTokenQuery } = api;
 export const authApi = api;
 export default api;
+
+// Re-export tipo para compatibilidad hacia atrás
+export type { LoginResponse };

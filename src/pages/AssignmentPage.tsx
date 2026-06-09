@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Breadcrumbs, IBox, PaginationOptions } from "../components";
 import { AssignmentModal } from "../modals/AssignmentModal";
 import { useAssignments } from "../features/assignments/assignmentHooks";
 import { PaginationTable } from "../components/PaginationTable";
-import type { Assignment } from "../features/assignments/assignmentApi";
+import type { Assignment } from "../core/interfaces";
 
 export const AssignmentPage = () => {
   const [selectedAssignment, setSelectedAssignment] = useState<
     Assignment | undefined
   >();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -28,26 +29,46 @@ export const AssignmentPage = () => {
     meta?.lastPage ??
     (meta?.limit ? Math.ceil((meta?.total || 0) / meta.limit) : 1);
 
+  const handleCreate = useCallback(() => {
+    setSelectedAssignment(undefined);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleEdit = useCallback((assignment: Assignment) => {
+    setSelectedAssignment(assignment);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedAssignment(undefined);
+  }, []);
+
+  const handleSaved = useCallback(async () => {
+    await refetch();
+    handleCloseModal();
+  }, [refetch, handleCloseModal]);
+
   return (
     <>
       <Breadcrumbs title="Asignaciones">
         <button
           className="btn btn-primary"
-          data-toggle="modal"
-          data-target="#assignmentModal"
-          onClick={() => setSelectedAssignment(undefined)}
+          onClick={handleCreate}
+          aria-label="Crear nueva asignación"
         >
-          Crear asignacion
+          <i className="fa fa-plus me-2" />
+          Crear asignación
         </button>
-        <AssignmentModal
-          identifier="assignmentModal"
-          data={selectedAssignment}
-          onSaved={() => {
-            setSelectedAssignment(undefined);
-            refetch();
-          }}
-        />
       </Breadcrumbs>
+
+      {/* Modal de crear/editar asignación */}
+      <AssignmentModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        data={selectedAssignment}
+        onSaved={handleSaved}
+      />
       <div className="wrapper wrapper-content animated fadeInRight">
         <IBox title="Asignaciones">
           {isLoading && <p>Cargando asignaciones...</p>}
@@ -85,10 +106,10 @@ export const AssignmentPage = () => {
                         <td>
                           <button
                             className="btn btn-sm btn-primary"
-                            data-toggle="modal"
-                            data-target="#assignmentModal"
-                            onClick={() => setSelectedAssignment(assignment)}
+                            onClick={() => handleEdit(assignment)}
+                            aria-label={`Editar asignación ${assignment.name}`}
                           >
+                            <i className="fa fa-edit me-1" />
                             Editar
                           </button>
                         </td>

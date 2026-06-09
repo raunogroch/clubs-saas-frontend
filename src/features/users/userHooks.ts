@@ -1,23 +1,29 @@
-// features/users/userHooks.ts
-
 import { useCallback, useMemo } from "react";
+
 import {
   useCreateUserMutation,
   useGetUsersQuery,
   useUpdateUserMutation,
 } from "./userApi";
-import type { User } from "./userApi";
 
-/**
- * Hook para obtener todos los usuarios
- * Maneja estado de carga, errores y caché automático
- */
-export const useUsers = (params?: {
+import type { User, CreateUserDto, UpdateUserDto } from "./userApi";
+
+interface UseUsersParams {
   role?: string;
   search?: string;
   page?: number;
   limit?: number;
-}) => {
+}
+
+/**
+ * Hook para obtener lista paginada de usuarios
+ *
+ * Manejo automático de:
+ * - Refetch en cambios de parámetros
+ * - Estados de carga y error
+ * - Invalidation de tags
+ */
+export const useUsers = (params?: UseUsersParams) => {
   const queryParams = {
     role: params?.role,
     search: params?.search,
@@ -28,96 +34,115 @@ export const useUsers = (params?: {
   const { data, isLoading, error, refetch } = useGetUsersQuery(queryParams);
 
   return {
-    users: data?.data || [],
+    users: data?.data ?? [],
     meta: data?.meta,
     isLoading,
-    error,
+    error: error
+      ? typeof error === "string"
+        ? error
+        : "Error al cargar usuarios"
+      : null,
     refetch,
     isEmpty: !isLoading && (!data?.data || data.data.length === 0),
   };
 };
 
 /**
- * Hook para crear un usuario
- * Encapsula la mutación y su estado
+ * Hook para crear usuario
+ *
+ * RTK Query invalida automáticamente la caché después de éxito
  */
 export const useCreateUser = () => {
-  const [createUser, { isLoading, error }] = useCreateUserMutation();
+  const [createUserMutation, { isLoading, error }] = useCreateUserMutation();
 
-  const handleCreateUser = useCallback(
-    async (user: Omit<User, "id">) => {
-      return await createUser(user).unwrap();
+  const createUser = useCallback(
+    async (user: CreateUserDto) => {
+      return await createUserMutation(user).unwrap();
     },
-    [createUser],
+    [createUserMutation],
   );
 
-  return {
-    createUser: handleCreateUser,
-    isLoading,
-    error,
-  };
-};
-
-export const useUpdateUser = () => {
-  const [updateUser, { isLoading, error }] = useUpdateUserMutation();
-
-  const handleUpdateUser = useCallback(
-    async (user: User) => {
-      return await updateUser(user).unwrap();
-    },
-    [updateUser],
-  );
+  const errorMessage = error
+    ? typeof error === "string"
+      ? error
+      : (error as any)?.status === 409
+        ? "El usuario ya existe"
+        : "Error al crear usuario"
+    : null;
 
   return {
-    updateUser: handleUpdateUser,
+    createUser,
     isLoading,
-    error,
+    error: errorMessage,
   };
 };
 
 /**
- * Hook para obtener un usuario por ID
+ * Hook para actualizar usuario
+ *
+ * RTK Query invalida automáticamente la caché después de éxito
+ */
+export const useUpdateUser = () => {
+  const [updateUserMutation, { isLoading, error }] = useUpdateUserMutation();
+
+  const updateUser = useCallback(
+    async (user: UpdateUserDto) => {
+      return await updateUserMutation(user).unwrap();
+    },
+    [updateUserMutation],
+  );
+
+  const errorMessage = error
+    ? typeof error === "string"
+      ? error
+      : (error as any)?.status === 409
+        ? "El usuario ya existe"
+        : (error as any)?.status === 404
+          ? "Usuario no encontrado"
+          : "Error al actualizar usuario"
+    : null;
+
+  return {
+    updateUser,
+    isLoading,
+    error: errorMessage,
+  };
+};
+
+/**
+ * Hook para obtener usuario por ID desde la lista en caché
+ *
+ * No realiza request, solo busca en datos existentes
  */
 export const useUserById = (id: string | undefined) => {
   const { users, isLoading } = useUsers();
 
-  const user = useMemo(() => users.find((u) => u.id === id), [users, id]);
+  const user = useMemo(() => users.find((u: User) => u.id === id), [users, id]);
 
   return {
     user,
     isLoading,
-    found: !!user,
+    found: Boolean(user),
   };
 };
 
 /**
- * Hook para gestionar el estado de usuarios
- * Proporciona acceso centralizado a todas las operaciones
+ * Hook centralizado para gestión completa de usuarios
+ * Agrupa toda la lógica en un solo place
  */
-export const useUserManager = () => {
-  const { users, isLoading, error, refetch, isEmpty } = useUsers();
-  const { createUser, isLoading: isCreating } = useCreateUser();
-  const { updateUser, isLoading: isUpdating } = useUpdateUser();
-
-  // Obtener estadísticas
-  const stats = useMemo(
-    () => ({
-      totalUsers: users.length,
-      isLoading,
-    }),
-    [users.length, isLoading],
-  );
+export const useUserManager = (params?: UseUsersParams) => {
+  const users = useUsers(params);
+  const createUser = useCreateUser();
+  const updateUser = useUpdateUser();
 
   return {
-    users,
-    stats,
-    isLoading,
-    error,
-    isEmpty,
-    refetch,
-    createUser,
-    updateUser,
-    isCreating,
-    isUpdating,
+    ...users,
+    createUser: createUser.createUser,
+    isCreatingUser: createUser.isLoading,
+    createUserError: createUser.error,
+
+    updateUser: updateUser.updateUser,
+    isUpdatingUser: updateUser.isLoading,
+    updateUserError: updateUser.error,
   };
 };

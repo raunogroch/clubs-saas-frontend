@@ -10,7 +10,7 @@ import {
   clearError,
 } from "./authSlice";
 import { useLoginMutation } from "./authApi";
-import type { LoginRequest } from "./authApi";
+import type { LoginRequest } from "../../core/interfaces";
 
 /**
  * Hook personalizado para manejar la autenticación

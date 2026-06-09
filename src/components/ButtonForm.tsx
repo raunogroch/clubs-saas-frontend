@@ -1,12 +1,4 @@
-import type { ReactNode } from "react";
-
-interface ButtonProps {
-  children: ReactNode;
-  className?: string;
-  onClick?: () => void;
-  type?: "button" | "submit" | "reset";
-  disabled?: boolean;
-}
+import type { FormButtonProps } from "../core/interfaces";
 
 export const ButtonForm = ({
   children,
@@ -14,7 +6,7 @@ export const ButtonForm = ({
   onClick,
   type = "button",
   disabled = false,
-}: ButtonProps) => {
+}: FormButtonProps) => {
   return (
     <button
       type={type}

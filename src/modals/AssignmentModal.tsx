@@ -1,23 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { InputForm, Modal } from "../components";
 import {
   useCreateAssignment,
   useUpdateAssignment,
 } from "../features/assignments/assignmentHooks";
-import type { Assignment } from "../features/assignments/assignmentApi";
+import type { AssignmentModalProps } from "../core/interfaces";
 
 type Inputs = {
   name: string;
 };
 
-interface AssignmentModalProps {
-  identifier: string;
-  data?: Assignment;
-  onSaved?: () => void;
-}
-
-export const AssignmentModal = (props: AssignmentModalProps) => {
+export const AssignmentModal = ({
+  open,
+  onClose,
+  data,
+  onSaved,
+}: AssignmentModalProps) => {
   const {
     createAssignment,
     isLoading: isCreating,
@@ -29,69 +28,80 @@ export const AssignmentModal = (props: AssignmentModalProps) => {
     error: updateError,
   } = useUpdateAssignment();
 
-  const isEdit = Boolean(props.data?.id);
+  const isEdit = Boolean(data?.id);
   const isSaving = isCreating || isUpdating;
   const error = createError || updateError;
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
+    clearErrors,
   } = useForm<Inputs>({
+    mode: "onBlur",
     defaultValues: {
-      name: props.data?.name ?? "",
+      name: "",
     },
   });
 
   useEffect(() => {
-    reset({ name: props.data?.name ?? "" });
-  }, [props.data, reset]);
-
-  const hideModal = () => {
-    const $ = (window as any).jQuery || (window as any).$;
-    if ($) {
-      $(`#${props.identifier}`).modal("hide");
-      return;
+    if (open) {
+      reset({ name: data?.name ?? "" });
+      clearErrors();
     }
+  }, [open, data, reset, clearErrors]);
 
-    const modal = document.getElementById(props.identifier);
-    if (modal) {
-      modal.classList.remove("in");
-      modal.style.display = "none";
-    }
-    const backdrop = document.querySelector(".modal-backdrop");
-    if (backdrop) {
-      backdrop.remove();
-    }
-    document.body.classList.remove("modal-open");
-  };
+  const onSubmit: SubmitHandler<Inputs> = useCallback(
+    async (formData) => {
+      try {
+        if (isEdit && data?.id) {
+          await updateAssignment({ id: data.id, ...formData });
+        } else {
+          await createAssignment(formData);
+        }
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    try {
-      if (isEdit && props.data?.id) {
-        await updateAssignment({ id: props.data.id, ...data });
-      } else {
-        await createAssignment(data);
+        reset();
+        onSaved?.();
+        onClose();
+      } catch (err) {
+        console.error("Error al guardar asignación:", err);
       }
-
-      reset();
-      hideModal();
-      props.onSaved?.();
-    } catch (err) {
-      console.error("Error al guardar asignación:", err);
-    }
-  };
+    },
+    [
+      isEdit,
+      data?.id,
+      updateAssignment,
+      createAssignment,
+      onSaved,
+      onClose,
+      reset,
+    ],
+  );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Modal
-        title={isEdit ? "Actualizar asignacion" : "Crear asignacion"}
-        identifier={props.identifier}
-        buttonName={isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
-      >
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={isEdit ? "Actualizar asignación" : "Crear asignación"}
+      description={
+        isEdit
+          ? "Modifica los datos de la asignación"
+          : "Crea una nueva asignación"
+      }
+    >
+      <form onSubmit={handleSubmit(onSubmit)}>
         {error && (
-          <div className="alert alert-danger" role="alert">
+          <div className="alert alert-danger alert-dismissible" role="alert">
+            <button
+              type="button"
+              className="close"
+              onClick={() => clearErrors()}
+              aria-label="Cerrar"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Error:</strong>{" "}
             {typeof error === "string" ? error : "Error al guardar asignación"}
           </div>
         )}
@@ -104,7 +114,35 @@ export const AssignmentModal = (props: AssignmentModalProps) => {
           required="El nombre es obligatorio"
           disabled={isSaving}
         />
-      </Modal>
-    </form>
+
+        <div className="modal-footer mt-4">
+          <button
+            type="button"
+            className="btn btn-white"
+            onClick={onClose}
+            disabled={isSaving}
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isSaving || isSubmitting}
+          >
+            {isSaving ? (
+              <>
+                <span className="fa fa-spinner fa-spin me-2" />
+                Guardando...
+              </>
+            ) : isEdit ? (
+              "Actualizar"
+            ) : (
+              "Crear"
+            )}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 };

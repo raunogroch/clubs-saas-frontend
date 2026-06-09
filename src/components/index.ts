@@ -16,3 +16,6 @@ export * from "./PaginationOptions";
 export * from "./IBox";
 export * from "./SplashScreen";
 export * from "./TokenExpirationWarning";
+export * from "./RolesDropdown";
+export * from "./LabelHighlight";
+export * from "./RolesHighlight";

@@ -2,28 +2,33 @@
  * core/types/index.ts
  *
  * Exporta todos los tipos centralizados
- * Punto de entrada para tipos de toda la aplicación
+ * Re-exporta desde core/interfaces para compatibilidad
  */
 
+// Re-export desde interfaces centralizadas
 export type {
   User,
-  CreateUserInput,
-  UpdateUserInput,
+  UserRole,
+  CreateUserDto,
+  UpdateUserDto,
   UserListResponse,
-  PaginationMeta,
-} from "./User";
+} from "../interfaces";
+
 export type {
   ApiResponse,
+  PaginationMeta,
   PaginatedResponse,
   ApiErrorResponse,
   PaginationParams,
-} from "./Api";
+} from "../interfaces";
+
 export type {
-  AppError,
-  AuthState,
   LoginCredentials,
   LoginResponse,
+  AuthState,
   AuthContextType,
-} from "./Auth";
+} from "../interfaces";
+
 export { ErrorCode, AppErrorClass } from "./Error";
 export type { AppError as IAppError } from "./Error";
+export type { UserFormInputs } from "./UsersForm";

@@ -9,13 +9,15 @@
  * - SRP: Un solo lugar para definir qué es un User
  */
 
+import type { Roles } from "../../common";
+
 export interface User {
   id: string;
   name: string;
   lastname: string;
   username: string;
   email?: string;
-  roles: string[];
+  roles: Roles[];
   permissions?: string[];
   avatar?: string;
   createdAt?: string;
@@ -27,7 +29,7 @@ export interface CreateUserInput {
   lastname: string;
   username: string;
   email?: string;
-  roles: string[];
+  roles: Roles[];
   password?: string;
 }
 
@@ -35,7 +37,7 @@ export interface UpdateUserInput {
   name?: string;
   lastname?: string;
   email?: string;
-  roles?: string[];
+  roles?: Roles[];
   avatar?: string;
 }
 

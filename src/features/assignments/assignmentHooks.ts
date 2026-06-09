@@ -6,7 +6,7 @@ import {
   useGetAssignmentsQuery,
   useUpdateAssignmentMutation,
 } from "./assignmentApi";
-import type { Assignment } from "./assignmentApi";
+import type { Assignment } from "../../core/interfaces";
 
 /**
  * Hook para obtener todas las asignaciones

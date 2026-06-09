@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { MenuProfile, MenuSingleOption } from ".";
 import { useAuthManager } from "../features/auth/authHooks";
+import type { UserRole } from "../features/users";
 
 declare global {
   interface JQuery {
@@ -25,7 +26,7 @@ export const Sidenav = () => {
   const displayName = user?.name
     ? `${user.name} ${user.lastname || ""}`.trim()
     : "Usuario";
-  const displayRoles = user?.roles || [];
+  const displayRoles: UserRole[] = user?.roles || [];
 
   return (
     <>
