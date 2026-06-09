@@ -19,7 +19,7 @@ export interface User {
   lastname: string;
   dni: string;
   username: string;
-  roles: UserRole[];
+  roles: UserRole[] | Roles[];
   gender?: Gender;
   birthDate?: Date;
   phone?: string;

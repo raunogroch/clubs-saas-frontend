@@ -1,9 +1,11 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { Roles } from "../../common";
+import { createContext, useContext, type ReactNode } from "react";
+import type { Roles } from "../../common/enums";
+import { useRolePersistence } from "../hooks/useRolePersistence";
 
 interface ActiveRoleContextType {
   activeRole: Roles | undefined;
   setActiveRole: (role: Roles) => void;
+  isHydrated: boolean;
 }
 
 const ActiveRoleContext = createContext<ActiveRoleContextType | undefined>(
@@ -11,13 +13,15 @@ const ActiveRoleContext = createContext<ActiveRoleContextType | undefined>(
 );
 
 export const ActiveRoleProvider = ({ children }: { children: ReactNode }) => {
-  const [activeRole, setActiveRole] = useState<Roles | undefined>();
+  const { activeRole, setActiveRole, isHydrated } =
+    useRolePersistence(undefined);
 
   return (
     <ActiveRoleContext.Provider
       value={{
         activeRole,
         setActiveRole,
+        isHydrated,
       }}
     >
       {children}

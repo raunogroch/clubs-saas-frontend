@@ -1,45 +1,41 @@
-import { useEffect, useRef, useState } from "react";
-
 import { useAuthManager } from "../features/auth/authHooks";
 import { getRoleLabel } from "../common/translations";
 import { useActiveRole } from "../core/context/ActiveRoleContext";
-import type { Roles } from "../common";
+import { useDropdownMenu } from "../core/hooks/useDropdownMenu";
+import { useInitializeActiveRole } from "../core/hooks/useInitializeActiveRole";
+import { useValidateRolesConsistency } from "../core/hooks/useValidateRolesConsistency";
+import { useNormalizeRoles } from "../core/hooks/useNormalizeRoles";
+import type { Roles } from "../common/enums";
 
+/**
+ * Componente RolesDropdown
+ *
+ * Responsabilidad única: Renderizar un dropdown para cambiar de rol
+ *
+ * Soporta dos estructuras de roles:
+ * - Roles[] directo: ["ADMIN", "SUPER_ADMIN"]
+ * - UserRole[]: [{ role: "ADMIN" }, { role: "SUPER_ADMIN" }]
+ *
+ * Lógica separada en:
+ * - useNormalizeRoles: Normaliza estructuras de roles
+ * - useDropdownMenu: Gestiona abrir/cerrar y clicks fuera
+ * - useInitializeActiveRole: Inicializa el rol si es necesario
+ * - useActiveRole: Obtiene/actualiza el rol activo
+ * - useValidateRolesConsistency: Valida que los roles sean válidos
+ */
 export const RolesDropdown = () => {
   const { user } = useAuthManager();
   const { activeRole, setActiveRole } = useActiveRole();
+  const { isOpen, toggleOpen, closeMenu, dropdownRef } = useDropdownMenu();
 
-  const [isOpen, setIsOpen] = useState(false);
+  // Normalizar roles independientemente de la estructura
+  const rolesArray: Roles[] = useNormalizeRoles(user?.roles);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // Validar consistencia de roles
+  useValidateRolesConsistency(rolesArray);
 
-  const rolesArray: any[] = user?.roles ?? [];
-
-  useEffect(() => {
-    if (
-      rolesArray.length > 0 &&
-      (!activeRole || !rolesArray.includes(activeRole))
-    ) {
-      setActiveRole(rolesArray[0]);
-    }
-  }, [rolesArray, activeRole, setActiveRole]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // Inicializar rol si es necesario
+  useInitializeActiveRole(rolesArray);
 
   if (rolesArray.length < 2) {
     return null;
@@ -47,7 +43,7 @@ export const RolesDropdown = () => {
 
   const handleRoleSelect = (role: Roles) => {
     setActiveRole(role);
-    setIsOpen(false);
+    closeMenu();
   };
 
   return (
@@ -55,7 +51,7 @@ export const RolesDropdown = () => {
       <button
         type="button"
         className="btn btn-white"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={toggleOpen}
         aria-expanded={isOpen}
         aria-haspopup="true"
         title={`Rol actual: ${getRoleLabel(activeRole)}`}
