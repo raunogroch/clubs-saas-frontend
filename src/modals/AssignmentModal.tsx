@@ -1,15 +1,13 @@
-import { useEffect, useCallback } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
 import { InputForm, Modal } from "../components";
 import {
-  useCreateAssignment,
-  useUpdateAssignment,
-} from "../features/assignments/assignmentHooks";
+  OwnerSearchInput,
+  OwnerSearchResults,
+  OwnerSelectionTable,
+} from "../components/OwnerSearch";
+import { useAssignmentModalForm } from "../hooks/useAssignmentModalForm";
+import { useAssignmentSubmit } from "../hooks/useAssignmentSubmit";
+import { useModalInitialization } from "../hooks/useModalInitialization";
 import type { AssignmentModalProps } from "../core/interfaces";
-
-type Inputs = {
-  name: string;
-};
 
 export const AssignmentModal = ({
   open,
@@ -17,67 +15,28 @@ export const AssignmentModal = ({
   data,
   onSaved,
 }: AssignmentModalProps) => {
-  const {
-    createAssignment,
-    isLoading: isCreating,
-    error: createError,
-  } = useCreateAssignment();
-  const {
-    updateAssignment,
-    isLoading: isUpdating,
-    error: updateError,
-  } = useUpdateAssignment();
-
-  const isEdit = Boolean(data?.id);
-  const isSaving = isCreating || isUpdating;
-  const error = createError || updateError;
-
+  const { form, onClearErrors } = useAssignmentModalForm(open, data);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    clearErrors,
-  } = useForm<Inputs>({
-    mode: "onBlur",
-    defaultValues: {
-      name: "",
+  } = form;
+
+  const { ownerSearch, handleClose } = useModalInitialization(open, data);
+
+  const { onSubmit, error, isSaving } = useAssignmentSubmit({
+    data,
+    ownerIds: ownerSearch.owners,
+    onSaved,
+    onClose,
+    onReset: () => {
+      reset();
+      handleClose();
     },
   });
 
-  useEffect(() => {
-    if (open) {
-      reset({ name: data?.name ?? "" });
-      clearErrors();
-    }
-  }, [open, data, reset, clearErrors]);
-
-  const onSubmit: SubmitHandler<Inputs> = useCallback(
-    async (formData) => {
-      try {
-        if (isEdit && data?.id) {
-          await updateAssignment({ id: data.id, ...formData });
-        } else {
-          await createAssignment(formData);
-        }
-
-        reset();
-        onSaved?.();
-        onClose();
-      } catch (err) {
-        console.error("Error al guardar asignación:", err);
-      }
-    },
-    [
-      isEdit,
-      data?.id,
-      updateAssignment,
-      createAssignment,
-      onSaved,
-      onClose,
-      reset,
-    ],
-  );
+  const isEdit = Boolean(data?.id);
 
   return (
     <Modal
@@ -96,7 +55,7 @@ export const AssignmentModal = ({
             <button
               type="button"
               className="close"
-              onClick={() => clearErrors()}
+              onClick={onClearErrors}
               aria-label="Cerrar"
             >
               <span aria-hidden="true">&times;</span>
@@ -114,6 +73,48 @@ export const AssignmentModal = ({
           required="El nombre es obligatorio"
           disabled={isSaving}
         />
+
+        <div className="form-group row" ref={ownerSearch.searchContainerRef}>
+          <label className="col-sm-2 col-form-label">
+            Propietarios
+            <span className="text-danger">*</span>
+          </label>
+          <div className="col-sm-10">
+            <div className="position-relative">
+              <OwnerSearchInput
+                searchTerm={ownerSearch.searchTerm}
+                onSearchChange={(term) => {
+                  ownerSearch.setSearchTerm(term);
+                  ownerSearch.setShowSearchResults(true);
+                }}
+                showResults={ownerSearch.showSearchResults}
+                onFocus={() => ownerSearch.setShowSearchResults(true)}
+                onClear={ownerSearch.clearSearch}
+                disabled={isSaving}
+              />
+
+              {ownerSearch.showSearchResults && (
+                <OwnerSearchResults
+                  searchTerm={ownerSearch.searchTerm}
+                  debouncedSearchTerm={ownerSearch.debouncedSearchTerm}
+                  isLoadingUsers={ownerSearch.isLoadingUsers}
+                  filteredUsers={ownerSearch.filteredUsers}
+                  users={[]}
+                  isSaving={isSaving}
+                  onSelectUser={ownerSearch.handleAddOwner}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        <OwnerSelectionTable
+          selectedUsers={ownerSearch.selectedUsers}
+          isSaving={isSaving}
+          onRemove={ownerSearch.handleRemoveOwner}
+        />
+
+        <input type="hidden" {...register("owners")} />
 
         <div className="modal-footer mt-4">
           <button

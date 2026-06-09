@@ -1,6 +1,9 @@
 import { Breadcrumbs, IBox, PaginationOptions, Alert } from "../components";
+import { AssignmentTable } from "../components/AssignmentTable";
+import { AssignmentTableState } from "../components/AssignmentTableState";
 import { AssignmentModal } from "../modals/AssignmentModal";
 import { useAssignments } from "../features/assignments/assignmentHooks";
+import { useAssignmentOwners } from "../core/hooks/useAssignmentOwners";
 import { PaginationTable } from "../components/PaginationTable";
 import {
   useModalManagement,
@@ -45,6 +48,8 @@ export const AssignmentPage = () => {
     limit: pageSize,
   });
 
+  const { getOwnerNames } = useAssignmentOwners();
+
   const totalPages = calculateTotalPages(meta?.total, {
     totalPages: meta?.totalPages,
     lastPage: meta?.lastPage,
@@ -78,60 +83,33 @@ export const AssignmentPage = () => {
         data={selectedAssignment}
         onSaved={handleSaved}
       />
+
       <div className="wrapper wrapper-content animated fadeInRight">
         {showAlert && <Alert type="success" message={alertMessage} />}
         <IBox title="Asignaciones">
-          {isLoading && <p>Cargando asignaciones...</p>}
-          {isError && (
-            <p className="text-danger">Error al cargar las asignaciones.</p>
-          )}
-          {!isLoading && !isError && assignments.length === 0 && (
-            <p>No hay asignaciones registradas.</p>
-          )}
+          <AssignmentTableState
+            isLoading={isLoading}
+            isError={!!isError}
+            isEmpty={assignments.length === 0}
+          />
+
           {!isLoading && !isError && assignments.length > 0 && (
             <>
-              <div className="table-responsive">
-                <div className="d-flex justify-content-end mb-2">
-                  <PaginationOptions
-                    pageSize={pageSize}
-                    setPageSize={onPageSizeChange}
-                    setPage={onPageChange}
-                  />
-                </div>
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>N°</th>
-                      <th>Nombre</th>
-                      <th>Propietarios</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {assignments.map((assignment, index) => (
-                      <tr key={assignment.id}>
-                        <td className="align-middle">
-                          {(page - 1) * pageSize + index + 1}
-                        </td>
-                        <td className="align-middle">{assignment.name}</td>
-                        <td className="align-middle">
-                          {assignment.owners?.join(", ") || "N/A"}
-                        </td>
-                        <td className="align-middle">
-                          <button
-                            className="btn btn-sm btn-primary"
-                            onClick={() => handleEdit(assignment)}
-                            aria-label={`Editar asignación ${assignment.name}`}
-                          >
-                            <i className="fa fa-edit me-1" />
-                            &nbsp;Editar
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="d-flex justify-content-end mb-2">
+                <PaginationOptions
+                  pageSize={pageSize}
+                  setPageSize={onPageSizeChange}
+                  setPage={onPageChange}
+                />
               </div>
+
+              <AssignmentTable
+                assignments={assignments}
+                page={page}
+                pageSize={pageSize}
+                getOwnerNames={getOwnerNames}
+                onEdit={handleEdit}
+              />
 
               <PaginationTable
                 page={page}
