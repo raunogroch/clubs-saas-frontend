@@ -1,11 +1,5 @@
-/**
- * core/interfaces/Auth.ts
- *
- * Interfaces centralizadas para autenticación
- */
-
+import type { User } from ".";
 import type { Roles } from "../../common";
-import type { User } from "./User";
 
 export interface LoginCredentials {
   username: string;

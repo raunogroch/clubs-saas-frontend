@@ -1,10 +1,4 @@
-/**
- * core/types/Auth.ts
- *
- * Tipos centralizados para autenticación
- */
-
-import type { User } from "./User";
+import type { User } from ".";
 
 export interface AuthState {
   user: User | null;

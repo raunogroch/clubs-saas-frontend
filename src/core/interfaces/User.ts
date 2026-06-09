@@ -1,10 +1,3 @@
-/**
- * core/interfaces/User.ts
- *
- * Interfaz centralizada para Usuario
- * Versión completa desde userApi
- */
-
 import type { Gender, Roles, Status } from "../../common/enums";
 
 export interface UserRole {
@@ -19,7 +12,7 @@ export interface User {
   lastname: string;
   dni: string;
   username: string;
-  roles: UserRole[] | Roles[];
+  roles: UserRole[];
   gender?: Gender;
   birthDate?: Date;
   phone?: string;
