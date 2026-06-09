@@ -878,8 +878,10 @@ h5 {
 }
 .navbar-default .nav > li > a:hover,
 .navbar-default .nav > li > a:focus {
-  background-color: #293846;
+  /*background-color: #293846;*/
+  background: rgba(41, 56, 70, 0.6);
   color: white;
+  border-radius: 0 50px 50px 0;
 }
 .nav .open > a,
 .nav .open > a:hover,
@@ -1005,8 +1007,9 @@ h5 {
 }
 .nav-header {
   padding: 33px 25px;
-  background-color: #2f4050;
-  background-image: url("patterns/header-profile.png");
+  /*background-color: #2f4050;*/
+  background-color: #f3f3f4;
+  /*  background-image: url("patterns/header-profile.png");*/
 }
 .caret {
   display: inline-block;
@@ -1029,7 +1032,9 @@ ul.nav-second-level {
 }
 .nav > li.active {
   border-left: 4px solid #19aa8d;
-  background: #293846;
+  /*background: #293846;*/
+  background: rgba(41, 56, 70, 1);
+  border-radius: 0 50px 50px 0;
 }
 .nav.nav-second-level > li.active {
   border: none;
@@ -1038,7 +1043,8 @@ ul.nav-second-level {
   height: auto !important;
 }
 .nav-header a {
-  color: #dfe4ed;
+  /*color: #dfe4ed;*/
+  color: #2f4050;
 }
 .nav-header .text-muted {
   color: #8095a8 !important;
@@ -4513,7 +4519,8 @@ samp {
 }
 body {
   font-family: "open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color: #2f4050;
+  /*background-color: #2f4050;    //valor intercambiable*/
+  background-color: #f3f3f4;
   font-size: 13px;
   color: #676a6c;
   overflow-x: hidden;
