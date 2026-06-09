@@ -5,7 +5,7 @@ import type {
 } from "../core/interfaces";
 
 export const OwnerSearchInput = (props: OwnerSearchInputProps) => {
-  const { searchTerm, onSearchChange, onFocus, onClear, disabled } = props;
+  const { searchTerm, onSearchChange, onFocus, disabled } = props;
 
   return (
     <div className="input-group">
