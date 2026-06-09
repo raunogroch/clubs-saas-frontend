@@ -10,7 +10,6 @@ export const RolesDropdown = () => {
   const { activeRole, setActiveRole } = useActiveRole();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isIconHovered, setIsIconHovered] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 

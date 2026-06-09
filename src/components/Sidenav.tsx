@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { MenuProfile, MenuSingleOption } from ".";
 import { useAuthManager } from "../features/auth/authHooks";
+import { useActiveRole } from "../core/context/ActiveRoleContext";
 import type { UserRole } from "../features/users";
+import { getMenuByRole } from "../features/navigation";
 
 export const Sidenav = () => {
   const { pathname } = useLocation();
   const { user } = useAuthManager();
+  const { activeRole } = useActiveRole();
 
   const [isMounted, setIsMounted] = useState(false);
 
@@ -19,6 +22,9 @@ export const Sidenav = () => {
     : "Usuario";
 
   const displayRoles: UserRole[] = user?.roles || [];
+
+  // Obtener el menú específico para el rol activo
+  const menuItems = activeRole ? getMenuByRole(activeRole) : [];
 
   if (!isMounted) return null;
 
@@ -42,26 +48,15 @@ export const Sidenav = () => {
             </div>
           </li>
 
-          <MenuSingleOption
-            route="/dashboard"
-            icon="th-large"
-            name="Inicio"
-            active={pathname === "/dashboard"}
-          />
-
-          <MenuSingleOption
-            route="/assignments"
-            icon="fa fa-tasks"
-            name="Asignaciones"
-            active={pathname === "/assignments"}
-          />
-
-          <MenuSingleOption
-            route="/admins"
-            icon="users"
-            name="Administradores"
-            active={pathname === "/admins"}
-          />
+          {menuItems.map((item) => (
+            <MenuSingleOption
+              key={item.id}
+              route={item.route}
+              icon={item.icon}
+              name={item.name}
+              active={pathname === item.route}
+            />
+          ))}
         </ul>
       </div>
     </nav>
