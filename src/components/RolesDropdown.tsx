@@ -10,6 +10,7 @@ export const RolesDropdown = () => {
   const { activeRole, setActiveRole } = useActiveRole();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isIconHovered, setIsIconHovered] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -50,12 +51,6 @@ export const RolesDropdown = () => {
     setIsOpen(false);
   };
 
-  if (import.meta.env.DEV) {
-    console.log("Usuario:", user);
-    console.log("Roles:", rolesArray);
-    console.log("Rol activo:", activeRole);
-  }
-
   return (
     <div ref={dropdownRef} style={{ position: "relative" }}>
       <button
@@ -73,7 +68,7 @@ export const RolesDropdown = () => {
       >
         <i className="fa fa-exchange" />
 
-        <span className="label label-danger">{getRoleLabel(activeRole)}</span>
+        <span className="label label-primary">{getRoleLabel(activeRole)}</span>
       </button>
 
       {isOpen && (

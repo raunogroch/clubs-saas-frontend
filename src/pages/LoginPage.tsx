@@ -41,7 +41,7 @@ export const LoginPage = () => {
       return false;
     }
 
-    if (password.length < 8) {
+    if (password.length < 5) {
       setValidationError("La contraseña debe tener al menos 8 caracteres");
       return false;
     }
