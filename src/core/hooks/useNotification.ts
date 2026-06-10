@@ -1,24 +1,4 @@
-/**
- * core/hooks/useNotification.ts
- *
- * Hook para mostrar notificaciones (toasts)
- *
- * Principios SOLID:
- * - SRP: Una responsabilidad - notificaciones
- * - ISP: Interfaz específica segregada
- *
- * Uso:
- * ```typescript
- * const { success, error, warning, info } = useNotification();
- *
- * try {
- *   await createUser(data);
- *   success('Usuario creado correctamente');
- * } catch (err) {
- *   error('Error al crear usuario');
- * }
- * ```
- */
+import toastr from "toastr";
 
 export interface UseNotificationReturn {
   success: (message: string, duration?: number) => void;
@@ -27,40 +7,43 @@ export interface UseNotificationReturn {
   info: (message: string, duration?: number) => void;
 }
 
-/**
- * Hook para mostrar notificaciones Toast
- *
- * Nota: Este es un stub. En implementación real, usarías:
- * - Toast library (toast-notification, react-toastify, etc.)
- * - O estado Redux para notificaciones globales
- *
- * @returns {UseNotificationReturn}
- */
+// Configuración global (una sola vez)
+toastr.options = {
+  closeButton: true,
+  debug: false,
+  newestOnTop: true,
+  progressBar: true,
+  positionClass: "toast-top-right",
+  preventDuplicates: false,
+  showDuration: 300,
+  hideDuration: 1000,
+  timeOut: 5000,
+  extendedTimeOut: 1000,
+  showEasing: "swing",
+  hideEasing: "linear",
+  showMethod: "fadeIn",
+  hideMethod: "fadeOut",
+};
+
 export const useNotification = (): UseNotificationReturn => {
-  const success = (message: string, _duration = 3000) => {
-    // TODO: Implementar con librería de toast o Redux
-    console.log("[SUCCESS]", message);
-  };
-
-  const error = (message: string, _duration = 3000) => {
-    // TODO: Implementar con librería de toast o Redux
-    console.error("[ERROR]", message);
-  };
-
-  const warning = (message: string, _duration = 3000) => {
-    // TODO: Implementar con librería de toast o Redux
-    console.warn("[WARNING]", message);
-  };
-
-  const info = (message: string, _duration = 3000) => {
-    // TODO: Implementar con librería de toast o Redux
-    console.info("[INFO]", message);
+  const showToast = (
+    type: "success" | "error" | "warning" | "info",
+    message: string,
+    duration = 5000,
+  ) => {
+    toastr[type](message, undefined, {
+      timeOut: duration,
+      extendedTimeOut: Math.floor(duration / 5),
+    });
   };
 
   return {
-    success,
-    error,
-    warning,
-    info,
+    success: (message, duration) => showToast("success", message, duration),
+
+    error: (message, duration) => showToast("error", message, duration),
+
+    warning: (message, duration) => showToast("warning", message, duration),
+
+    info: (message, duration) => showToast("info", message, duration),
   };
 };

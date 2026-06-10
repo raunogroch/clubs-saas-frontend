@@ -26,8 +26,8 @@ export const Modal = ({
   children,
   size,
 }: ModalProps) => {
-  // Memoizar onClose para evitar listeners duplicados
-  const memoizedOnClose = useCallback(onClose, [onClose]);
+  // Mantener una referencia estable del cierre del modal
+  const memoizedOnClose = useCallback(() => onClose(), [onClose]);
 
   useEffect(() => {
     if (!open) return;

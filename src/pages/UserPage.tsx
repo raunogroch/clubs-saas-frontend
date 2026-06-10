@@ -1,11 +1,10 @@
-import { Breadcrumbs, IBox, PaginationOptions, Alert } from "../components";
+import { Breadcrumbs, IBox, PaginationOptions } from "../components";
 import { PaginationTable } from "../components/PaginationTable";
 import { UserModal } from "../modals/UserModal";
 import { useUsers } from "../features/users/userHooks";
 import {
   useSearchSetup,
   useModalManagement,
-  useAlert,
   usePaginationState,
   useModalSaveHandler,
 } from "../core/hooks";
@@ -23,12 +22,6 @@ export const UserPage = (props: UserPageProps) => {
     handleEdit,
     handleClose: handleCloseModal,
   } = useModalManagement<User>();
-
-  const {
-    isVisible: showAlert,
-    message: alertMessage,
-    showAlert: showAlertMessage,
-  } = useAlert(5000);
 
   const {
     page,
@@ -58,7 +51,6 @@ export const UserPage = (props: UserPageProps) => {
     selectedItem: selectedUser,
     refetch,
     onModalClose: handleCloseModal,
-    onShowAlert: showAlertMessage,
   });
 
   return (
@@ -82,7 +74,6 @@ export const UserPage = (props: UserPageProps) => {
       />
 
       <div className="wrapper wrapper-content animated fadeInRight">
-        {showAlert && <Alert type="success" message={alertMessage} />}
         <IBox title="Usuarios">
           {isLoading && <p className="text-info">Cargando usuarios...</p>}
 

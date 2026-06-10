@@ -118,6 +118,6 @@ export const mergeObjects = <T extends object>(
 /**
  * Valida si un objeto está vacío
  */
-export const isEmpty = (obj: Record<string, any>): boolean => {
+export const isEmpty = (obj: Record<string, unknown>): boolean => {
   return Object.keys(obj).length === 0;
 };

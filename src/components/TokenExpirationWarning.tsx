@@ -5,7 +5,7 @@
  * Permite al usuario renovar sesión o logout
  */
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useTokenExpiration } from "../hooks/useTokenValidation";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { logout } from "../features/auth/authSlice";
@@ -13,41 +13,20 @@ import { logout } from "../features/auth/authSlice";
 export const TokenExpirationWarning = () => {
   const { expiresIn, isExpired } = useTokenExpiration();
   const dispatch = useAppDispatch();
-  const [showWarning, setShowWarning] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   // Mostrar advertencia cuando faltan menos de 5 minutos
   const WARNING_THRESHOLD = 5 * 60 * 1000; // 5 minutos en ms
+  const showWarning = Boolean(
+    expiresIn && expiresIn > 0 && !isExpired && expiresIn < WARNING_THRESHOLD,
+  );
 
-  useEffect(() => {
-    if (!expiresIn || isExpired) {
-      setShowWarning(false);
-      return;
-    }
+  const timeRemaining = useMemo(() => {
+    if (!expiresIn || expiresIn <= 0) return "0m 0s";
 
-    // Si quedan menos de 5 minutos, mostrar advertencia
-    setShowWarning(expiresIn < WARNING_THRESHOLD);
-  }, [expiresIn, isExpired]);
-
-  // Actualizar tiempo restante cada segundo
-  useEffect(() => {
-    if (!showWarning) return;
-
-    // Actualizar inmediatamente
-    const updateTimeRemaining = () => {
-      if (expiresIn && expiresIn > 0) {
-        const minutes = Math.floor(expiresIn / 1000 / 60);
-        const seconds = Math.floor((expiresIn / 1000) % 60);
-        setTimeRemaining(`${minutes}m ${seconds}s`);
-      }
-    };
-
-    updateTimeRemaining();
-
-    // No actualizar cada segundo porque expiresIn no cambia en este componente
-    // Es un valor calculado una sola vez. Para una actualización dinámica,
-    // necesitaríamos recalcular en main.tsx
-  }, [showWarning, expiresIn]);
+    const minutes = Math.floor(expiresIn / 1000 / 60);
+    const seconds = Math.floor((expiresIn / 1000) % 60);
+    return `${minutes}m ${seconds}s`;
+  }, [expiresIn]);
 
   if (!showWarning) return null;
 
@@ -80,8 +59,6 @@ export const TokenExpirationWarning = () => {
           className="btn btn-sm btn-warning"
           onClick={() => {
             // Aquí podrías agregar lógica para renovar el token
-            // Por ahora, solo cerrar la advertencia
-            setShowWarning(false);
           }}
           style={{ marginRight: "10px" }}
         >

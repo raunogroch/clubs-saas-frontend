@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { MenuProfile, MenuSingleOption } from ".";
 import { useAuthManager } from "../features/auth/authHooks";
-import { useActiveRole } from "../core/context/ActiveRoleContext";
+import { useActiveRole } from "../core/context/useActiveRole";
 import type { UserRole } from "../features/users";
 import { getMenuByRole } from "../features/navigation";
 
@@ -11,12 +11,6 @@ export const Sidenav = () => {
   const { user } = useAuthManager();
   const { activeRole } = useActiveRole();
 
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   const displayName = user?.name
     ? `${user.name} ${user.lastname || ""}`.trim()
     : "Usuario";
@@ -24,9 +18,10 @@ export const Sidenav = () => {
   const displayRoles: UserRole[] = user?.roles || [];
 
   // Obtener el menú específico para el rol activo
-  const menuItems = activeRole ? getMenuByRole(activeRole) : [];
-
-  if (!isMounted) return null;
+  const menuItems = useMemo(
+    () => (activeRole ? getMenuByRole(activeRole) : []),
+    [activeRole],
+  );
 
   return (
     <nav className="navbar-default navbar-static-side" role="navigation">

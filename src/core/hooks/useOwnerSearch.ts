@@ -49,12 +49,12 @@ export const useOwnerSearch = () => {
   }, [showSearchResults]);
 
   const initializeOwners = useCallback(
-    (data?: { owners?: string[] | any[] }) => {
+    (data?: { owners?: Array<string | { userId?: string }> }) => {
       let ownerUserIds: string[] = [];
       if (data?.owners && data.owners.length > 0) {
-        ownerUserIds = data.owners.map((owner: any) =>
-          typeof owner === "string" ? owner : owner.userId,
-        );
+        ownerUserIds = data.owners
+          .map((owner) => (typeof owner === "string" ? owner : owner.userId))
+          .filter((ownerId): ownerId is string => Boolean(ownerId));
       }
 
       setOwners(ownerUserIds);

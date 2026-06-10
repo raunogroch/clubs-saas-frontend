@@ -1,6 +1,6 @@
 import { useAuthManager } from "../features/auth/authHooks";
 import { getRoleLabel } from "../common/translations";
-import { useActiveRole } from "../core/context/ActiveRoleContext";
+import { useActiveRole } from "../core/context/useActiveRole";
 import { useDropdownMenu } from "../core/hooks/useDropdownMenu";
 import { useInitializeActiveRole } from "../core/hooks/useInitializeActiveRole";
 import { useValidateRolesConsistency } from "../core/hooks/useValidateRolesConsistency";

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { DropdownMenu } from "./DropdownMenu";
 import { useAuthManager } from "../features/auth/authHooks";
-import { useActiveRole } from "../core/context/ActiveRoleContext";
+import { useActiveRole } from "../core/context/useActiveRole";
 import { getRoleLabel } from "../common/translations";
 import type { MenuProfileProps } from "../core/interfaces";
 

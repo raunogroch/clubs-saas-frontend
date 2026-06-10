@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback } from "react";
 import { useOwnerSearch } from "../core/hooks/useOwnerSearch";
 import type { AssignmentModalProps } from "../core/interfaces";
 
@@ -13,24 +13,21 @@ export const useModalInitialization = (
     if (open) {
       ownerSearch.initializeOwners(data);
     }
-  }, [open, data?.id, data?.owners, ownerSearch.initializeOwners]);
+  }, [open, data, ownerSearch]);
 
   // Carga usuarios seleccionados cuando cambian los IDs de propietarios
   useEffect(() => {
     if (ownerSearch.owners.length > 0) {
       ownerSearch.loadSelectedUsers();
     }
-  }, [ownerSearch.owners, ownerSearch.loadSelectedUsers]);
+  }, [ownerSearch]);
 
   const handleClose = useCallback(() => {
     ownerSearch.initializeOwners();
-  }, [ownerSearch.initializeOwners]);
-
-  // Evita que el objeto completo se reenvíe y cause re-renders innecesarios
-  const memoizedOwnerSearch = useMemo(() => ownerSearch, [ownerSearch]);
+  }, [ownerSearch]);
 
   return {
-    ownerSearch: memoizedOwnerSearch,
+    ownerSearch,
     handleClose,
   };
 };

@@ -26,7 +26,11 @@ export const usePersistorRehydration = (): boolean => {
     const handleRehydrate = () => {
       // El persistor.getState() devuelve el estado de persistencia
       // Cuando rehydrated es true, significa que se completó la rehydratación
-      const persistState = (persistor as any).getState?.();
+      const persistState = (
+        persistor as {
+          getState?: () => { rehydrated?: boolean };
+        }
+      ).getState?.();
 
       if (persistState?.rehydrated !== false) {
         // Si no está explícitamente en "false" de rehydratación,

@@ -1,4 +1,4 @@
-import { Breadcrumbs, IBox, PaginationOptions, Alert } from "../components";
+import { Breadcrumbs, IBox, PaginationOptions } from "../components";
 import { AssignmentTable } from "../components/AssignmentTable";
 import { AssignmentTableState } from "../components/AssignmentTableState";
 import { AssignmentModal } from "../modals/AssignmentModal";
@@ -7,7 +7,6 @@ import { useAssignmentOwners } from "../core/hooks/useAssignmentOwners";
 import { PaginationTable } from "../components/PaginationTable";
 import {
   useModalManagement,
-  useAlert,
   usePaginationState,
   useModalSaveHandler,
 } from "../core/hooks";
@@ -22,12 +21,6 @@ export const AssignmentPage = () => {
     handleEdit,
     handleClose: handleCloseModal,
   } = useModalManagement<Assignment>();
-
-  const {
-    isVisible: showAlert,
-    message: alertMessage,
-    showAlert: showAlertMessage,
-  } = useAlert(5000);
 
   const {
     page,
@@ -61,7 +54,6 @@ export const AssignmentPage = () => {
     selectedItem: selectedAssignment,
     refetch,
     onModalClose: handleCloseModal,
-    onShowAlert: showAlertMessage,
   });
 
   return (
@@ -85,7 +77,6 @@ export const AssignmentPage = () => {
       />
 
       <div className="wrapper wrapper-content animated fadeInRight">
-        {showAlert && <Alert type="success" message={alertMessage} />}
         <IBox title="Asignaciones">
           <AssignmentTableState
             isLoading={isLoading}

@@ -40,26 +40,27 @@ const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
 });
 
+export type RootState = ReturnType<typeof rootReducer>;
+
 // Aplicar persistReducer al reducer global
 // Ahora el whitelist funciona correctamente: solo persistirá el slice "auth"
-const persistedRootReducer = persistReducer(persistConfig, rootReducer);
-
-// === MIDDLEWARE ===
-const getMiddleware = (getDefaultMiddleware: any) => {
-  return getDefaultMiddleware({
-    serializableCheck: {
-      // redux-persist usa acciones que no son serializables
-      ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
-    },
-  })
-    .concat(authApi.middleware, assignmentApi.middleware, userApi.middleware)
-    .concat(authMiddleware); // Agregar middleware de autenticación
-};
+const persistedRootReducer = persistReducer<RootState>(
+  persistConfig,
+  rootReducer,
+);
 
 // === STORE ===
 export const store = configureStore({
   reducer: persistedRootReducer,
-  middleware: getMiddleware,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // redux-persist usa acciones que no son serializables
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+      },
+    })
+      .concat(authApi.middleware, assignmentApi.middleware, userApi.middleware)
+      .concat(authMiddleware),
 });
 
 // === PERSISTOR ===
@@ -67,5 +68,4 @@ export const persistor = persistStore(store);
 
 // === TIPOS ===
 // Tipos TypeScript para usar en componentes
-export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

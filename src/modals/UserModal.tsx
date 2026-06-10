@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
 
 import { InputForm, Modal } from "../components";
@@ -126,73 +126,57 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
    * Lógica de envío del formulario
    * Incluye validaciones, transformaciones y manejo de errores
    */
-  const onSubmit: SubmitHandler<UserFormInputs> = useCallback(
-    async (formData) => {
-      try {
-        // Validar roles (al menos uno debe estar seleccionado)
-        const roles = formData.roles
-          .map((r) => r.role)
-          .filter((role): role is Roles => role !== "");
+  const onSubmit: SubmitHandler<UserFormInputs> = async (formData) => {
+    try {
+      // Validar roles (al menos uno debe estar seleccionado)
+      const roles = formData.roles
+        .map((r) => r.role)
+        .filter((role): role is Roles => role !== "");
 
-        if (roles.length === 0) {
-          setError("roles", {
-            type: "manual",
-            message: "Debe seleccionar al menos un rol",
-          });
-          return;
-        }
-
-        // Construir payload con transformaciones
-        const basePayload = {
-          name: formData.name.trim(),
-          lastname: formData.lastname.trim(),
-          dni: formData.dni.trim(),
-          username: formData.username.trim(),
-          roles,
-          ...(formData.gender && { gender: formData.gender as Gender }),
-          ...(formData.status && { status: formData.status as Status }),
-          ...(formData.phone && { phone: formData.phone.trim() }),
-          ...(formData.address && { address: formData.address.trim() }),
-          ...(formData.birthDate && {
-            birthDate: new Date(formData.birthDate),
-          }),
-        };
-
-        // Crear o actualizar según contexto
-        if (isEdit && data?.id) {
-          const updatePayload: UpdateUserDto = {
-            id: data.id,
-            ...basePayload,
-          };
-          await updateUser(updatePayload);
-        } else {
-          const createPayload: CreateUserDto = {
-            ...basePayload,
-            password: formData.dni.trim(), // Password = DNI inicial
-          };
-          await createUser(createPayload);
-        }
-
-        // Éxito: resetear y cerrar
-        reset(emptyForm);
-        onSaved?.();
-        onClose();
-      } catch (error) {
-        console.error("Error al guardar usuario:", error);
-        // Los errores se manejan via createError/updateError en RTK Query
+      if (roles.length === 0) {
+        setError("roles", {
+          type: "manual",
+          message: "Debe seleccionar al menos un rol",
+        });
+        return;
       }
-    },
-    [
-      isEdit,
-      data?.id,
-      updateUser,
-      createUser,
-      onSaved,
-      onClose,
-      reset,
-      setError,
-    ],
-  );
+
+      const basePayload = {
+        name: formData.name.trim(),
+        lastname: formData.lastname.trim(),
+        dni: formData.dni.trim(),
+        username: formData.username.trim(),
+        roles,
+        ...(formData.gender && { gender: formData.gender as Gender }),
+        ...(formData.status && { status: formData.status as Status }),
+        ...(formData.phone && { phone: formData.phone.trim() }),
+        ...(formData.address && { address: formData.address.trim() }),
+        ...(formData.birthDate && {
+          birthDate: new Date(formData.birthDate),
+        }),
+      };
+
+      if (isEdit && data?.id) {
+        const updatePayload: UpdateUserDto = {
+          id: data.id,
+          ...basePayload,
+        };
+        await updateUser(updatePayload);
+      } else {
+        const createPayload: CreateUserDto = {
+          ...basePayload,
+          password: formData.dni.trim(),
+        };
+        await createUser(createPayload);
+      }
+
+      reset(emptyForm);
+      onSaved?.();
+      onClose();
+    } catch (error) {
+      console.error("Error al guardar usuario:", error);
+    }
+  };
 
   return (
     <Modal

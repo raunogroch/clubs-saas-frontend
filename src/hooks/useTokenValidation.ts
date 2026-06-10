@@ -34,14 +34,8 @@ export const useTokenValidation = () => {
     const unwatch = watchTokenChanges((newToken) => {
       // Si el token desaparece de localStorage pero Redux dice que está autenticado
       if (isAuthenticated && !newToken) {
-        console.warn("Token eliminado de localStorage. Disparando logout...");
+        // Token cleanup: dispatch logout
         dispatch(logoutAction());
-      }
-
-      // Si aparece un nuevo token en localStorage
-      if (newToken && newToken !== reduxToken) {
-        console.log("Token actualizado desde otra pestaña");
-        // El token debe validarse en baseQueryWithAuth
       }
     });
 
@@ -93,7 +87,7 @@ export const useAutoLogoutOnTokenExpiry = (onBeforeLogout?: () => void) => {
       const timeoutTime = Math.max(expiresIn - 60 * 1000, 0);
 
       const timeout = setTimeout(() => {
-        console.warn("Token va a expirar. Disparando logout automático...");
+        // Token expiration: trigger auto-logout
         onBeforeLogout?.();
         dispatch(logoutAction());
       }, timeoutTime);

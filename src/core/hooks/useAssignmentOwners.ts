@@ -16,18 +16,20 @@ export const useAssignmentOwners = () => {
     return map;
   }, [allAdminUsers]);
 
-  const getOwnerNames = (owners?: string[] | any[]): string[] => {
+  const getOwnerNames = (
+    owners?: Array<string | { userId?: string }>,
+  ): string[] => {
     if (!owners || owners.length === 0) return [];
 
     return owners
       .map((owner) => {
         const userId = typeof owner === "string" ? owner : owner.userId;
-        return userNameMap[userId];
+        return userId ? userNameMap[userId] : "";
       })
       .filter(Boolean);
   };
 
-  const hasOwners = (owners?: string[] | any[]): boolean => {
+  const hasOwners = (owners?: Array<string | { userId?: string }>): boolean => {
     return getOwnerNames(owners).length > 0;
   };
 

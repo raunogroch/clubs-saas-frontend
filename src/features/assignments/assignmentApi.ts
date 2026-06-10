@@ -16,7 +16,7 @@ const api = createApi({
       query: (args) => {
         const page = args?.page ?? 1;
         const limit = args?.limit;
-        let url = `/assignments?page=${page}&limit=${limit ?? 10}`;
+        const url = `/assignments?page=${page}&limit=${limit ?? 10}`;
 
         return {
           url,

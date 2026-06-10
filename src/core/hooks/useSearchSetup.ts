@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSearch } from "../context/SearchContext";
+import { useSearch } from "../context/useSearch";
 
 export const useSearchSetup = () => {
   const { searchValue, setSearchValue, setIsSearchEnabled } = useSearch();

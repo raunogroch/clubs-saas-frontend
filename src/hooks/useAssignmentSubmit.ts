@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import {
   useCreateAssignment,
@@ -52,40 +51,28 @@ export const useAssignmentSubmit = ({
   const isSaving = isCreating || isUpdating;
   const error = createError || updateError;
 
-  const onSubmit: SubmitHandler<Inputs> = useCallback(
-    async (formData) => {
-      try {
-        if (isEdit && data?.id) {
-          await updateAssignment({
-            id: data.id,
-            name: formData.name,
-            owners: ownerIds,
-          });
-        } else {
-          await createAssignment({
-            name: formData.name,
-            owners: ownerIds,
-          });
-        }
-
-        onReset();
-        onSaved?.();
-        onClose();
-      } catch (err) {
-        console.error("Error al guardar asignación:", err);
+  const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+    try {
+      if (isEdit && data?.id) {
+        await updateAssignment({
+          id: data.id,
+          name: formData.name,
+          owners: ownerIds,
+        });
+      } else {
+        await createAssignment({
+          name: formData.name,
+          owners: ownerIds,
+        });
       }
-    },
-    [
-      isEdit,
-      data?.id,
-      updateAssignment,
-      createAssignment,
-      ownerIds,
-      onReset,
-      onSaved,
-      onClose,
-    ],
-  );
+
+      onReset();
+      onSaved?.();
+      onClose();
+    } catch (err) {
+      console.error("Error al guardar asignación:", err);
+    }
+  };
 
   return {
     onSubmit,

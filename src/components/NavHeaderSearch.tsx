@@ -1,4 +1,4 @@
-import { useSearch } from "../core/context/SearchContext";
+import { useSearch } from "../core/context/useSearch";
 
 export const NavHeaderSearch = () => {
   const { searchValue, setSearchValue } = useSearch();

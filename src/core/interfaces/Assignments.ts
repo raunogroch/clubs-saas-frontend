@@ -37,7 +37,7 @@ export interface AssignmentTableProps {
   assignments: Assignment[];
   page: number;
   pageSize: number;
-  getOwnerNames: (owners?: string[] | any[]) => string[];
+  getOwnerNames: (owners?: Array<string | { userId?: string }>) => string[];
   onEdit: (assignment: Assignment) => void;
 }
 

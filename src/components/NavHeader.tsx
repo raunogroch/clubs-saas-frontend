@@ -4,7 +4,7 @@ import { NavHeaderSearch } from "./NavHeaderSearch";
 import { Button } from "./Button";
 import { useAuthManager } from "../features/auth/authHooks";
 import { ButtonForm } from "./ButtonForm";
-import { useSearch } from "../core/context/SearchContext";
+import { useSearch } from "../core/context/useSearch";
 import {
   getLocalStorageItem,
   setLocalStorageItem,

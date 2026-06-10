@@ -12,7 +12,7 @@
 interface PersistRoot {
   auth: {
     token: string | null;
-    user: any;
+    user: Record<string, unknown> | null;
     isAuthenticated: boolean;
   };
 }
@@ -97,7 +97,9 @@ export const isValidTokenFormat = (token: string | null): boolean => {
  * @param token - Token JWT
  * @returns Payload decodificado o null si inválido
  */
-export const decodeJWT = (token: string | null): Record<string, any> | null => {
+export const decodeJWT = (
+  token: string | null,
+): Record<string, unknown> | null => {
   if (!token) return null;
 
   try {
@@ -121,10 +123,14 @@ export const decodeJWT = (token: string | null): Record<string, any> | null => {
  */
 export const isTokenExpired = (token: string | null): boolean => {
   const payload = decodeJWT(token);
-  if (!payload || !payload.exp) return true;
+  if (!payload || typeof payload !== "object" || !("exp" in payload))
+    return true;
+
+  const exp = Number((payload as { exp?: number }).exp);
+  if (!Number.isFinite(exp)) return true;
 
   // exp está en segundos, Date.now() en milisegundos
-  const expirationTime = payload.exp * 1000;
+  const expirationTime = exp * 1000;
   const currentTime = Date.now();
 
   // Considerar expirado si quedan menos de 60 segundos
@@ -139,9 +145,13 @@ export const isTokenExpired = (token: string | null): boolean => {
  */
 export const getTokenExpirationTime = (token: string | null): number | null => {
   const payload = decodeJWT(token);
-  if (!payload || !payload.exp) return null;
+  if (!payload || typeof payload !== "object" || !("exp" in payload))
+    return null;
 
-  const expirationTime = payload.exp * 1000;
+  const exp = Number((payload as { exp?: number }).exp);
+  if (!Number.isFinite(exp)) return null;
+
+  const expirationTime = exp * 1000;
   const currentTime = Date.now();
   const timeRemaining = expirationTime - currentTime;
 

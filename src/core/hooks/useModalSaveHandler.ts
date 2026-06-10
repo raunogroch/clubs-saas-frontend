@@ -1,13 +1,11 @@
 import { useCallback } from "react";
-
-type AlertType = "success" | "error" | "warning" | "info";
+import { useNotification } from "./useNotification";
 
 interface UseModalSaveHandlerParams {
   isCreating: boolean;
   selectedItem: { name?: string } | undefined;
-  refetch: () => Promise<any>;
+  refetch: () => Promise<unknown>;
   onModalClose: () => void;
-  onShowAlert: (message: string, type?: AlertType) => void;
 }
 
 export const useModalSaveHandler = ({
@@ -15,8 +13,9 @@ export const useModalSaveHandler = ({
   selectedItem,
   refetch,
   onModalClose,
-  onShowAlert,
 }: UseModalSaveHandlerParams) => {
+  const { success } = useNotification();
+
   return useCallback(async () => {
     await refetch();
     const itemName = selectedItem?.name || "";
@@ -25,7 +24,7 @@ export const useModalSaveHandler = ({
       ? `${itemName} ${action} exitosamente`
       : `Cambios guardados exitosamente`;
 
-    onShowAlert(message, "success");
+    success(message);
     onModalClose();
-  }, [refetch, onModalClose, onShowAlert, isCreating, selectedItem?.name]);
+  }, [refetch, onModalClose, success, isCreating, selectedItem?.name]);
 };

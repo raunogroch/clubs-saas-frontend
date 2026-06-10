@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useActiveRole } from "../core/context/ActiveRoleContext";
+import { useActiveRole } from "../core/context/useActiveRole";
 import { isRouteAllowedForRole } from "../features/navigation";
 
 export const useRoleRouteValidator = () => {

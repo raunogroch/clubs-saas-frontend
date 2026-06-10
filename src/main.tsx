@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
+import "toastr/build/toastr.min.css";
 import { router } from "./router/router";
 import { store, persistor } from "./app/store";
 import { AppInitializer } from "./app/AppInitializer";

@@ -65,7 +65,10 @@ export const useCreateUser = () => {
   const errorMessage = error
     ? typeof error === "string"
       ? error
-      : (error as any)?.status === 409
+      : typeof error === "object" &&
+          error &&
+          "status" in error &&
+          error.status === 409
         ? "El usuario ya existe"
         : "Error al crear usuario"
     : null;
@@ -95,9 +98,15 @@ export const useUpdateUser = () => {
   const errorMessage = error
     ? typeof error === "string"
       ? error
-      : (error as any)?.status === 409
+      : typeof error === "object" &&
+          error &&
+          "status" in error &&
+          error.status === 409
         ? "El usuario ya existe"
-        : (error as any)?.status === 404
+        : typeof error === "object" &&
+            error &&
+            "status" in error &&
+            error.status === 404
           ? "Usuario no encontrado"
           : "Error al actualizar usuario"
     : null;

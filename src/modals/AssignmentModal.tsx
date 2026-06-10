@@ -24,10 +24,25 @@ export const AssignmentModal = ({
   } = form;
 
   const { ownerSearch, handleClose } = useModalInitialization(open, data);
+  const {
+    owners,
+    searchContainerRef,
+    searchTerm,
+    setSearchTerm,
+    showSearchResults,
+    setShowSearchResults,
+    debouncedSearchTerm,
+    isLoadingUsers,
+    filteredUsers,
+    selectedUsers,
+    handleAddOwner,
+    handleRemoveOwner,
+    clearSearch,
+  } = ownerSearch;
 
   const { onSubmit, error, isSaving } = useAssignmentSubmit({
     data,
-    ownerIds: ownerSearch.owners,
+    ownerIds: owners,
     onSaved,
     onClose,
     onReset: () => {
@@ -74,7 +89,7 @@ export const AssignmentModal = ({
           disabled={isSaving}
         />
 
-        <div className="form-group row" ref={ownerSearch.searchContainerRef}>
+        <div className="form-group row" ref={searchContainerRef}>
           <label className="col-sm-2 col-form-label">
             Propietarios
             <span className="text-danger">*</span>
@@ -82,26 +97,26 @@ export const AssignmentModal = ({
           <div className="col-sm-10">
             <div className="position-relative">
               <OwnerSearchInput
-                searchTerm={ownerSearch.searchTerm}
+                searchTerm={searchTerm}
                 onSearchChange={(term) => {
-                  ownerSearch.setSearchTerm(term);
-                  ownerSearch.setShowSearchResults(true);
+                  setSearchTerm(term);
+                  setShowSearchResults(true);
                 }}
-                showResults={ownerSearch.showSearchResults}
-                onFocus={() => ownerSearch.setShowSearchResults(true)}
-                onClear={ownerSearch.clearSearch}
+                showResults={showSearchResults}
+                onFocus={() => setShowSearchResults(true)}
+                onClear={clearSearch}
                 disabled={isSaving}
               />
 
-              {ownerSearch.showSearchResults && (
+              {showSearchResults && (
                 <OwnerSearchResults
-                  searchTerm={ownerSearch.searchTerm}
-                  debouncedSearchTerm={ownerSearch.debouncedSearchTerm}
-                  isLoadingUsers={ownerSearch.isLoadingUsers}
-                  filteredUsers={ownerSearch.filteredUsers}
+                  searchTerm={searchTerm}
+                  debouncedSearchTerm={debouncedSearchTerm}
+                  isLoadingUsers={isLoadingUsers}
+                  filteredUsers={filteredUsers}
                   users={[]}
                   isSaving={isSaving}
-                  onSelectUser={ownerSearch.handleAddOwner}
+                  onSelectUser={handleAddOwner}
                 />
               )}
             </div>
@@ -109,9 +124,9 @@ export const AssignmentModal = ({
         </div>
 
         <OwnerSelectionTable
-          selectedUsers={ownerSearch.selectedUsers}
+          selectedUsers={selectedUsers}
           isSaving={isSaving}
-          onRemove={ownerSearch.handleRemoveOwner}
+          onRemove={handleRemoveOwner}
         />
 
         <input type="hidden" {...register("owners")} />
