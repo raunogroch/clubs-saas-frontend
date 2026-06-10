@@ -1,4 +1,7 @@
-import { ClubStatus as ClubStatusEnum, Sport as SportEnum } from "../../common/enums";
+import {
+  ClubStatus as ClubStatusEnum,
+  Sport as SportEnum,
+} from "../../common/enums";
 
 export type ClubSport = (typeof SportEnum)[keyof typeof SportEnum];
 
