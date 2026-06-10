@@ -23,6 +23,9 @@ const AssignmentPage = lazy(() =>
 const UserPage = lazy(() =>
   import("../pages/UserPage").then((m) => ({ default: m.UserPage })),
 );
+const ClubPage = lazy(() =>
+  import("../pages/ClubPage").then((m) => ({ default: m.ClubPage })),
+);
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -73,6 +76,14 @@ export const router = createBrowserRouter([
             element: (
               <RouteLoader>
                 <UserPage role="ADMIN" />
+              </RouteLoader>
+            ),
+          },
+          {
+            path: "clubs",
+            element: (
+              <RouteLoader>
+                <ClubPage />
               </RouteLoader>
             ),
           },

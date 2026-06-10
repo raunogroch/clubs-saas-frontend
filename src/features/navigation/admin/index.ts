@@ -7,4 +7,10 @@ export const adminMenu: MenuItem[] = [
     icon: "th-large",
     name: "Dashboard",
   },
+  {
+    id: "clubs",
+    route: "/clubs",
+    icon: "building",
+    name: "Clubes",
+  },
 ];
