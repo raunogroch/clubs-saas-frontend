@@ -1,4 +1,4 @@
-import { useAuthManager } from "../features/auth/authHooks";
+import { useAuthManager } from "../features/auth/useAuthManager";
 import { getRoleLabel } from "../common/translations";
 import { useActiveRole } from "../core/context/useActiveRole";
 import { useDropdownMenu } from "../core/hooks/useDropdownMenu";

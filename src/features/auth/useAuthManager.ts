@@ -1,4 +1,4 @@
-// features/auth/authHooks.ts
+// features/auth/useAuthManager.ts
 
 import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
@@ -66,7 +66,7 @@ export const useAuthManager = () => {
             });
 
             dispatch(updateUserAssignments(assignments));
-          } catch (error) {
+          } catch {
             dispatch(updateUserAssignments([]));
           }
         }

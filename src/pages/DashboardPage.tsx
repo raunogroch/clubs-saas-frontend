@@ -1,5 +1,5 @@
 import { useActiveRole } from "../core/context/useActiveRole";
-import { useAuthManager } from "../features/auth/authHooks";
+import { useAuthManager } from "../features/auth/useAuthManager";
 import {
   DashboardAdmin,
   DashboardAssistant,

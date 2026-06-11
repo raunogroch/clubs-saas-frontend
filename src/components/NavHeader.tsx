@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { NavHeaderSearch } from "./NavHeaderSearch";
 import { Button } from "./Button";
-import { useAuthManager } from "../features/auth/authHooks";
+import { useAuthManager } from "../features/auth/useAuthManager";
 import { ButtonForm } from "./ButtonForm";
 import { useSearch } from "../core/context/useSearch";
 import {

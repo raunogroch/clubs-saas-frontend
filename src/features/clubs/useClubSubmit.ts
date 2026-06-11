@@ -53,7 +53,7 @@ export const useClubSubmit = (
       onSaved?.();
       onClose?.();
     },
-    [createClub, data?.id, isEdit, onClose, onSaved, updateClub],
+    [createClub, data, isEdit, onClose, onSaved, updateClub],
   );
 
   return {

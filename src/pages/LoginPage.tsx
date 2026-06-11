@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ButtonForm } from "../components";
-import { useAuthManager } from "../features/auth/authHooks";
+import { useAuthManager } from "../features/auth/useAuthManager";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ export const LoginPage = () => {
       await login({ username, password });
       // La redirección ocurre en el useEffect cuando isAuthenticated cambia
     } catch {
-      // El error se maneja en authHooks y se muestra en el estado 'error'
+      // El error se maneja en useAuthManager y se muestra en el estado 'error'
     }
   };
 
