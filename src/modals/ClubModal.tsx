@@ -98,14 +98,6 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
             />
 
             <InputForm<ClubFormInputs>
-              title="Imagen"
-              name="image"
-              register={register}
-              errors={errors}
-              disabled={isSaving}
-            />
-
-            <InputForm<ClubFormInputs>
               title="Deporte"
               name="sport"
               register={register}
@@ -151,15 +143,6 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
               register={register}
               errors={errors}
               required="El país es obligatorio"
-              disabled={isSaving}
-            />
-
-            <InputForm<ClubFormInputs>
-              title="Assignment ID"
-              name="assignmentId"
-              register={register}
-              errors={errors}
-              required="El assignmentId es obligatorio"
               disabled={isSaving}
             />
 
