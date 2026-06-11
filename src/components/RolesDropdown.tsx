@@ -1,6 +1,7 @@
 import { useAuthManager } from "../features/auth/useAuthManager";
 import { getRoleLabel } from "../common/translations";
 import { useActiveRole } from "../core/context/useActiveRole";
+import { useAssignmentPersistence } from "../core/hooks";
 import { useDropdownMenu } from "../core/hooks/useDropdownMenu";
 import { useInitializeActiveRole } from "../core/hooks/useInitializeActiveRole";
 import { useValidateRolesConsistency } from "../core/hooks/useValidateRolesConsistency";
@@ -24,8 +25,9 @@ import type { Roles } from "../common/enums";
  * - useValidateRolesConsistency: Valida que los roles sean válidos
  */
 export const RolesDropdown = () => {
-  const { user } = useAuthManager();
+  const { user, refreshAssignments } = useAuthManager();
   const { activeRole, setActiveRole } = useActiveRole();
+  const { setAssignmentId } = useAssignmentPersistence();
   const { isOpen, toggleOpen, closeMenu, dropdownRef } = useDropdownMenu();
 
   // Normalizar roles independientemente de la estructura
@@ -41,8 +43,16 @@ export const RolesDropdown = () => {
     return null;
   }
 
-  const handleRoleSelect = (role: Roles) => {
+  const handleRoleSelect = async (role: Roles) => {
     setActiveRole(role);
+
+    const assignments = await refreshAssignments();
+    const nextAssignmentId = assignments[0]?.assignmentId ?? "";
+
+    if (nextAssignmentId) {
+      setAssignmentId(nextAssignmentId);
+    }
+
     closeMenu();
   };
 

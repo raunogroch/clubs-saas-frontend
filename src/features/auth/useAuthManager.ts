@@ -82,6 +82,23 @@ export const useAuthManager = () => {
     [dispatch, loginMutation, triggerGetCurrentUserAssignments],
   );
 
+  const refreshAssignments = useCallback(async () => {
+    if (!user?.id || !shouldFetchUserAssignments(user)) {
+      return [];
+    }
+
+    try {
+      const assignments = await triggerGetCurrentUserAssignments(
+        user.id,
+      ).unwrap();
+      dispatch(updateUserAssignments(assignments));
+      return assignments;
+    } catch {
+      dispatch(updateUserAssignments([]));
+      return [];
+    }
+  }, [dispatch, triggerGetCurrentUserAssignments, user]);
+
   // Función de logout
   const handleLogout = useCallback(() => {
     dispatch(logout());
@@ -100,5 +117,6 @@ export const useAuthManager = () => {
     login: handleLogin,
     logout: handleLogout,
     clearError: handleClearError,
+    refreshAssignments,
   };
 };
