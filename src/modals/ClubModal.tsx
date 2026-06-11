@@ -109,15 +109,6 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
             />
 
             <InputForm<ClubFormInputs>
-              title="Teléfono"
-              name="phone"
-              register={register}
-              errors={errors}
-              required="El teléfono es obligatorio"
-              disabled={isSaving}
-            />
-
-            <InputForm<ClubFormInputs>
               title="Dirección"
               name="address"
               register={register}

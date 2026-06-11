@@ -126,7 +126,6 @@ export const ClubPage = () => {
                     <tr>
                       <th>Nombre</th>
                       <th>Deporte</th>
-                      <th>Teléfono</th>
                       <th>Ciudad</th>
                       <th>País</th>
                       <th>Estado</th>
@@ -140,7 +139,6 @@ export const ClubPage = () => {
                         <td className="align-middle">
                           {getSportLabel(club.sport) ?? club.sport}
                         </td>
-                        <td className="align-middle">{club.phone}</td>
                         <td className="align-middle">{club.city}</td>
                         <td className="align-middle">{club.country}</td>
                         <td className="align-middle">
@@ -153,7 +151,7 @@ export const ClubPage = () => {
                             aria-label={`Editar club ${club.name}`}
                           >
                             <i className="fa fa-edit me-1" />
-                            Editar
+                            &nbsp;Editar
                           </button>
                           {/* <button
                             className="btn btn-sm btn-danger"
