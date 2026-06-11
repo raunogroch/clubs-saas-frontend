@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const ASSIGNMENT_ID_STORAGE_KEY = "activeAssignmentId";
 const LEGACY_ASSIGNMENT_STORAGE_KEY = "activeAssignment";
+const ASSIGNMENT_CHANGED_EVENT = "activeAssignmentId:changed";
 
 const normalizeAssignmentId = (value: unknown): string => {
   if (typeof value === "string") {
@@ -63,6 +64,36 @@ export const useAssignmentPersistence = () => {
     getStoredAssignmentId,
   );
 
+  const syncAssignmentId = useCallback(() => {
+    setAssignmentIdState(getStoredAssignmentId());
+  }, []);
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (
+        event.key === ASSIGNMENT_ID_STORAGE_KEY ||
+        event.key === LEGACY_ASSIGNMENT_STORAGE_KEY
+      ) {
+        syncAssignmentId();
+      }
+    };
+
+    const handleAssignmentChange = () => {
+      syncAssignmentId();
+    };
+
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener(ASSIGNMENT_CHANGED_EVENT, handleAssignmentChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener(
+        ASSIGNMENT_CHANGED_EVENT,
+        handleAssignmentChange,
+      );
+    };
+  }, [syncAssignmentId]);
+
   const setAssignmentId = useCallback((value: string) => {
     const normalizedValue = value?.trim() ?? "";
 
@@ -75,6 +106,7 @@ export const useAssignmentPersistence = () => {
     try {
       localStorage.setItem(ASSIGNMENT_ID_STORAGE_KEY, normalizedValue);
       localStorage.removeItem(LEGACY_ASSIGNMENT_STORAGE_KEY);
+      window.dispatchEvent(new Event(ASSIGNMENT_CHANGED_EVENT));
     } catch {
       // Silently handle storage error
     }
