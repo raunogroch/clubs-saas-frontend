@@ -29,6 +29,11 @@ const ClubPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
+const NoAssignmentsPage = lazy(() =>
+  import("../pages/NoAssignmentsPage").then((m) => ({
+    default: m.NoAssignmentsPage,
+  })),
+);
 
 const RouteLoader = ({ children }: { children: ReactNode }) => (
   <Suspense fallback={<SplashScreen />}>{children}</Suspense>
@@ -60,6 +65,14 @@ export const router = createBrowserRouter([
             element: (
               <RouteLoader>
                 <DashboardPage />
+              </RouteLoader>
+            ),
+          },
+          {
+            path: "no-assignments",
+            element: (
+              <RouteLoader>
+                <NoAssignmentsPage />
               </RouteLoader>
             ),
           },
