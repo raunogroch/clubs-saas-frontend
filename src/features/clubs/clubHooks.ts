@@ -15,6 +15,7 @@ interface UseClubsParams {
   page?: number;
   limit?: number;
   search?: string;
+  assignmentId?: string;
 }
 
 export const useClubs = (params?: UseClubsParams) => {
@@ -26,8 +27,18 @@ export const useClubs = (params?: UseClubsParams) => {
 
   const { data, isLoading, error, refetch } = useGetClubsQuery(queryParams);
 
+  const filteredClubs = (data?.data ?? []).filter((club) => {
+    const assignmentId = params?.assignmentId?.trim();
+
+    if (!assignmentId) {
+      return true;
+    }
+
+    return club.assignmentId === assignmentId;
+  });
+
   return {
-    clubs: data?.data ?? [],
+    clubs: filteredClubs,
     meta: data?.meta,
     isLoading,
     error: error ? "No se pudieron cargar los clubes" : null,

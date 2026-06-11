@@ -7,11 +7,18 @@ import {
   useModalSaveHandler,
   usePaginationState,
 } from "../core/hooks";
+import { useAssignmentPersistence } from "../core/hooks";
+import { useActiveRole } from "../core/context/useActiveRole";
+import { useAuthManager } from "../features/auth/useAuthManager";
 import type { Club } from "../core/interfaces/Clubs";
+import { Roles } from "../common/enums";
 //import { useNotification } from "../core/hooks/useNotification";
 import { getClubStatusLabel, getSportLabel } from "../common/translations";
 
 export const ClubPage = () => {
+  const { user } = useAuthManager();
+  const { activeRole } = useActiveRole();
+  const { assignmentId: persistedAssignmentId } = useAssignmentPersistence();
   const {
     isOpen: isModalOpen,
     selectedItem: selectedClub,
@@ -29,9 +36,15 @@ export const ClubPage = () => {
     calculateTotalPages,
   } = usePaginationState();
 
+  const assignmentFilter =
+    activeRole === Roles.ADMIN
+      ? persistedAssignmentId || user?.assignments?.[0]?.assignmentId || ""
+      : undefined;
+
   const { clubs, meta, isLoading, error, refetch } = useClubs({
     page,
     limit: pageSize,
+    assignmentId: assignmentFilter,
   });
 
   //const { deleteClub } = useDeleteClub();
