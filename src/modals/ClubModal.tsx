@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { InputForm, Modal } from "../components";
+import { useAssignmentPersistence } from "../core/hooks";
 import type { ClubModalProps } from "../core/interfaces/Clubs";
+import { useAppSelector } from "../hooks/reduxHooks";
 import { sportOptions, statusOptions } from "../features/clubs/clubFormOptions";
 import {
   emptyForm,
@@ -12,6 +14,9 @@ import { useClubSubmit } from "../features/clubs/useClubSubmit";
 
 export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
   const { submit, isSaving, error } = useClubSubmit(data, onSaved, onClose);
+  const { assignmentId: persistedAssignmentId, setAssignmentId } =
+    useAssignmentPersistence();
+  const user = useAppSelector((state) => state.auth.user);
 
   const {
     register,
@@ -24,18 +29,38 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
     defaultValues: emptyForm,
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(mapClubToForm(data));
-      clearErrors();
-    }
-  }, [open, data, reset, clearErrors]);
-
   const isEdit = Boolean(data?.id);
+  const defaultAssignmentId =
+    data?.assignmentId ||
+    persistedAssignmentId ||
+    user?.assignments?.[0]?.assignmentId ||
+    "";
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const nextValues = mapClubToForm(data);
+
+    if (!isEdit && defaultAssignmentId && !nextValues.assignmentId) {
+      nextValues.assignmentId = defaultAssignmentId;
+    }
+
+    reset(nextValues);
+    clearErrors();
+  }, [open, data, reset, clearErrors, isEdit, defaultAssignmentId]);
 
   const onSubmit = handleSubmit(async (formData) => {
     try {
-      await submit(formData);
+      const resolvedAssignmentId =
+        formData.assignmentId.trim() || defaultAssignmentId;
+
+      if (resolvedAssignmentId) {
+        setAssignmentId(resolvedAssignmentId);
+      }
+
+      await submit({ ...formData, assignmentId: resolvedAssignmentId });
       reset(emptyForm);
     } catch (error) {
       console.error("Error al guardar club:", error);

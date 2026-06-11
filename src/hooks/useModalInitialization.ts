@@ -7,24 +7,25 @@ export const useModalInitialization = (
   data: AssignmentModalProps["data"],
 ) => {
   const ownerSearch = useOwnerSearch();
+  const { initializeOwners, loadSelectedUsers, owners } = ownerSearch;
 
   // Inicializa propietarios solo cuando se abre el modal o cambian los datos
   useEffect(() => {
     if (open) {
-      ownerSearch.initializeOwners(data);
+      initializeOwners(data);
     }
-  }, [open, data, ownerSearch]);
+  }, [open, data, initializeOwners]);
 
   // Carga usuarios seleccionados cuando cambian los IDs de propietarios
   useEffect(() => {
-    if (ownerSearch.owners.length > 0) {
-      ownerSearch.loadSelectedUsers();
+    if (owners.length > 0) {
+      loadSelectedUsers();
     }
-  }, [ownerSearch]);
+  }, [owners, loadSelectedUsers]);
 
   const handleClose = useCallback(() => {
-    ownerSearch.initializeOwners();
-  }, [ownerSearch]);
+    initializeOwners();
+  }, [initializeOwners]);
 
   return {
     ownerSearch,

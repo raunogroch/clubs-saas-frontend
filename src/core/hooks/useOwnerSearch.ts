@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useUsers } from "../../features/users/userHooks";
 import { Roles } from "../../common/enums";
 import type { User } from "../../core/interfaces";
@@ -101,23 +101,42 @@ export const useOwnerSearch = () => {
     setShowSearchResults(false);
   }, []);
 
-  const filteredUsers = users.filter((user) => !owners.includes(user.id));
+  const filteredUsers = useMemo(
+    () => users.filter((user) => !owners.includes(user.id)),
+    [users, owners],
+  );
 
-  return {
-    searchTerm,
-    setSearchTerm,
-    debouncedSearchTerm,
-    showSearchResults,
-    setShowSearchResults,
-    owners,
-    selectedUsers,
-    searchContainerRef,
-    filteredUsers,
-    isLoadingUsers,
-    initializeOwners,
-    loadSelectedUsers,
-    handleAddOwner,
-    handleRemoveOwner,
-    clearSearch,
-  };
+  return useMemo(
+    () => ({
+      searchTerm,
+      setSearchTerm,
+      debouncedSearchTerm,
+      showSearchResults,
+      setShowSearchResults,
+      owners,
+      selectedUsers,
+      searchContainerRef,
+      filteredUsers,
+      isLoadingUsers,
+      initializeOwners,
+      loadSelectedUsers,
+      handleAddOwner,
+      handleRemoveOwner,
+      clearSearch,
+    }),
+    [
+      searchTerm,
+      debouncedSearchTerm,
+      showSearchResults,
+      owners,
+      selectedUsers,
+      filteredUsers,
+      isLoadingUsers,
+      initializeOwners,
+      loadSelectedUsers,
+      handleAddOwner,
+      handleRemoveOwner,
+      clearSearch,
+    ],
+  );
 };

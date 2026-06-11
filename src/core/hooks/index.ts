@@ -10,3 +10,4 @@ export { useOwnerSearch } from "./useOwnerSearch";
 export { useNotification } from "./useNotification";
 export type { UseNotificationReturn } from "./useNotification";
 export { usePermissions } from "./usePermissions";
+export { useAssignmentPersistence } from "./useAssignmentPersistence";
