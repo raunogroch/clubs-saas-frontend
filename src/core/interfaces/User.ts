@@ -6,6 +6,16 @@ export interface UserRole {
   createdAt?: string;
 }
 
+export interface UserAssignments {
+  id: string;
+  userId: string;
+  assignmentId: string;
+  status: Status | string;
+  createdAt: string;
+  updatedAt: string;
+  available?: boolean | null;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -18,6 +28,7 @@ export interface User {
   phone?: string;
   address?: string;
   status?: Status;
+  assignments?: UserAssignments[];
 }
 
 export interface CreateUserDto {

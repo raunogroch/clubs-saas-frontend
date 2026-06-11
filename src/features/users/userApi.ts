@@ -58,6 +58,21 @@ const api = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
+
+    /**
+     * Obtiene un usuario por ID con todos sus datos incluyendo assignments
+     *
+     * Principios SOLID:
+     * - SRP: Una responsabilidad - obtener datos completos del usuario
+     * - OCP: Extensible sin modificar código existente
+     * - DIP: Depende del baseQuery autenticado
+     */
+    getUserById: builder.query<User, string>({
+      query: (userId) => ({
+        url: `/users/${userId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -65,6 +80,8 @@ export const {
   useGetUsersQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
+  useGetUserByIdQuery,
+  useLazyGetUserByIdQuery,
 } = api;
 export const userApi = api;
 export default api;

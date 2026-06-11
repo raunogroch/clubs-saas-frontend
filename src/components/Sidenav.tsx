@@ -16,6 +16,8 @@ export const Sidenav = () => {
     : "Usuario";
 
   const displayRoles: UserRole[] = user?.roles || [];
+  const hasAssignments = (user?.assignments ?? []).length > 0;
+  const shouldHideMenuForAdmin = activeRole === "ADMIN" && !hasAssignments;
 
   // Obtener el menú específico para el rol activo
   const menuItems = useMemo(
@@ -43,15 +45,16 @@ export const Sidenav = () => {
             </div>
           </li>
 
-          {menuItems.map((item) => (
-            <MenuSingleOption
-              key={item.id}
-              route={item.route}
-              icon={item.icon}
-              name={item.name}
-              active={pathname === item.route}
-            />
-          ))}
+          {!shouldHideMenuForAdmin &&
+            menuItems.map((item) => (
+              <MenuSingleOption
+                key={item.id}
+                route={item.route}
+                icon={item.icon}
+                name={item.name}
+                active={pathname === item.route}
+              />
+            ))}
         </ul>
       </div>
     </nav>

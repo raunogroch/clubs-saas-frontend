@@ -1,6 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
-import type { Assignment, PaginatedResponse } from "../../core/interfaces";
+import type {
+  Assignment,
+  PaginatedResponse,
+  UserAssignments,
+} from "../../core/interfaces";
 
 const api = createApi({
   reducerPath: "assignmentApi",
@@ -45,6 +49,14 @@ const api = createApi({
       },
       invalidatesTags: ["Assignments"],
     }),
+
+    getUserAssignments: builder.query<UserAssignments[], string>({
+      query: (userId) => ({
+        url: `/user/${userId}`,
+        method: "GET",
+      }),
+      providesTags: ["Assignments"],
+    }),
   }),
 });
 
@@ -52,6 +64,7 @@ export const {
   useGetAssignmentsQuery,
   useCreateAssignmentMutation,
   useUpdateAssignmentMutation,
+  useGetUserAssignmentsQuery,
 } = api;
 export const assignmentApi = api;
 export default api;

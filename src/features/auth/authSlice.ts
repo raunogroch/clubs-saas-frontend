@@ -11,6 +11,7 @@
 
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState, User } from "../../core/types";
+import type { UserAssignments } from "../../core/interfaces";
 
 const initialState: AuthState = {
   user: null,
@@ -84,6 +85,22 @@ export const authSlice = createSlice({
         state.user = { ...state.user, ...action.payload };
       }
     },
+
+    /**
+     * Action para actualizar assignments del usuario autenticado
+     *
+     * Principios SOLID:
+     * - SRP: Una responsabilidad - actualizar solo assignments
+     * - DIP: Recibe array de UserAssignments (abstracción)
+     */
+    updateUserAssignments: (
+      state,
+      action: PayloadAction<UserAssignments[]>,
+    ) => {
+      if (state.user) {
+        state.user.assignments = action.payload;
+      }
+    },
   },
 });
 
@@ -94,6 +111,7 @@ export const {
   logout,
   clearError,
   updateUser,
+  updateUserAssignments,
 } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -16,6 +16,7 @@ import storage from "./storage";
 import authReducer from "../features/auth/authSlice";
 import authApi from "../features/auth/authApi";
 import assignmentApi from "../features/assignments/assignmentApi";
+import userAssignmentApi from "../features/assignments/userAssignmentApi";
 import userApi from "../features/users/userApi";
 import clubApi from "../features/clubs/clubApi";
 import persistenceReducer from "./persistenceSlice";
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   [authApi.reducerPath]: authApi.reducer,
   [assignmentApi.reducerPath]: assignmentApi.reducer,
+  [userAssignmentApi.reducerPath]: userAssignmentApi.reducer,
   [userApi.reducerPath]: userApi.reducer,
   [clubApi.reducerPath]: clubApi.reducer,
 });
@@ -64,6 +66,7 @@ export const store = configureStore({
       .concat(
         authApi.middleware,
         assignmentApi.middleware,
+        userAssignmentApi.middleware,
         userApi.middleware,
         clubApi.middleware,
       )
