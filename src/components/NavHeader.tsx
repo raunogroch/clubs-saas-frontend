@@ -10,7 +10,6 @@ import {
   setLocalStorageItem,
 } from "../core/utils/localStorage";
 import { RolesDropdown } from "./RolesDropdown";
-import { AssignmentsDropdown } from "./AssignmentsDropdown";
 
 export const NavHeader = () => {
   const navigate = useNavigate();
@@ -68,7 +67,6 @@ export const NavHeader = () => {
           }}
         >
           <RolesDropdown />
-          <AssignmentsDropdown />
         </div>
         <ul className="nav navbar-top-links navbar-right">
           <li>
