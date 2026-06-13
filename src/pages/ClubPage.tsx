@@ -126,6 +126,7 @@ export const ClubPage = () => {
                     <tr>
                       <th>Nombre</th>
                       <th>Deporte</th>
+                      <th>Telefono</th>
                       <th>Ciudad</th>
                       <th>País</th>
                       <th>Estado</th>
@@ -139,6 +140,7 @@ export const ClubPage = () => {
                         <td className="align-middle">
                           {getSportLabel(club.sport) ?? club.sport}
                         </td>
+                        <td className="align-middle">{club.phone}</td>
                         <td className="align-middle">{club.city}</td>
                         <td className="align-middle">{club.country}</td>
                         <td className="align-middle">

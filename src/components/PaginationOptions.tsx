@@ -7,14 +7,13 @@ const pageSizeOptions = [5, 10, 20, 50, 100];
 
 export const PaginationOptions = (props: PaginationOptionsProps) => {
   return (
-    <div className="d-flex align-items-center gap-2" style={{ gap: "0.5rem" }}>
+    <div className="d-flex align-items-center gap-2 pagination-options-container">
       <label htmlFor="pageSizeSelect" className="mb-0">
         <small>Registros:</small>
       </label>
       <select
         id="pageSizeSelect"
-        className="form-control form-control-sm"
-        style={{ width: "auto" }}
+        className="form-control form-control-sm pagination-select"
         value={props.pageSize}
         onChange={(e) => {
           props.setPageSize(Number(e.target.value));

@@ -38,9 +38,9 @@ export const Sidenav = () => {
 
             <div className="logo-element">
               <img
-                src="assets/img/olympics.svg"
+                //src="assets/img/olympics.svg"
                 alt="logo"
-                style={{ height: "20px" }}
+                className="sidenav-logo"
               />
             </div>
           </li>

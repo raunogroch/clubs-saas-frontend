@@ -36,15 +36,7 @@ export const OwnerSearchResults = (props: OwnerSearchResultsProps) => {
     onSelectUser,
   } = props;
   return (
-    <div
-      className="border border-1 bg-white rounded mt-1 shadow-sm"
-      style={{
-        maxHeight: "300px",
-        overflowY: "auto",
-        minWidth: "100%",
-        zIndex: 1050,
-      }}
-    >
+    <div className="owner-search-container">
       {searchTerm === "" ? (
         <div className="p-2 text-muted text-center">
           <small>Escribe para buscar usuarios ADMIN</small>
@@ -73,8 +65,7 @@ export const OwnerSearchResults = (props: OwnerSearchResultsProps) => {
             <button
               key={user.id}
               type="button"
-              className="w-100 text-start p-2 border-0 bg-white"
-              style={{ cursor: "pointer" }}
+              className="w-100 text-start p-2 border-0 bg-white owner-search-button"
               onMouseDown={(e) => {
                 e.preventDefault();
                 onSelectUser(user.id, user);
@@ -113,7 +104,7 @@ export const OwnerSelectionTable = (props: OwnerSelectionTableProps) => {
               <tr>
                 <th>Nombre completo</th>
                 <th>Carnet</th>
-                <th style={{ width: "50px" }}>Acción</th>
+                <th className="owner-search-table-header-action">Acción</th>
               </tr>
             </thead>
             <tbody>

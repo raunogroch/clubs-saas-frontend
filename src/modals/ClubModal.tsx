@@ -116,6 +116,15 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
               required="La dirección es obligatoria"
               disabled={isSaving}
             />
+
+            <InputForm<ClubFormInputs>
+              title="Telefono"
+              name="phone"
+              register={register}
+              errors={errors}
+              required="El teléfono es obligatorio"
+              disabled={isSaving}
+            />
           </div>
 
           <div className="col-md-6">

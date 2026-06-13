@@ -62,11 +62,10 @@ export const Modal = ({
 
       {/* Modal */}
       <div
-        className="modal inmodal fade show"
+        className="modal inmodal fade show modal-shown"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        style={{ display: "block" }}
       >
         <div
           className={`modal-dialog ${size ? `modal-${size}` : ""}`}

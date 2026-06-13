@@ -75,7 +75,7 @@ export const RolesDropdown = () => {
   };
 
   return (
-    <div ref={dropdownRef} style={{ position: "relative" }}>
+    <div ref={dropdownRef} className="roles-dropdown-container">
       <button
         type="button"
         className="btn btn-default btn-sm"
@@ -93,54 +93,23 @@ export const RolesDropdown = () => {
       </button>
 
       {isOpen && (
-        <ul
-          className="dropdown-menu dropdown-user"
-          style={{
-            display: "block",
-            position: "absolute",
-            top: "100%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            marginTop: "5px",
-            minWidth: "180px",
-            zIndex: 1000,
-          }}
-        >
+        <ul className="dropdown-menu dropdown-user dropdown-centered">
           {showRolesSection && (
             <>
-              <li
-                className="dropdown-header"
-                style={{
-                  padding: "8px 12px",
-                  fontSize: "11px",
-                  textTransform: "uppercase",
-                  color: "#777",
-                }}
-              >
+              <li className="dropdown-header-styled">
                 Roles
               </li>
               {rolesArray.map((role) => (
                 <li key={role}>
                   <button
                     type="button"
-                    className="dropdown-item"
+                    className={`dropdown-item-custom ${activeRole === role ? "active" : ""}`}
                     onClick={() => handleRoleSelect(role)}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      border: "none",
-                      padding: "8px 12px",
-                      cursor: "pointer",
-                      backgroundColor:
-                        activeRole === role ? "#f3f3f3" : "transparent",
-                      fontWeight: activeRole === role ? "bold" : "normal",
-                    }}
                   >
                     <i
-                      className={`fa ${
+                      className={`fa dropdown-item-icon ${
                         activeRole === role ? "fa-check-circle" : "fa-circle-o"
                       }`}
-                      style={{ marginRight: "8px" }}
                     />
                     {getRoleLabel(role)}
                   </button>
@@ -152,37 +121,18 @@ export const RolesDropdown = () => {
           {showAssignmentsSection && (
             <>
               {showRolesSection && <li className="dropdown-divider" />}
-              <li
-                className="dropdown-header"
-                style={{
-                  padding: "8px 12px",
-                  fontSize: "11px",
-                  textTransform: "uppercase",
-                  color: "#777",
-                }}
-              >
+              <li className="dropdown-header-styled">
                 Asignaciones
               </li>
               {assignments.map((value, index) => (
                 <li key={value}>
                   <button
                     type="button"
-                    className="dropdown-item"
+                    className={`dropdown-item-custom ${assignmentId === value ? "active" : ""}`}
                     onClick={() => handleAssignmentSelect(value)}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      border: "none",
-                      padding: "8px 12px",
-                      cursor: "pointer",
-                      backgroundColor:
-                        assignmentId === value ? "#f3f3f3" : "transparent",
-                      fontWeight: assignmentId === value ? "bold" : "normal",
-                    }}
                   >
                     <i
-                      className={`fa ${assignmentId === value ? "fa-check-circle" : "fa-circle-o"}`}
-                      style={{ marginRight: "8px" }}
+                      className={`fa dropdown-item-icon ${assignmentId === value ? "fa-check-circle" : "fa-circle-o"}`}
                     />
                     {`Asignación ${index + 1}`}
                   </button>

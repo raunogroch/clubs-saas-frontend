@@ -42,57 +42,30 @@ export const AssignmentsDropdown = () => {
   };
 
   return (
-    <div ref={dropdownRef} style={{ position: "relative", marginRight: "8px" }}>
+    <div ref={dropdownRef} className="assignments-dropdown-container">
       <button
         type="button"
-        className="btn btn-white"
+        className="btn btn-white assignments-dropdown-button"
         onClick={toggleOpen}
         aria-expanded={isOpen}
         aria-haspopup="true"
         title={`Assignment activo: ${selectedAssignmentLabel}`}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-        }}
       >
         <i className="fa fa-briefcase" />
         <span className="label label-primary">{selectedAssignmentLabel}</span>
       </button>
 
       {isOpen && (
-        <ul
-          className="dropdown-menu dropdown-user"
-          style={{
-            display: "block",
-            position: "absolute",
-            top: "100%",
-            right: 0,
-            marginTop: "5px",
-            minWidth: "220px",
-            zIndex: 1000,
-          }}
-        >
+        <ul className="dropdown-menu dropdown-user dropdown-assignments">
           {assignments.map((value, index) => (
             <li key={value}>
               <button
                 type="button"
-                className="dropdown-item"
+                className={`dropdown-item-custom ${assignmentId === value ? "active" : ""}`}
                 onClick={() => handleAssignmentSelect(value)}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  border: "none",
-                  padding: "8px 12px",
-                  cursor: "pointer",
-                  backgroundColor:
-                    assignmentId === value ? "#f3f3f3" : "transparent",
-                  fontWeight: assignmentId === value ? "bold" : "normal",
-                }}
               >
                 <i
-                  className={`fa ${assignmentId === value ? "fa-check-circle" : "fa-circle-o"}`}
-                  style={{ marginRight: "8px" }}
+                  className={`fa dropdown-item-icon ${assignmentId === value ? "fa-check-circle" : "fa-circle-o"}`}
                 />
                 {`Asignación ${index + 1}`}
               </button>

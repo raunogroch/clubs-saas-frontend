@@ -18,7 +18,7 @@ export const PaginationTable = ({
       <small>
         Página {page} de {totalPages} {total && `— Total ${total}`}
       </small>
-      <div className="d-flex align-items-center" style={{ gap: "0.3rem" }}>
+      <div className="d-flex align-items-center pagination-controls">
         <button
           className="btn btn-sm btn-primary"
           hidden={page <= 1}

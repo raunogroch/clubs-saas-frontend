@@ -36,15 +36,8 @@ export const TokenExpirationWarning = () => {
 
   return (
     <div
-      className="alert alert-warning alert-dismissible fade show"
+      className="alert alert-warning alert-dismissible fade show token-warning-container"
       role="alert"
-      style={{
-        position: "fixed",
-        top: "20px",
-        right: "20px",
-        zIndex: 9999,
-        maxWidth: "400px",
-      }}
     >
       <strong>⏰ Sesión próxima a expirar</strong>
       <p className="mb-0 mt-2">
@@ -56,11 +49,10 @@ export const TokenExpirationWarning = () => {
       </small>
       <div className="mt-3">
         <button
-          className="btn btn-sm btn-warning"
+          className="btn btn-sm btn-warning token-warning-button"
           onClick={() => {
             // Aquí podrías agregar lógica para renovar el token
           }}
-          style={{ marginRight: "10px" }}
         >
           Entendido
         </button>

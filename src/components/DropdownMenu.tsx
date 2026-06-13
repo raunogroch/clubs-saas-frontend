@@ -17,8 +17,7 @@ export const DropdownMenu = ({ options }: DropdownMenuProps) => {
           {option.divider && <li className="dropdown-divider"></li>}
           <li>
             <a
-              style={{ color: "grey" }}
-              className="dropdown-item"
+              className="dropdown-item dropdown-link-grey"
               href={option.route || "#"}
               onClick={(e) => {
                 if (option.onClick) {

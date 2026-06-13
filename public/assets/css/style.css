@@ -9761,3 +9761,213 @@ body.md-skin {
     margin: 0;
   }
 }
+
+/* ====================================
+   Component Styles - Extracted from Inline
+   ==================================== */
+
+/* NavHeader Styles */
+.nav-header-navbar {
+  margin-bottom: 0;
+}
+
+.nav-header-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+/* RolesDropdown Styles */
+.roles-dropdown-container {
+  position: relative;
+}
+
+.dropdown-centered {
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: 5px;
+  min-width: 180px;
+  z-index: 1000;
+  transform: translateX(0%);
+  right: auto;
+}
+
+.dropdown-header-styled {
+  padding: 8px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #777;
+}
+
+.dropdown-item-custom {
+  width: 100%;
+  text-align: left;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  background-color: transparent;
+  font-weight: normal;
+}
+
+.dropdown-item-custom.active {
+  background-color: #f3f3f3;
+  font-weight: bold;
+}
+
+.dropdown-item-icon {
+  margin-right: 8px;
+}
+
+/* AssignmentsDropdown Styles */
+.assignments-dropdown-container {
+  position: relative;
+  margin-right: 8px;
+}
+
+.assignments-dropdown-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-assignments {
+  display: block;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  min-width: 220px;
+  z-index: 1000;
+}
+
+/* Sidenav Styles */
+.sidenav-logo {
+  height: 20px;
+}
+
+/* SplashScreen Styles */
+.splash-screen-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.splash-screen-content {
+  text-align: center;
+}
+
+.splash-screen-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #007bff;
+  border-top: 4px solid #f3f3f3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.splash-screen-text {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* TokenExpirationWarning Styles */
+.token-warning-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 400px;
+}
+
+.token-warning-button {
+  margin-right: 10px;
+}
+
+/* PaginationOptions Styles */
+.pagination-options-container {
+  gap: 0.5rem;
+}
+
+.pagination-select {
+  width: auto;
+}
+
+/* PaginationTable Styles */
+.pagination-controls {
+  gap: 0.3rem;
+}
+
+/* NoAssignmentsPage Styles */
+.no-assignments-row {
+  min-height: 70vh;
+  align-items: center;
+}
+
+.no-assignments-box {
+  margin-bottom: 0;
+}
+
+.no-assignments-content {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+/* Modal Styles */
+.modal-shown {
+  display: block;
+}
+
+/* Breadcrumbs Styles */
+.breadcrumbs-container {
+  border-radius: 30px;
+}
+
+/* OwnerSearch Styles */
+.owner-search-container {
+  max-height: 300px;
+  overflow-y: auto;
+  min-width: 100%;
+  z-index: 1050;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.owner-search-button {
+  cursor: pointer;
+}
+
+.owner-search-table-header-action {
+  width: 50px;
+}
+
+/* DropdownMenu Styles */
+.dropdown-link-grey {
+  color: grey;
+}

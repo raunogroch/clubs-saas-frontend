@@ -44,9 +44,8 @@ export const NavHeader = () => {
   return (
     <div className="row ">
       <nav
-        className="navbar navbar-static-top  "
+        className="navbar navbar-static-top nav-header-navbar"
         role="navigation"
-        style={{ marginBottom: "0" }}
       >
         <div className="navbar-header">
           <ButtonForm
@@ -58,14 +57,7 @@ export const NavHeader = () => {
           </ButtonForm>
           {isSearchEnabled && <NavHeaderSearch />}
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flex: 1,
-          }}
-        >
+        <div className="nav-header-center">
           <RolesDropdown />
         </div>
         <ul className="nav navbar-top-links navbar-right">

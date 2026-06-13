@@ -5,20 +5,10 @@ export const NoAssignmentsPage = () => {
 
   return (
     <div className="wrapper wrapper-content animated fadeInRight">
-      <div className="row" style={{ minHeight: "70vh", alignItems: "center" }}>
+      <div className="row no-assignments-row">
         <div className="col-lg-12">
-          <div className="ibox float-e-margins" style={{ marginBottom: 0 }}>
-            <div
-              className="text-center"
-              style={{
-                minHeight: "60vh",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "24px",
-              }}
-            >
+          <div className="ibox float-e-margins no-assignments-box">
+            <div className="text-center no-assignments-content">
               <i className="fa fa-exclamation-circle fa-5x text-warning" />
               <h2 className="m-t-md">No tienes asignaciones activas</h2>
               <p className="text-muted">
