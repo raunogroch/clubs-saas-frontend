@@ -96,9 +96,7 @@ export const RolesDropdown = () => {
         <ul className="dropdown-menu dropdown-user dropdown-centered">
           {showRolesSection && (
             <>
-              <li className="dropdown-header-styled">
-                Roles
-              </li>
+              <li className="dropdown-header-styled">Roles</li>
               {rolesArray.map((role) => (
                 <li key={role}>
                   <button
@@ -121,9 +119,7 @@ export const RolesDropdown = () => {
           {showAssignmentsSection && (
             <>
               {showRolesSection && <li className="dropdown-divider" />}
-              <li className="dropdown-header-styled">
-                Asignaciones
-              </li>
+              <li className="dropdown-header-styled">Asignaciones</li>
               {assignments.map((value, index) => (
                 <li key={value}>
                   <button

@@ -10,9 +10,7 @@ export const SplashScreen = () => {
     <div className="splash-screen-container">
       <div className="splash-screen-content">
         <div className="splash-screen-spinner" />
-        <p className="splash-screen-text">
-          Cargando...
-        </p>
+        <p className="splash-screen-text">Cargando...</p>
       </div>
     </div>
   );

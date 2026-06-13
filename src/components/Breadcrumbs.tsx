@@ -7,9 +7,7 @@ interface BreadcrumbsProps {
 
 export const Breadcrumbs = (props: BreadcrumbsProps) => {
   return (
-    <div
-      className="row wrapper border-bottom white-bg page-heading m-1 breadcrumbs-container"
-    >
+    <div className="row wrapper border-bottom white-bg page-heading m-1 breadcrumbs-container">
       <div className="col-sm-4">
         <h2>{props.title}</h2>
         <ol className="breadcrumb">
