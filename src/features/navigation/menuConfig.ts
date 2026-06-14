@@ -24,7 +24,14 @@ export const getMenuByRole = (role: Roles): MenuItem[] => {
 
 export const isRouteAllowedForRole = (route: string, role: Roles): boolean => {
   const menuItems = getMenuByRole(role);
-  return menuItems.some((item) => item.route === route);
+
+  return menuItems.some((item) => {
+    if (item.route === route) {
+      return true;
+    }
+
+    return route.startsWith(`${item.route}/`);
+  });
 };
 
 export const getAllowedRoutesForRole = (role: Roles): string[] => {

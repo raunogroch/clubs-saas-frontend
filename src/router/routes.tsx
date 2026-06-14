@@ -26,6 +26,9 @@ const UserPage = lazy(() =>
 const ClubPage = lazy(() =>
   import("../pages/ClubPage").then((m) => ({ default: m.ClubPage })),
 );
+const GroupsPage = lazy(() =>
+  import("../pages/GroupsPage").then((m) => ({ default: m.GroupsPage })),
+);
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -97,6 +100,14 @@ export const router = createBrowserRouter([
             element: (
               <RouteLoader>
                 <ClubPage />
+              </RouteLoader>
+            ),
+          },
+          {
+            path: "clubs/:clubId/groups",
+            element: (
+              <RouteLoader>
+                <GroupsPage />
               </RouteLoader>
             ),
           },

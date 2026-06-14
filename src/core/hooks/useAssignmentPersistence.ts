@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
 const ASSIGNMENT_ID_STORAGE_KEY = "activeAssignmentId";
+const CLUB_ID_STORAGE_KEY = "activeClubId";
 const LEGACY_ASSIGNMENT_STORAGE_KEY = "activeAssignment";
 const ASSIGNMENT_CHANGED_EVENT = "activeAssignmentId:changed";
+const CLUB_CHANGED_EVENT = "activeClubId:changed";
 
 const normalizeAssignmentId = (value: unknown): string => {
   if (typeof value === "string") {
@@ -60,12 +62,25 @@ export const useAssignmentPersistence = () => {
     }
   };
 
+  const getStoredClubId = (): string => {
+    try {
+      return localStorage.getItem(CLUB_ID_STORAGE_KEY)?.trim() || "";
+    } catch {
+      return "";
+    }
+  };
+
   const [assignmentId, setAssignmentIdState] = useState<string>(
     getStoredAssignmentId,
   );
+  const [clubId, setClubIdState] = useState<string>(getStoredClubId);
 
   const syncAssignmentId = useCallback(() => {
     setAssignmentIdState(getStoredAssignmentId());
+  }, []);
+
+  const syncClubId = useCallback(() => {
+    setClubIdState(getStoredClubId());
   }, []);
 
   useEffect(() => {
@@ -76,14 +91,23 @@ export const useAssignmentPersistence = () => {
       ) {
         syncAssignmentId();
       }
+
+      if (event.key === CLUB_ID_STORAGE_KEY) {
+        syncClubId();
+      }
     };
 
     const handleAssignmentChange = () => {
       syncAssignmentId();
     };
 
+    const handleClubChange = () => {
+      syncClubId();
+    };
+
     window.addEventListener("storage", handleStorage);
     window.addEventListener(ASSIGNMENT_CHANGED_EVENT, handleAssignmentChange);
+    window.addEventListener(CLUB_CHANGED_EVENT, handleClubChange);
 
     return () => {
       window.removeEventListener("storage", handleStorage);
@@ -91,8 +115,9 @@ export const useAssignmentPersistence = () => {
         ASSIGNMENT_CHANGED_EVENT,
         handleAssignmentChange,
       );
+      window.removeEventListener(CLUB_CHANGED_EVENT, handleClubChange);
     };
-  }, [syncAssignmentId]);
+  }, [syncAssignmentId, syncClubId]);
 
   const setAssignmentId = useCallback((value: string) => {
     const normalizedValue = value?.trim() ?? "";
@@ -112,8 +137,27 @@ export const useAssignmentPersistence = () => {
     }
   }, []);
 
+  const setClubId = useCallback((value: string) => {
+    const normalizedValue = value?.trim() ?? "";
+
+    if (!normalizedValue) {
+      return;
+    }
+
+    setClubIdState(normalizedValue);
+
+    try {
+      localStorage.setItem(CLUB_ID_STORAGE_KEY, normalizedValue);
+      window.dispatchEvent(new Event(CLUB_CHANGED_EVENT));
+    } catch {
+      // Silently handle storage error
+    }
+  }, []);
+
   return {
     assignmentId,
     setAssignmentId,
+    clubId,
+    setClubId,
   };
 };

@@ -4,5 +4,6 @@ export * from "./Api";
 export * from "./Auth";
 export * from "./Assignments";
 export * from "./Clubs";
+export * from "./Groups";
 export * from "./Dashboard";
 export * from "./Navigation";

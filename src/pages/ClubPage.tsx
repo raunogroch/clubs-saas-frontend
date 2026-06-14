@@ -1,6 +1,7 @@
 import { Breadcrumbs, IBox, PaginationOptions } from "../components";
 import { PaginationTable } from "../components/PaginationTable";
 import { ClubModal } from "../modals/ClubModal";
+import { useNavigate } from "react-router-dom";
 import { useClubs } from "../features/clubs/clubHooks";
 import {
   useModalManagement,
@@ -16,9 +17,14 @@ import { Roles } from "../common/enums";
 import { getClubStatusLabel, getSportLabel } from "../common/translations";
 
 export const ClubPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuthManager();
   const { activeRole } = useActiveRole();
-  const { assignmentId: persistedAssignmentId } = useAssignmentPersistence();
+  const {
+    assignmentId: persistedAssignmentId,
+    setAssignmentId,
+    setClubId,
+  } = useAssignmentPersistence();
   const {
     isOpen: isModalOpen,
     selectedItem: selectedClub,
@@ -130,7 +136,7 @@ export const ClubPage = () => {
                       <th>Ciudad</th>
                       <th>País</th>
                       <th>Estado</th>
-                      <th>Acciones</th>
+                      <th className="text-center">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -146,23 +152,29 @@ export const ClubPage = () => {
                         <td className="align-middle">
                           {getClubStatusLabel(club.status) ?? club.status}
                         </td>
-                        <td className="align-middle">
+                        <td className="align-middle text-center">
                           <button
-                            className="btn btn-sm btn-primary me-2"
+                            className="btn btn-sm btn-info mx-2"
+                            onClick={() => {
+                              setAssignmentId(
+                                club.assignmentId || persistedAssignmentId,
+                              );
+                              setClubId(club.id);
+                              navigate(`/clubs/${club.id}/groups`);
+                            }}
+                            aria-label={`Ver grupos de ${club.name}`}
+                          >
+                            <i className="fa fa-users me-1" />
+                            &nbsp;Grupos
+                          </button>
+                          <button
+                            className="btn btn-sm btn-primary mx-2"
                             onClick={() => handleEdit(club)}
                             aria-label={`Editar club ${club.name}`}
                           >
                             <i className="fa fa-edit me-1" />
                             &nbsp;Editar
                           </button>
-                          {/* <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() => handleDelete(club)}
-                            aria-label={`Eliminar club ${club.name}`}
-                          >
-                            <i className="fa fa-trash me-1" />
-                            Eliminar
-                          </button> */}
                         </td>
                       </tr>
                     ))}
