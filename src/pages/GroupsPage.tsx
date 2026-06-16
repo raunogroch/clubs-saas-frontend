@@ -1,7 +1,12 @@
 import { Breadcrumbs, IBox, PaginationOptions } from "../components";
-import { GroupsModal } from "../modals/GroupsModal";
+import {
+  GroupsModal,
+  SchedulesModal,
+  CoachesModal,
+  EnrollmentsModal,
+} from "../modals";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGroups } from "../features/groups/groupHooks";
 import {
   useModalManagement,
@@ -25,6 +30,13 @@ export const GroupsPage = () => {
   const { activeRole } = useActiveRole();
   const { assignmentId: persistedAssignmentId, clubId: persistedClubId } =
     useAssignmentPersistence();
+
+  // Estados para los modales independientes de sub-recursos
+  const [schedulesModalOpen, setSchedulesModalOpen] = useState(false);
+  const [coachesModalOpen, setCoachesModalOpen] = useState(false);
+  const [enrollmentsModalOpen, setEnrollmentsModalOpen] = useState(false);
+  const [selectedGroupForSubResources, setSelectedGroupForSubResources] =
+    useState<Group | null>(null);
 
   const {
     isOpen: isModalOpen,
@@ -71,7 +83,10 @@ export const GroupsPage = () => {
 
   // Navegar a /clubs cuando cambia la asignación
   useEffect(() => {
-    if (previousAssignmentId.current !== undefined && previousAssignmentId.current !== persistedAssignmentId) {
+    if (
+      previousAssignmentId.current !== undefined &&
+      previousAssignmentId.current !== persistedAssignmentId
+    ) {
       navigate("/clubs");
     }
     previousAssignmentId.current = persistedAssignmentId;
@@ -93,6 +108,20 @@ export const GroupsPage = () => {
 
   const getClubName = (clubId: string): string => {
     return clubs.find((club) => club.id === clubId)?.name || "N/A";
+  };
+
+  /**
+   * Abre el modal independiente apropiado según el tipo de sub-recurso
+   */
+  const handleOpenGroupTab = (group: Group, tab: string) => {
+    setSelectedGroupForSubResources(group);
+    if (tab === "schedules") {
+      setSchedulesModalOpen(true);
+    } else if (tab === "coaches") {
+      setCoachesModalOpen(true);
+    } else if (tab === "athletes") {
+      setEnrollmentsModalOpen(true);
+    }
   };
 
   const pageTitle = activeClubId
@@ -145,6 +174,36 @@ export const GroupsPage = () => {
         onSaved={handleSaved}
         defaultClubId={activeClubId}
       />
+
+      {/* Modales independientes para sub-recursos */}
+      {selectedGroupForSubResources && (
+        <>
+          <SchedulesModal
+            groupId={selectedGroupForSubResources.id}
+            open={schedulesModalOpen}
+            onClose={() => setSchedulesModalOpen(false)}
+            onSaved={() => {
+              refetch();
+            }}
+          />
+          <CoachesModal
+            groupId={selectedGroupForSubResources.id}
+            open={coachesModalOpen}
+            onClose={() => setCoachesModalOpen(false)}
+            onSaved={() => {
+              refetch();
+            }}
+          />
+          <EnrollmentsModal
+            groupId={selectedGroupForSubResources.id}
+            open={enrollmentsModalOpen}
+            onClose={() => setEnrollmentsModalOpen(false)}
+            onSaved={() => {
+              refetch();
+            }}
+          />
+        </>
+      )}
 
       <div className="wrapper wrapper-content animated fadeInRight">
         <IBox title="Grupos">
@@ -225,14 +284,39 @@ export const GroupsPage = () => {
                           </span>
                         </td>
                         <td className="align-middle">
-                          <button
-                            className="btn btn-info"
-                            onClick={() => handleEdit(group)}
-                            aria-label={`Editar grupo ${group.name}`}
-                          >
-                            <i className="fa fa-edit" />
-                            &nbsp; Editar
-                          </button>
+                          <div className="btn-group btn-group-sm" role="group">
+                            <button
+                              className="btn btn-info"
+                              onClick={() => handleEdit(group)}
+                              aria-label={`Editar grupo ${group.name}`}
+                              title="Editar información del grupo"
+                            >
+                              <i className="fa fa-edit" />
+                              &nbsp; Editar
+                            </button>
+                            <button
+                              className="btn btn-warning"
+                              onClick={() =>
+                                handleOpenGroupTab(group, "coaches")
+                              }
+                              aria-label={`Gestionar coaches de ${group.name}`}
+                              title="Agregar y gestionar coaches"
+                            >
+                              <i className="fa fa-users" />
+                              &nbsp; Coaches
+                            </button>
+                            <button
+                              className="btn btn-success"
+                              onClick={() =>
+                                handleOpenGroupTab(group, "schedules")
+                              }
+                              aria-label={`Gestionar horarios de ${group.name}`}
+                              title="Agregar y gestionar horarios de entrenamiento"
+                            >
+                              <i className="fa fa-calendar" />
+                              &nbsp; Horarios
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

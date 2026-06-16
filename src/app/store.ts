@@ -20,6 +20,7 @@ import userAssignmentApi from "../features/assignments/userAssignmentApi";
 import userApi from "../features/users/userApi";
 import clubApi from "../features/clubs/clubApi";
 import groupApi from "../features/groups/groupApi";
+import groupRelationsApi from "../features/groups/groupRelationsApi";
 import persistenceReducer from "./persistenceSlice";
 import authMiddleware from "./middleware/authMiddleware";
 
@@ -44,6 +45,7 @@ const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
   [clubApi.reducerPath]: clubApi.reducer,
   [groupApi.reducerPath]: groupApi.reducer,
+  [groupRelationsApi.reducerPath]: groupRelationsApi.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -72,6 +74,7 @@ export const store = configureStore({
         userApi.middleware,
         clubApi.middleware,
         groupApi.middleware,
+        groupRelationsApi.middleware,
       )
       .concat(authMiddleware),
 });

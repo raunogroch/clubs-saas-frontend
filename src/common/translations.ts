@@ -1,4 +1,13 @@
-import { ClubStatus, Gender, Roles, Sport, Status } from "./enums";
+import {
+  ClubStatus,
+  CoachRole,
+  EnrollmentStatus,
+  Gender,
+  Roles,
+  Sport,
+  Status,
+  WeekDay,
+} from "./enums";
 
 export const genderLabels: Record<Gender, string> = {
   [Gender.MALE]: "Masculino",
@@ -47,6 +56,32 @@ export const statusClubLabels: Record<ClubStatus, string> = {
   [ClubStatus.SUSPENDED]: "Suspendido",
 };
 
+export const weekDayLabels: Record<WeekDay, string> = {
+  [WeekDay.MONDAY]: "Lunes",
+  [WeekDay.TUESDAY]: "Martes",
+  [WeekDay.WEDNESDAY]: "Miércoles",
+  [WeekDay.THURSDAY]: "Jueves",
+  [WeekDay.FRIDAY]: "Viernes",
+  [WeekDay.SATURDAY]: "Sábado",
+  [WeekDay.SUNDAY]: "Domingo",
+};
+
+export const coachRoleLabels: Record<CoachRole, string> = {
+  [CoachRole.HEAD_COACH]: "Entrenador Principal",
+  [CoachRole.ASSISTANT_COACH]: "Entrenador Asistente",
+  [CoachRole.FITNESS_COACH]: "Entrenador de Fitness",
+  [CoachRole.GOALKEEPER_COACH]: "Entrenador de Porteros",
+  [CoachRole.TECHNICAL_ASSISTANT]: "Asistente Técnico",
+};
+
+export const enrollmentStatusLabels: Record<EnrollmentStatus, string> = {
+  [EnrollmentStatus.ACTIVE]: "Activo",
+  [EnrollmentStatus.PENDING]: "Pendiente",
+  [EnrollmentStatus.SUSPENDED]: "Suspendido",
+  [EnrollmentStatus.WITHDRAWN]: "Retirado",
+  [EnrollmentStatus.COMPLETED]: "Completado",
+};
+
 export const getGenderLabel = (gender?: Gender): string => {
   return gender ? genderLabels[gender] : "N/A";
 };
@@ -65,4 +100,16 @@ export const getSportLabel = (sport?: Sport): string => {
 
 export const getClubStatusLabel = (status?: ClubStatus): string => {
   return status ? statusClubLabels[status] : "N/A";
+};
+
+export const getWeekDayLabel = (day?: WeekDay): string => {
+  return day ? weekDayLabels[day] : "N/A";
+};
+
+export const getCoachRoleLabel = (role?: CoachRole): string => {
+  return role ? coachRoleLabels[role] : "N/A";
+};
+
+export const getEnrollmentStatusLabel = (status?: EnrollmentStatus): string => {
+  return status ? enrollmentStatusLabels[status] : "N/A";
 };

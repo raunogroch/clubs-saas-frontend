@@ -4,7 +4,6 @@ import type {
   Group,
   GroupListResponse,
   CreateGroupDto,
-  UpdateGroupDto,
 } from "../../core/interfaces/Groups";
 
 /**
@@ -55,6 +54,21 @@ const api = createApi({
     }),
 
     /**
+     * GET /groups/:id
+     * Obtiene un grupo específico con sus coaches, schedules y enrollments
+     */
+    getGroup: builder.query<Group, string>({
+      query: (groupId) => ({
+        url: `/groups/${groupId}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, _groupId) => [
+        { type: "GroupsByClub", id: "all" },
+        "Groups",
+      ],
+    }),
+
+    /**
      * POST /groups
      * Crea un nuevo grupo
      */
@@ -74,16 +88,35 @@ const api = createApi({
     /**
      * PATCH /groups/:id
      * Actualiza un grupo existente
+     * Puede incluir coaches y schedules en el body
      */
-    updateGroup: builder.mutation<Group, UpdateGroupDto>({
-      query: (body) => ({
-        url: `/groups/${body.id}`,
-        method: "PATCH",
-        body,
-      }),
+    updateGroup: builder.mutation<
+      Group,
+      {
+        id: string;
+        name?: string;
+        description?: string | null;
+        clubId?: string;
+        assignmentId?: string;
+        address?: string | null;
+        maxAthletes?: number | null;
+        minAge?: number | null;
+        maxAge?: number | null;
+        status?: any;
+        coaches?: string[];
+        schedules?: any[];
+      }
+    >({
+      query: (body) => {
+        return {
+          url: `/groups/${body.id}`,
+          method: "PATCH",
+          body: body,
+        };
+      },
       // Invalidar el cache del club específico
       invalidatesTags: (_result, _error, arg) => [
-        { type: "GroupsByClub", id: arg.clubId },
+        { type: "GroupsByClub", id: arg.clubId || "all" },
         "Groups",
       ],
     }),
@@ -105,6 +138,7 @@ const api = createApi({
 
 export const {
   useGetGroupsQuery,
+  useGetGroupQuery,
   useCreateGroupMutation,
   useUpdateGroupMutation,
   useDeleteGroupMutation,

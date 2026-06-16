@@ -2,10 +2,81 @@ import { Status } from "../../common/enums";
 
 export type GroupStatus = (typeof Status)[keyof typeof Status];
 
+// ============ ENUMS (as Type Unions) ============
+export type WeekDay =
+  | "MONDAY"
+  | "TUESDAY"
+  | "WEDNESDAY"
+  | "THURSDAY"
+  | "FRIDAY"
+  | "SATURDAY"
+  | "SUNDAY";
+
+export type EnrollmentStatus =
+  | "ACTIVE"
+  | "PENDING"
+  | "SUSPENDED"
+  | "WITHDRAWN"
+  | "COMPLETED";
+
+export type CoachRole =
+  | "HEAD_COACH"
+  | "ASSISTANT_COACH"
+  | "FITNESS_COACH"
+  | "GOALKEEPER_COACH"
+  | "TECHNICAL_ASSISTANT";
+
+// ============ COACH INTERFACES ============
 export interface Coach {
   id: string;
   name: string;
   email: string;
+}
+
+export interface GroupCoach {
+  id: string;
+  groupId: string;
+  coachId: string;
+  role?: CoachRole;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateGroupCoachDto {
+  coachId: string;
+  role?: CoachRole;
+}
+
+export interface UpdateGroupCoachDto extends CreateGroupCoachDto {
+  id: string;
+}
+
+// ============ SCHEDULE INTERFACES ============
+export interface GroupSchedule {
+  id: string;
+  groupId: string;
+  day: WeekDay;
+  startTime: string;
+  endTime: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateGroupScheduleDto {
+  day: WeekDay;
+  startTime: string;
+  endTime: string;
+}
+
+export interface UpdateGroupScheduleDto extends CreateGroupScheduleDto {
+  id: string;
+}
+
+// ============ ENROLLMENT INTERFACES ============
+export interface Athlete {
+  id: string;
+  name: string;
+  email?: string;
 }
 
 export interface Schedule {
@@ -17,9 +88,25 @@ export interface Schedule {
 
 export interface Enrollment {
   id: string;
+  groupId: string;
   athleteId: string;
-  athleteName: string;
-  enrollmentDate: string;
+  athlete?: Athlete;
+  status: EnrollmentStatus;
+  joinedAt?: string | null;
+  leftAt?: string | null;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateEnrollmentDto {
+  athleteId: string;
+  status?: EnrollmentStatus;
+  notes?: string;
+}
+
+export interface UpdateEnrollmentDto extends CreateEnrollmentDto {
+  id: string;
 }
 
 export interface Group {
@@ -33,9 +120,9 @@ export interface Group {
   minAge?: number | null;
   maxAge?: number | null;
   status: GroupStatus;
-  coaches: Coach[];
-  schedules: Schedule[];
-  enrollments: Enrollment[];
+  coaches?: GroupCoach[];
+  schedules?: GroupSchedule[];
+  enrollments?: Enrollment[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -65,6 +152,8 @@ export interface CreateGroupDto {
 
 export interface UpdateGroupDto extends CreateGroupDto {
   id: string;
+  coaches?: string[];
+  schedules?: CreateGroupScheduleDto[];
 }
 
 export interface GroupModalProps {
@@ -73,4 +162,5 @@ export interface GroupModalProps {
   data?: Group;
   onSaved?: () => void;
   defaultClubId?: string;
+  initialTab?: "info" | "coaches" | "schedules" | "athletes";
 }

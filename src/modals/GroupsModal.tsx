@@ -11,13 +11,15 @@ import {
 } from "../features/groups/groupFormMapper";
 import { useGroupSubmit } from "../features/groups/useGroupSubmit";
 
+interface GroupsModalProps extends GroupModalProps {}
+
 export const GroupsModal = ({
   open,
   onClose,
   data,
   onSaved,
   defaultClubId,
-}: GroupModalProps) => {
+}: GroupsModalProps) => {
   const {
     submit,
     isSaving,
@@ -88,7 +90,6 @@ export const GroupsModal = ({
       await submit({ ...formData, assignmentId: resolvedAssignmentId });
       reset(emptyForm);
     } catch (error) {
-      // Capturar errores de validación del hook useGroupSubmit
       if (error instanceof Error && error.message) {
         setValidationError(error.message);
       } else {
@@ -196,6 +197,7 @@ export const GroupsModal = ({
             className="btn btn-primary"
             disabled={isSaving || isSubmitting}
           >
+            <i className="fa fa-save"></i>&nbsp;
             {isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
           </button>
         </div>
