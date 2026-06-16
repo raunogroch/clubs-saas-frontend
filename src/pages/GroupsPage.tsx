@@ -134,12 +134,12 @@ export const GroupsPage = () => {
       <>
         <Breadcrumbs title="Grupos">
           <button
-            className="btn btn-rounded btn-sm btn-rounded btn-primary"
+            className="btn btn-rounded btn-rounded btn-primary"
             disabled
             aria-label="Crear nuevo grupo"
           >
             <i className="fa fa-plus" />
-            &nbsp;Crear grupo
+            &nbsp;Crear
           </button>
         </Breadcrumbs>
         <div className="wrapper wrapper-content animated fadeInRight">

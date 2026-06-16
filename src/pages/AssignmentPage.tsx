@@ -60,12 +60,12 @@ export const AssignmentPage = () => {
     <>
       <Breadcrumbs title="Asignaciones">
         <button
-          className="btn btn-sm btn-rounded btn-primary"
+          className="btn btn-rounded btn-primary"
           onClick={handleCreate}
           aria-label="Crear nueva asignación"
         >
-          <i className="fa fa-plus me-2" />
-          &nbsp;Crear asignación
+          <i className="fa fa-plus" />
+          &nbsp;Crear
         </button>
       </Breadcrumbs>
 

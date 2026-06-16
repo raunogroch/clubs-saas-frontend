@@ -62,7 +62,7 @@ export const UserPage = (props: UserPageProps) => {
           aria-label="Crear"
         >
           <i className="fa fa-plus" />
-          &nbsp;Crear usuario
+          &nbsp;Crear
         </button>
       </Breadcrumbs>
 

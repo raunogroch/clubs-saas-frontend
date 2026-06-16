@@ -146,6 +146,8 @@ export const AssignmentModal = ({
             className="btn btn-sm btn-rounded btn-primary"
             disabled={isSaving || isSubmitting}
           >
+            <i className="fa fa-save" />
+            &nbsp;
             {isSaving ? (
               <>
                 <span className="fa fa-spinner fa-spin me-2" />
