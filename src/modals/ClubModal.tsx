@@ -162,7 +162,7 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-white"
+            className="btn btn-sm btn-rounded btn-white"
             onClick={onClose}
             disabled={isSaving}
           >
@@ -171,7 +171,7 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-sm btn-rounded btn-primary"
             disabled={isSaving || isSubmitting}
           >
             {isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}

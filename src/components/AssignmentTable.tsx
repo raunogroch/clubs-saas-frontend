@@ -36,7 +36,7 @@ export const AssignmentTable = (props: AssignmentTableProps) => {
                 </td>
                 <td className="align-middle">
                   <button
-                    className="btn btn-sm btn-primary"
+                    className="btn btn-rounded btn-sm btn-primary"
                     onClick={() => onEdit(assignment)}
                     aria-label={`Editar asignación ${assignment.name}`}
                   >

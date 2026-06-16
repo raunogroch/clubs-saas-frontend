@@ -60,7 +60,7 @@ export const AssignmentPage = () => {
     <>
       <Breadcrumbs title="Asignaciones">
         <button
-          className="btn btn-primary"
+          className="btn btn-sm btn-rounded btn-primary"
           onClick={handleCreate}
           aria-label="Crear nueva asignación"
         >

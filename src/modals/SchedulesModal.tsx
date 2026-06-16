@@ -153,7 +153,7 @@ export const SchedulesModal = ({
         <div className="mb-3 float-right">
           <button
             type="button"
-            className="btn btn-sm btn-success"
+            className="btn btn-sm btn-rounded btn-success"
             onClick={handleAddScheduleRow}
             disabled={isLoadingTotal}
           >
@@ -245,7 +245,7 @@ export const SchedulesModal = ({
                       <td className="text-center">
                         <button
                           type="button"
-                          className="btn btn-sm btn-danger"
+                          className="btn btn-sm btn-rounded btn-danger"
                           onClick={() =>
                             handleRemoveExisting(schedule.id || "")
                           }
@@ -318,7 +318,7 @@ export const SchedulesModal = ({
                     <td className="text-center">
                       <button
                         type="button"
-                        className="btn btn-sm btn-warning"
+                        className="btn btn-sm btn-rounded btn-warning"
                         onClick={() => handleRemovePending(schedule.tempId)}
                         title={MESSAGES.CONFIRMATION.DELETE_SCHEDULE}
                       >
@@ -336,7 +336,7 @@ export const SchedulesModal = ({
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-rounded"
             onClick={onClose}
             disabled={isLoadingTotal}
           >
@@ -345,7 +345,7 @@ export const SchedulesModal = ({
 
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-primary btn-rounded"
             onClick={handleSaveAll}
             disabled={isLoadingTotal || !hasChanges()}
           >

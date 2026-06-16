@@ -57,12 +57,12 @@ export const UserPage = (props: UserPageProps) => {
     <>
       <Breadcrumbs title="Usuarios">
         <button
-          className="btn btn-primary"
+          className="btn btn-rounded btn-primary"
           onClick={handleCreate}
-          aria-label="Crear nuevo usuario"
+          aria-label="Crear"
         >
-          <i className="fa fa-plus me-2" />
-          &nbsp; Crear usuario
+          <i className="fa fa-plus" />
+          &nbsp;Crear usuario
         </button>
       </Breadcrumbs>
 
@@ -156,7 +156,7 @@ export const UserPage = (props: UserPageProps) => {
 
                         <td className="align-middle">
                           <button
-                            className="btn btn-sm btn-primary"
+                            className="btn btn-sm btn-rounded btn-primary"
                             onClick={() => handleEdit(user)}
                             aria-label={`Editar usuario ${user.name} ${user.lastname}`}
                           >

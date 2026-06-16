@@ -172,7 +172,7 @@ export const CoachesModal = ({
 
             <button
               type="submit"
-              className="btn btn-sm btn-primary mt-3"
+              className="btn btn-rounded btn-sm btn-primary mt-3"
               disabled={isLoadingTotal}
             >
               {isFormSubmitting ? (
@@ -214,7 +214,7 @@ export const CoachesModal = ({
                     <td>
                       <button
                         type="button"
-                        className="btn btn-sm btn-danger"
+                        className="btn btn-rounded btn-sm btn-danger"
                         onClick={() => handleRemoveCoach(coach.id || "")}
                         disabled={isLoadingTotal || !coach.id}
                         title={
@@ -237,7 +237,7 @@ export const CoachesModal = ({
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-rounded btn-sm btn-secondary"
             onClick={onClose}
             disabled={isLoadingTotal}
           >

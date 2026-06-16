@@ -311,7 +311,7 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-white"
+            className="btn btn-sm  btn-rounded btn-white"
             onClick={onClose}
             disabled={isSaving}
           >
@@ -320,7 +320,7 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-sm  btn-rounded btn-primary"
             disabled={isSaving || isSubmitting}
           >
             {isSaving ? (

@@ -134,12 +134,12 @@ export const GroupsPage = () => {
       <>
         <Breadcrumbs title="Grupos">
           <button
-            className="btn btn-primary"
+            className="btn btn-rounded btn-sm btn-rounded btn-primary"
             disabled
             aria-label="Crear nuevo grupo"
           >
-            <i className="fa fa-plus me-2" />
-            &nbsp; Crear grupo
+            <i className="fa fa-plus" />
+            &nbsp;Crear grupo
           </button>
         </Breadcrumbs>
         <div className="wrapper wrapper-content animated fadeInRight">
@@ -158,11 +158,11 @@ export const GroupsPage = () => {
     <>
       <Breadcrumbs title={pageTitle}>
         <button
-          className="btn btn-primary"
+          className="btn btn-rounded btn-sm btn-rounded btn-primary"
           onClick={handleCreate}
           aria-label="Crear nuevo grupo"
         >
-          <i className="fa fa-plus me-2" />
+          <i className="fa fa-plus" />
           &nbsp; Crear grupo
         </button>
       </Breadcrumbs>
@@ -286,7 +286,7 @@ export const GroupsPage = () => {
                         <td className="align-middle">
                           <div className="btn-group btn-group-sm" role="group">
                             <button
-                              className="btn btn-info"
+                              className="btn btn-rounded btn-sm btn-info"
                               onClick={() => handleEdit(group)}
                               aria-label={`Editar grupo ${group.name}`}
                               title="Editar información del grupo"
@@ -295,7 +295,7 @@ export const GroupsPage = () => {
                               &nbsp; Editar
                             </button>
                             <button
-                              className="btn btn-warning"
+                              className="btn btn-rounded btn-sm btn-warning"
                               onClick={() =>
                                 handleOpenGroupTab(group, "coaches")
                               }
@@ -306,7 +306,7 @@ export const GroupsPage = () => {
                               &nbsp; Coaches
                             </button>
                             <button
-                              className="btn btn-success"
+                              className="btn btn-rounded btn-sm btn-success"
                               onClick={() =>
                                 handleOpenGroupTab(group, "schedules")
                               }

@@ -128,7 +128,7 @@ export const LoginPage = () => {
               {/* Botón de envío */}
               <ButtonForm
                 type="submit"
-                className="btn btn-primary block full-width m-b"
+                className="btn btn-rounded btn-primary block full-width m-b"
                 disabled={loading}
               >
                 {loading ? "Autenticando..." : "Iniciar sesión"}
@@ -143,7 +143,7 @@ export const LoginPage = () => {
               </p>
 
               <a
-                className="btn btn-sm btn-white btn-block"
+                className="btn btn-rounded btn-sm btn-white"
                 href="register.html"
               >
                 Crear una cuenta

@@ -110,16 +110,16 @@ export const OwnerSelectionTable = (props: OwnerSelectionTableProps) => {
             <tbody>
               {selectedUsers.map((user) => (
                 <tr key={user.id}>
-                  <td>
+                  <td className="align-middle">
                     <div className="fw-600">
                       {user.lastname}, {user.name}
                     </div>
                   </td>
-                  <td>{user.dni}</td>
+                  <td className="align-middle">{user.dni}</td>
                   <td className="text-center">
                     <button
                       type="button"
-                      className="btn btn-sm btn-danger"
+                      className="btn btn-rounded btn-sm btn-danger"
                       onClick={() => onRemove(user.id)}
                       disabled={isSaving}
                       title="Remover"

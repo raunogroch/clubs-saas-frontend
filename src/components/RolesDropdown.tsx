@@ -78,7 +78,7 @@ export const RolesDropdown = () => {
     <div ref={dropdownRef} className="roles-dropdown-container">
       <button
         type="button"
-        className="btn btn-default btn-sm"
+        className="btn btn-rounded btn-default btn-sm"
         onClick={toggleOpen}
         aria-expanded={isOpen}
         aria-haspopup="true"

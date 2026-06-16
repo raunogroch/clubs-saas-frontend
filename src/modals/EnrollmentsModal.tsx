@@ -90,7 +90,9 @@ export const EnrollmentsModal = ({
       onClose();
     } catch (error) {
       setValidationError(
-        error instanceof Error ? error.message : MESSAGES.ERROR.ENROLLMENT_ERROR,
+        error instanceof Error
+          ? error.message
+          : MESSAGES.ERROR.ENROLLMENT_ERROR,
       );
     }
   });
@@ -158,7 +160,7 @@ export const EnrollmentsModal = ({
 
             <button
               type="submit"
-              className="btn btn-sm btn-primary mt-3"
+              className="btn btn-rounded btn-sm btn-primary mt-3"
               disabled={isLoadingTotal}
             >
               {isFormSubmitting ? (
@@ -208,7 +210,7 @@ export const EnrollmentsModal = ({
                     <td>
                       <button
                         type="button"
-                        className="btn btn-sm btn-danger"
+                        className="btn btn-rounded btn-sm btn-danger"
                         onClick={() =>
                           handleRemoveEnrollment(enrollment.id || "")
                         }
@@ -233,7 +235,7 @@ export const EnrollmentsModal = ({
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-sm btn-rounded btn-secondary"
             onClick={onClose}
             disabled={isLoadingTotal}
           >

@@ -86,12 +86,12 @@ export const ClubPage = () => {
     <>
       <Breadcrumbs title="Clubes">
         <button
-          className="btn btn-primary"
+          className="btn btn-rounded btn-primary"
           onClick={handleCreate}
           aria-label="Crear nuevo club"
         >
-          <i className="fa fa-plus me-2" />
-          &nbsp; Crear club
+          <i className="fa fa-plus" />
+          &nbsp;Crear
         </button>
       </Breadcrumbs>
 
@@ -131,10 +131,9 @@ export const ClubPage = () => {
                   <thead className="table-light">
                     <tr>
                       <th>Nombre</th>
-                      <th>Deporte</th>
+                      <th>Disciplina</th>
+                      <th>Grupos</th>
                       <th>Telefono</th>
-                      <th>Ciudad</th>
-                      <th>País</th>
                       <th>Estado</th>
                       <th className="text-center">Acciones</th>
                     </tr>
@@ -146,15 +145,10 @@ export const ClubPage = () => {
                         <td className="align-middle">
                           {getSportLabel(club.sport) ?? club.sport}
                         </td>
-                        <td className="align-middle">{club.phone}</td>
-                        <td className="align-middle">{club.city}</td>
-                        <td className="align-middle">{club.country}</td>
+
                         <td className="align-middle">
-                          {getClubStatusLabel(club.status) ?? club.status}
-                        </td>
-                        <td className="align-middle text-center">
                           <button
-                            className="btn btn-sm btn-info mx-2"
+                            className="btn btn-sm btn-rounded btn-info"
                             onClick={() => {
                               setAssignmentId(
                                 club.assignmentId || persistedAssignmentId,
@@ -164,15 +158,21 @@ export const ClubPage = () => {
                             }}
                             aria-label={`Ver grupos de ${club.name}`}
                           >
-                            <i className="fa fa-users me-1" />
-                            &nbsp;Grupos
+                            <i className="fa fa-users" />
+                            &nbsp;Ingresar
                           </button>
+                        </td>
+                        <td className="align-middle">{club.phone}</td>
+                        <td className="align-middle">
+                          {getClubStatusLabel(club.status) ?? club.status}
+                        </td>
+                        <td className="align-middle text-center">
                           <button
-                            className="btn btn-sm btn-primary mx-2"
+                            className="btn btn-sm btn-rounded btn-primary mx-2"
                             onClick={() => handleEdit(club)}
                             aria-label={`Editar club ${club.name}`}
                           >
-                            <i className="fa fa-edit me-1" />
+                            <i className="fa fa-edit" />
                             &nbsp;Editar
                           </button>
                         </td>

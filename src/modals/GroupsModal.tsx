@@ -185,7 +185,7 @@ export const GroupsModal = ({
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-white"
+            className="btn btn-sm btn-rounded btn-white"
             onClick={onClose}
             disabled={isSaving}
           >
@@ -194,7 +194,7 @@ export const GroupsModal = ({
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-sm btn-rounded btn-primary"
             disabled={isSaving || isSubmitting}
           >
             <i className="fa fa-save"></i>&nbsp;

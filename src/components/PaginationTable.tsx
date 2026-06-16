@@ -20,7 +20,7 @@ export const PaginationTable = ({
       </small>
       <div className="d-flex align-items-center pagination-controls">
         <button
-          className="btn btn-sm btn-primary"
+          className="btn btn-rounded btn-sm btn-primary"
           hidden={page <= 1}
           onClick={() => onPageChange(Math.max(1, page - 1))}
         >
@@ -29,14 +29,14 @@ export const PaginationTable = ({
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
           <button
             key={num}
-            className={`btn btn-sm ${page === num ? "btn-primary" : "btn-light"}`}
+            className={`btn btn-rounded btn-sm ${page === num ? "btn-primary" : "btn-light"}`}
             onClick={() => onPageChange(num)}
           >
             {num}
           </button>
         ))}
         <button
-          className="btn btn-sm btn-primary"
+          className="btn btn-rounded btn-sm btn-primary"
           hidden={page >= totalPages}
           onClick={() => onPageChange(Math.min(totalPages, page + 1))}
         >

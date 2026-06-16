@@ -49,7 +49,7 @@ export const TokenExpirationWarning = () => {
       </small>
       <div className="mt-3">
         <button
-          className="btn btn-sm btn-warning token-warning-button"
+          className="btn btn-sm btn-rounded btn-warning token-warning-button"
           onClick={() => {
             // Aquí podrías agregar lógica para renovar el token
           }}
@@ -57,7 +57,7 @@ export const TokenExpirationWarning = () => {
           Entendido
         </button>
         <button
-          className="btn btn-sm btn-outline-danger"
+          className="btn btn-sm btn-rounded btn-outline-danger"
           onClick={handleLogout}
         >
           Cerrar sesión

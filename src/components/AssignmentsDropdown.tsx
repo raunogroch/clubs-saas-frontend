@@ -45,7 +45,7 @@ export const AssignmentsDropdown = () => {
     <div ref={dropdownRef} className="assignments-dropdown-container">
       <button
         type="button"
-        className="btn btn-white assignments-dropdown-button"
+        className="btn btn-rounded btn-sm btn-white assignments-dropdown-button"
         onClick={toggleOpen}
         aria-expanded={isOpen}
         aria-haspopup="true"

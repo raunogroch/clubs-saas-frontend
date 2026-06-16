@@ -67,7 +67,7 @@ export const RolesFieldArray = ({
               <div className="input-group-append">
                 <button
                   type="button"
-                  className="btn btn-danger"
+                  className="btn btn-sm btn-danger"
                   onClick={() => handleRemoveRole(index)}
                   disabled={isSaving || fields.length === 1}
                   aria-label={`Eliminar rol ${index + 1}`}
@@ -86,7 +86,7 @@ export const RolesFieldArray = ({
         {/* Botón para agregar rol */}
         <button
           type="button"
-          className="btn btn-sm btn-success mt-2"
+          className="btn btn-rounded btn-sm btn-success"
           onClick={handleAddRole}
           disabled={isSaving}
           aria-label="Agregar nuevo rol"

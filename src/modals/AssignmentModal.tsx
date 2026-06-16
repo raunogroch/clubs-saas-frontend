@@ -134,7 +134,7 @@ export const AssignmentModal = ({
         <div className="modal-footer mt-4">
           <button
             type="button"
-            className="btn btn-white"
+            className="btn btn-sm btn-rounded btn-white"
             onClick={onClose}
             disabled={isSaving}
           >
@@ -143,7 +143,7 @@ export const AssignmentModal = ({
 
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-sm btn-rounded btn-primary"
             disabled={isSaving || isSubmitting}
           >
             {isSaving ? (
