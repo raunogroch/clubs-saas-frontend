@@ -14,9 +14,9 @@ export const adminMenu: MenuItem[] = [
     name: "Clubes",
   },
   {
-    id: "coaches",
-    route: "/coaches",
+    id: "users",
+    route: "/users",
     icon: "users",
-    name: "Entrenadores",
+    name: "Usuarios",
   },
 ];

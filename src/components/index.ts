@@ -20,3 +20,4 @@ export * from "./RolesDropdown";
 export * from "./AssignmentsDropdown";
 export * from "./LabelHighlight";
 export * from "./RolesHighlight";
+export * from "./UserRoleBox";

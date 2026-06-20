@@ -20,14 +20,9 @@ const AssignmentPage = lazy(() =>
     default: m.AssignmentPage,
   })),
 );
-const UserAdminPage = lazy(() =>
-  import("../pages/Users/UserAdminPage").then((m) => ({
-    default: m.UserAdminPage,
-  })),
-);
-const UserSuperadminPage = lazy(() =>
-  import("../pages/Users/UserSuperadminPage").then((m) => ({
-    default: m.UserSuperadminPage,
+const UsersPage = lazy(() =>
+  import("../pages/Users/UsersPage").then((m) => ({
+    default: m.UsersPage,
   })),
 );
 const ClubPage = lazy(() =>
@@ -98,15 +93,7 @@ export const router = createBrowserRouter([
             path: "users",
             element: (
               <RouteLoader>
-                <UserSuperadminPage role="ADMIN" roleList="*" />
-              </RouteLoader>
-            ),
-          },
-          {
-            path: "coaches",
-            element: (
-              <RouteLoader>
-                <UserAdminPage role="COACH" roleList={["ASSISTANT","COACH", "PARENT", "ATHLETE"]} />
+                <UsersPage />
               </RouteLoader>
             ),
           },

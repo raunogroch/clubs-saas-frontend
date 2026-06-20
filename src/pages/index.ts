@@ -6,3 +6,4 @@ export * from "./LoginPage";
 export * from "./NotFoundPage";
 export * from "./Users/UserAdminPage";
 export * from "./Users/UserSuperadminPage";
+export * from "./Users/UsersPage";

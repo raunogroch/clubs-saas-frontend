@@ -79,6 +79,5 @@ export interface UserModalProps {
 }
 
 export interface UserPageProps {
-  role: string;
   roleList?: "*" | Roles[];
 }

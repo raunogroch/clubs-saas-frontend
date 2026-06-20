@@ -1,15 +1,29 @@
-import { getRoleLabel, Roles } from "../../common";
-import { Breadcumbs } from "../../components";
 import {
   useModalManagement,
   useModalSaveHandler,
   useSearchSetup,
+  useRoleList,
 } from "../../core/hooks";
 import type { User, UserPageProps } from "../../core/interfaces";
 import { UserModal } from "../../modals";
 import { UserRoleContainer } from "./UserRoleContainer";
+import { UsersPageHeader } from "./UsersPageHeader";
 
-export const UserSuperadminPage = (props: UserPageProps) => {
+/**
+ * UsersPage Component
+ *
+ * Responsabilidades:
+ * - Orquestar modal management y búsqueda
+ * - Renderizar UI basada en roleList resuelto dinámicamente
+ *
+ * Principios SOLID aplicados:
+ * - SRP: Componente enfocado solo en orquestación y renderizado
+ * - DIP: Depende de hooks para lógica de negocio, no de implementación directa
+ * - OCP: Abierto a cambios en resolución de roleList sin modificar este componente
+ */
+export const UsersPage = (props: UserPageProps) => {
+  const roleList = useRoleList(props.roleList);
+
   const {
     isOpen: isModalOpen,
     selectedItem: selectedUser,
@@ -20,12 +34,6 @@ export const UserSuperadminPage = (props: UserPageProps) => {
   } = useModalManagement<User>();
 
   const { searchValue } = useSearchSetup();
-
-  // Get all role options based on props
-  const allRoles: Roles[] = 
-    props.roleList === "*" || !props.roleList
-      ? (Object.keys(getRoleLabel) as Roles[])
-      : (props.roleList as Roles[]);
 
   const handleSaved = useModalSaveHandler({
     isCreating,
@@ -38,37 +46,23 @@ export const UserSuperadminPage = (props: UserPageProps) => {
 
   return (
     <>
-      <Breadcumbs
-        title="Usuarios"
-        items={[
-          { label: "Inicio", route: "/dashboard" },
-          { label: "Usuarios" },
-        ]}
-      >
-        <button
-          className="btn btn-rounded btn-primary"
-          onClick={handleCreate}
-          aria-label="Crear"
-        >
-          <i className="fa fa-plus" />
-          &nbsp;Crear
-        </button>
-      </Breadcumbs>
+      <UsersPageHeader onCreateClick={handleCreate} />
 
       <UserModal
         open={isModalOpen}
         onClose={handleCloseModal}
         data={selectedUser}
         onSaved={handleSaved}
-        roleList={props.roleList}
+        roleList={roleList}
       />
 
       <div className="wrapper wrapper-content animated fadeInRight">
-        {allRoles.map((role) => (
+        {roleList.map((role) => (
           <UserRoleContainer
             key={role}
             role={role}
             searchValue={searchValue}
+            rolesCount={roleList.length}
             onEdit={handleEdit}
           />
         ))}

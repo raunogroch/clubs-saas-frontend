@@ -3,10 +3,11 @@ import { useState } from "react";
 interface IBoxProps {
   title: string;
   children: React.ReactNode;
+  initialCollapsed?: boolean;
 }
 
 export const IBox = (props: IBoxProps) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(props.initialCollapsed ?? false);
   return (
     <div className={`ibox ${collapsed ? "collapsed" : ""}`}>
       <div className="ibox-title">
