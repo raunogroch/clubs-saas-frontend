@@ -158,7 +158,7 @@ export const ClubPage = () => {
                             }}
                             aria-label={`Ver grupos de ${club.name}`}
                           >
-                            <i className="fa fa-users" />
+                            <i className="fa fa-list" />
                             &nbsp;Ingresar
                           </button>
                         </td>

@@ -236,7 +236,8 @@ export const GroupsPage = () => {
                   <thead className="table-light">
                     <tr>
                       <th>Nombre</th>
-                      <th>Club</th>
+                      <th>Horarios</th>
+                      <th>Entregadores</th>
                       <th>Dirección</th>
                       <th>Atletas</th>
                       <th>Rango de edad</th>
@@ -251,7 +252,36 @@ export const GroupsPage = () => {
                           <strong>{group.name}</strong>
                         </td>
                         <td className="align-middle">
-                          {getClubName(group.clubId)}
+                          <button
+                            className="btn btn-rounded btn-sm btn-outline-success"
+                            onClick={() =>
+                              handleOpenGroupTab(group, "schedules")
+                            }
+                          >
+                            <i className="fa fa-calendar" />
+                          </button>
+                          &nbsp;
+                          {(group.schedules?.length ?? 0) > 0 ? (
+                            <span>{group.schedules?.length} horarios</span>
+                          ) : (
+                            "Sin asignar"
+                          )}
+                        </td>
+                        <td>
+                          <button
+                            className="btn btn-rounded btn-sm btn-outline-warning"
+                            onClick={() => handleOpenGroupTab(group, "coaches")}
+                            aria-label={`Gestionar coaches de ${group.name}`}
+                            title="Agregar y gestionar coaches"
+                          >
+                            <i className="fa fa-users" />
+                          </button>
+                          &nbsp;
+                          {(group.coaches?.length ?? 0) > 0 ? (
+                            <span>{group.coaches?.length} Entrenadores</span>
+                          ) : (
+                            "Sin asignar"
+                          )}
                         </td>
                         <td className="align-middle">
                           {group.address || "N/A"}
@@ -293,28 +323,6 @@ export const GroupsPage = () => {
                             >
                               <i className="fa fa-edit" />
                               &nbsp; Editar
-                            </button>
-                            <button
-                              className="btn btn-rounded btn-sm btn-warning"
-                              onClick={() =>
-                                handleOpenGroupTab(group, "coaches")
-                              }
-                              aria-label={`Gestionar coaches de ${group.name}`}
-                              title="Agregar y gestionar coaches"
-                            >
-                              <i className="fa fa-users" />
-                              &nbsp; Coaches
-                            </button>
-                            <button
-                              className="btn btn-rounded btn-sm btn-success"
-                              onClick={() =>
-                                handleOpenGroupTab(group, "schedules")
-                              }
-                              aria-label={`Gestionar horarios de ${group.name}`}
-                              title="Agregar y gestionar horarios de entrenamiento"
-                            >
-                              <i className="fa fa-calendar" />
-                              &nbsp; Horarios
                             </button>
                           </div>
                         </td>
