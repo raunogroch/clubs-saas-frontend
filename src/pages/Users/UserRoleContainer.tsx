@@ -54,6 +54,7 @@ export const UserRoleContainer = ({
         totalPages={totalPages}
         total={meta?.total}
         rolesCount={rolesCount}
+        searchValue={searchValue}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onEdit={onEdit}

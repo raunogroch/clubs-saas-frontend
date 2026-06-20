@@ -22,7 +22,7 @@ export const UserSuperadminPage = (props: UserPageProps) => {
   const { searchValue } = useSearchSetup();
 
   // Get all role options based on props
-  const allRoles: Roles[] = 
+  const allRoles: Roles[] =
     props.roleList === "*" || !props.roleList
       ? (Object.keys(getRoleLabel) as Roles[])
       : (props.roleList as Roles[]);
