@@ -14,9 +14,9 @@ export const superAdminMenu: MenuItem[] = [
     name: "Asignaciones",
   },
   {
-    id: "admins",
-    route: "/admins",
+    id: "users",
+    route: "/users",
     icon: "users",
-    name: "Administradores",
+    name: "Usuarios",
   },
 ];

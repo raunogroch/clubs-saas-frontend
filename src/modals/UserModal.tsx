@@ -11,12 +11,16 @@ import type {
   UpdateUserDto,
 } from "../features/users/userApi";
 
-import { genderLabels, statusLabels } from "../common/translations";
+import {
+  genderLabels,
+  statusLabels,
+  rolesLabels,
+} from "../common/translations";
 import type { Gender, Roles, Status } from "../common/enums";
 import type { UserFormInputs } from "../core/types";
 import type { UserModalProps } from "../core/interfaces";
 
-// Opciones de selects - Memoizadas fuera del componente
+// Selects
 const genderOptions = Object.entries(genderLabels).map(([value, label]) => ({
   value,
   label,
@@ -41,55 +45,46 @@ const emptyForm: UserFormInputs = {
   status: "",
 };
 
-/**
- * Transforma un usuario de la API al formato del formulario
- * Maneja conversiones de tipos y values vacíos
- */
 const mapUserToForm = (user?: User): UserFormInputs => {
-  if (!user) {
-    return emptyForm;
-  }
+  if (!user) return emptyForm;
 
   return {
     name: user.name ?? "",
     lastname: user.lastname ?? "",
     dni: user.dni ?? "",
     username: user.username ?? "",
-
-    // Transformar roles: UserRole[] → { role: Roles | "" }[]
     roles:
-      user.roles && user.roles.length > 0
-        ? user.roles.map((userRole) => ({
-            role: userRole.role as Roles, // UserRole.role es siempre Roles
+      user.roles?.length > 0
+        ? user.roles.map((r) => ({
+            role: r.role as Roles,
           }))
         : [{ role: "" }],
-
     gender: user.gender ?? "",
-
-    // Manejo seguro de dates (usar ISO string sin conversión)
     birthDate: user.birthDate
       ? new Date(user.birthDate).toISOString().split("T")[0]
       : "",
-
     phone: user.phone ?? "",
     address: user.address ?? "",
     status: user.status ?? "",
   };
 };
 
-export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
+export const UserModal = (props: UserModalProps) => {
+  const { roleList } = props;
+
   const {
     createUser,
     isLoading: isCreating,
     error: createError,
   } = useCreateUser();
+
   const {
     updateUser,
     isLoading: isUpdating,
     error: updateError,
   } = useUpdateUser();
 
-  const isEdit = Boolean(data?.id);
+  const isEdit = Boolean(props.data?.id);
   const isSaving = isCreating || isUpdating;
   const error = createError || updateError;
 
@@ -102,7 +97,7 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
     setError,
     clearErrors,
   } = useForm<UserFormInputs>({
-    mode: "onBlur", // Validar solo cuando pierde el foco
+    mode: "onBlur",
     defaultValues: emptyForm,
   });
 
@@ -111,24 +106,15 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
     name: "roles",
   });
 
-  /**
-   * Reset del formulario cuando cambia el usuario a editar
-   * Optimizado: solo resetea cuando open=true y cambia data
-   */
   useEffect(() => {
-    if (open) {
-      reset(mapUserToForm(data));
-      clearErrors(); // Limpiar errores previos
+    if (props.open) {
+      reset(mapUserToForm(props.data));
+      clearErrors();
     }
-  }, [open, data, reset, clearErrors]);
+  }, [props.open, props.data, reset, clearErrors]);
 
-  /**
-   * Lógica de envío del formulario
-   * Incluye validaciones, transformaciones y manejo de errores
-   */
   const onSubmit: SubmitHandler<UserFormInputs> = async (formData) => {
     try {
-      // Validar roles (al menos uno debe estar seleccionado)
       const roles = formData.roles
         .map((r) => r.role)
         .filter((role): role is Roles => role !== "");
@@ -156,32 +142,43 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
         }),
       };
 
-      if (isEdit && data?.id) {
-        const updatePayload: UpdateUserDto = {
-          id: data.id,
+      if (isEdit && props.data?.id) {
+        await updateUser({
+          id: props.data.id,
           ...basePayload,
-        };
-        await updateUser(updatePayload);
+        } as UpdateUserDto);
       } else {
-        const createPayload: CreateUserDto = {
+        await createUser({
           ...basePayload,
           password: formData.dni.trim(),
-        };
-        await createUser(createPayload);
+        } as CreateUserDto);
       }
 
       reset(emptyForm);
-      onSaved?.();
-      onClose();
-    } catch (error) {
-      console.error("Error al guardar usuario:", error);
+      props.onSaved?.();
+      props.onClose();
+    } catch (err) {
+      console.error("Error al guardar usuario:", err);
     }
   };
 
+  // 🔥 ROLES FILTRADOS (CORREGIDO)
+  const allRoleOptions = Object.entries(rolesLabels).map(([value, label]) => ({
+    value,
+    label,
+  }));
+
+  const roleOptions =
+    roleList === "*" || !roleList
+      ? allRoleOptions
+      : allRoleOptions.filter((option) =>
+          roleList.includes(option.value as Roles),
+        );
+
   return (
     <Modal
-      open={open}
-      onClose={onClose}
+      open={props.open}
+      onClose={props.onClose}
       title={isEdit ? "Actualizar usuario" : "Crear usuario"}
       description={
         isEdit
@@ -191,16 +188,14 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
       size="lg"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Error global del API */}
         {error && (
-          <div className="alert alert-danger alert-dismissible" role="alert">
+          <div className="alert alert-danger alert-dismissible">
             <button
               type="button"
               className="close"
               onClick={() => clearErrors()}
-              aria-label="Cerrar"
             >
-              <span aria-hidden="true">&times;</span>
+              ×
             </button>
             <strong>Error:</strong>{" "}
             {typeof error === "string"
@@ -208,8 +203,6 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
               : "No se pudo guardar el usuario"}
           </div>
         )}
-
-        {/* Contenido del formulario en dos columnas */}
 
         <div className="row">
           <div className="col-md-6">
@@ -303,16 +296,16 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
               register={register}
               isSaving={isSaving}
               error={errors.roles?.message}
+              roleOptions={roleOptions}
             />
           </div>
         </div>
 
-        {/* Footer con botones */}
         <div className="modal-footer">
           <button
             type="button"
-            className="btn btn-sm  btn-rounded btn-white"
-            onClick={onClose}
+            className="btn btn-sm btn-rounded btn-white"
+            onClick={props.onClose}
             disabled={isSaving}
           >
             Cancelar
@@ -320,21 +313,10 @@ export const UserModal = ({ open, onClose, data, onSaved }: UserModalProps) => {
 
           <button
             type="submit"
-            className="btn btn-sm  btn-rounded btn-primary"
+            className="btn btn-sm btn-rounded btn-primary"
             disabled={isSaving || isSubmitting}
           >
-            <i className="fa fa-save" />
-            &nbsp;
-            {isSaving ? (
-              <>
-                <span className="fa fa-spinner fa-spin me-2" />
-                Guardando...
-              </>
-            ) : isEdit ? (
-              "Actualizar"
-            ) : (
-              "Crear"
-            )}
+            {isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
           </button>
         </div>
       </form>

@@ -1,19 +1,22 @@
-import { Breadcumbs, IBox, PaginationOptions } from "../components";
-import { PaginationTable } from "../components/PaginationTable";
-import { UserModal } from "../modals/UserModal";
-import { useUsers } from "../features/users/userHooks";
+import { getGenderLabel, getStatusLabel } from "../../common";
 import {
-  useSearchSetup,
+  Breadcumbs,
+  IBox,
+  PaginationOptions,
+  PaginationTable,
+  RolesHighlight,
+} from "../../components";
+import {
   useModalManagement,
-  usePaginationState,
   useModalSaveHandler,
-} from "../core/hooks";
-import type { User } from "../features/users/userApi";
-import { getGenderLabel, getStatusLabel } from "../common/translations";
-import { RolesHighlight } from "../components/RolesHighlight";
-import type { UserPageProps } from "../core/interfaces";
+  usePaginationState,
+  useSearchSetup,
+} from "../../core/hooks";
+import type { User, UserPageProps } from "../../core/interfaces";
+import { useUsers } from "../../features/users";
+import { UserModal } from "../../modals";
 
-export const UserPage = (props: UserPageProps) => {
+export const UserAdminPage = (props: UserPageProps) => {
   const {
     isOpen: isModalOpen,
     selectedItem: selectedUser,
@@ -77,6 +80,7 @@ export const UserPage = (props: UserPageProps) => {
         onClose={handleCloseModal}
         data={selectedUser}
         onSaved={handleSaved}
+        roleList={props.roleList}
       />
 
       <div className="wrapper wrapper-content animated fadeInRight">

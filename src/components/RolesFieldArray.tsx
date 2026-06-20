@@ -5,8 +5,6 @@ import type {
   UseFormRegister,
 } from "react-hook-form";
 
-import { Roles } from "../common/enums";
-import { rolesLabels } from "../common/translations";
 import type { UserFormInputs } from "../core/types";
 
 interface RolesFieldArrayProps {
@@ -15,7 +13,11 @@ interface RolesFieldArrayProps {
   remove: UseFieldArrayRemove;
   register: UseFormRegister<UserFormInputs>;
   isSaving: boolean;
-  error?: string; // Error message opcional
+  error?: string;
+  roleOptions: {
+    value: string;
+    label: string;
+  }[];
 }
 
 export const RolesFieldArray = ({
@@ -25,13 +27,13 @@ export const RolesFieldArray = ({
   register,
   isSaving,
   error,
+  roleOptions,
 }: RolesFieldArrayProps) => {
   const handleAddRole = () => {
     append({ role: "" });
   };
 
   const handleRemoveRole = (index: number) => {
-    // Asegurar que siempre haya al menos un campo vacío
     if (fields.length > 1) {
       remove(index);
     }
@@ -57,9 +59,9 @@ export const RolesFieldArray = ({
               >
                 <option value="">-- Seleccionar rol --</option>
 
-                {Object.values(Roles).map((role) => (
-                  <option key={role} value={role}>
-                    {rolesLabels[role]}
+                {roleOptions.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
                   </option>
                 ))}
               </select>
@@ -79,11 +81,9 @@ export const RolesFieldArray = ({
             </div>
           ))}
 
-          {/* Mensaje de error */}
           {error && <div className="invalid-feedback d-block">{error}</div>}
         </div>
 
-        {/* Botón para agregar rol */}
         <button
           type="button"
           className="btn btn-rounded btn-sm btn-success"

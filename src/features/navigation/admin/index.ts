@@ -13,4 +13,10 @@ export const adminMenu: MenuItem[] = [
     icon: "building",
     name: "Clubes",
   },
+  {
+    id: "coaches",
+    route: "/coaches",
+    icon: "users",
+    name: "Entrenadores",
+  },
 ];

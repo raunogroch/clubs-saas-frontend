@@ -75,8 +75,10 @@ export interface UserModalProps {
   onClose: () => void;
   data?: User;
   onSaved?: () => void;
+  roleList?: "*" | Roles[];
 }
 
 export interface UserPageProps {
   role: string;
+  roleList?: "*" | Roles[];
 }

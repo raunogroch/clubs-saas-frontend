@@ -4,4 +4,5 @@ export * from "./GroupsPage";
 export * from "./dashboard";
 export * from "./LoginPage";
 export * from "./NotFoundPage";
-export * from "./UserPage";
+export * from "./Users/UserAdminPage";
+export * from "./Users/UserSuperadminPage";
