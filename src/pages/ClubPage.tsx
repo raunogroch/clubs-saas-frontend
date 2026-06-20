@@ -1,4 +1,4 @@
-import { Breadcrumbs, IBox, PaginationOptions } from "../components";
+import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import { PaginationTable } from "../components/PaginationTable";
 import { ClubModal } from "../modals/ClubModal";
 import { useNavigate } from "react-router-dom";
@@ -69,22 +69,12 @@ export const ClubPage = () => {
     onModalClose: handleCloseModal,
   });
 
-  //   const handleDelete = async (club: Club) => {
-  //     if (!window.confirm(`¿Deseas eliminar el club ${club.name}?`)) return;
-
-  //     try {
-  //       await deleteClub(club.id);
-  //       await refetch();
-  //       success(`Club ${club.name} eliminado correctamente`);
-  //     } catch (err) {
-  //       console.error(err);
-  //       notifyError("No se pudo eliminar el club");
-  //     }
-  //   };
-
   return (
     <>
-      <Breadcrumbs title="Clubes">
+      <Breadcumbs
+        title="Clubes"
+        items={[{ label: "Inicio", route: "/dashboard" }, { label: "Clubs" }]}
+      >
         <button
           className="btn btn-rounded btn-primary"
           onClick={handleCreate}
@@ -93,7 +83,7 @@ export const ClubPage = () => {
           <i className="fa fa-plus" />
           &nbsp;Crear
         </button>
-      </Breadcrumbs>
+      </Breadcumbs>
 
       <ClubModal
         open={isModalOpen}

@@ -1,5 +1,5 @@
 export * from "./Button";
-export * from "./Breadcrumbs";
+export * from "./Breadcumbs";
 export * from "./Footer";
 export * from "./NavHeader";
 export * from "./Sidenav";

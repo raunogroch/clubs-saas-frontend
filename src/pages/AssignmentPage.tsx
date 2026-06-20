@@ -1,4 +1,4 @@
-import { Breadcrumbs, IBox, PaginationOptions } from "../components";
+import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import { AssignmentTable } from "../components/AssignmentTable";
 import { AssignmentTableState } from "../components/AssignmentTableState";
 import { AssignmentModal } from "../modals/AssignmentModal";
@@ -58,7 +58,13 @@ export const AssignmentPage = () => {
 
   return (
     <>
-      <Breadcrumbs title="Asignaciones">
+      <Breadcumbs
+        title="Asignaciones"
+        items={[
+          { label: "Inicio", route: "/dashboard" },
+          { label: "Asignaciones" },
+        ]}
+      >
         <button
           className="btn btn-rounded btn-primary"
           onClick={handleCreate}
@@ -67,7 +73,7 @@ export const AssignmentPage = () => {
           <i className="fa fa-plus" />
           &nbsp;Crear
         </button>
-      </Breadcrumbs>
+      </Breadcumbs>
 
       <AssignmentModal
         open={isModalOpen}

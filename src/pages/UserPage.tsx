@@ -1,4 +1,4 @@
-import { Breadcrumbs, IBox, PaginationOptions } from "../components";
+import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import { PaginationTable } from "../components/PaginationTable";
 import { UserModal } from "../modals/UserModal";
 import { useUsers } from "../features/users/userHooks";
@@ -55,7 +55,13 @@ export const UserPage = (props: UserPageProps) => {
 
   return (
     <>
-      <Breadcrumbs title="Usuarios">
+      <Breadcumbs
+        title="Usuarios"
+        items={[
+          { label: "Inicio", route: "/dashboard" },
+          { label: "Usuarios" },
+        ]}
+      >
         <button
           className="btn btn-rounded btn-primary"
           onClick={handleCreate}
@@ -64,7 +70,7 @@ export const UserPage = (props: UserPageProps) => {
           <i className="fa fa-plus" />
           &nbsp;Crear
         </button>
-      </Breadcrumbs>
+      </Breadcumbs>
 
       <UserModal
         open={isModalOpen}

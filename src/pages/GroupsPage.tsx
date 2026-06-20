@@ -1,4 +1,4 @@
-import { Breadcrumbs, IBox, PaginationOptions } from "../components";
+import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import {
   GroupsModal,
   SchedulesModal,
@@ -132,7 +132,14 @@ export const GroupsPage = () => {
   if (!activeClubId) {
     return (
       <>
-        <Breadcrumbs title="Grupos">
+        <Breadcumbs
+          title={pageTitle}
+          items={[
+            { label: "Inicio", route: "/dashboard" },
+            { label: "Clubs", route: "/clubs" },
+            { label: "Grupos" },
+          ]}
+        >
           <button
             className="btn btn-rounded btn-rounded btn-primary"
             disabled
@@ -141,7 +148,7 @@ export const GroupsPage = () => {
             <i className="fa fa-plus" />
             &nbsp;Crear
           </button>
-        </Breadcrumbs>
+        </Breadcumbs>
         <div className="wrapper wrapper-content animated fadeInRight">
           <IBox title="Grupos">
             <div className="alert alert-warning" role="alert">
@@ -156,7 +163,14 @@ export const GroupsPage = () => {
   // ==================== RENDER ====================
   return (
     <>
-      <Breadcrumbs title={pageTitle}>
+      <Breadcumbs
+        title={pageTitle}
+        items={[
+          { label: "Inicio", route: "/dashboard" },
+          { label: "Clubs", route: "/clubs" },
+          { label: "Grupos" },
+        ]}
+      >
         <button
           className="btn btn-rounded btn-sm btn-rounded btn-primary"
           onClick={handleCreate}
@@ -165,7 +179,7 @@ export const GroupsPage = () => {
           <i className="fa fa-plus" />
           &nbsp; Crear grupo
         </button>
-      </Breadcrumbs>
+      </Breadcumbs>
 
       <GroupsModal
         open={isModalOpen}
@@ -314,7 +328,7 @@ export const GroupsPage = () => {
                           </span>
                         </td>
                         <td className="align-middle">
-                          <div className="btn-group btn-group-sm" role="group">
+                          <div className="btn btn-sm btn-rounded" role="group">
                             <button
                               className="btn btn-rounded btn-sm btn-info"
                               onClick={() => handleEdit(group)}
@@ -322,7 +336,7 @@ export const GroupsPage = () => {
                               title="Editar información del grupo"
                             >
                               <i className="fa fa-edit" />
-                              &nbsp; Editar
+                              &nbsp;Editar
                             </button>
                           </div>
                         </td>
