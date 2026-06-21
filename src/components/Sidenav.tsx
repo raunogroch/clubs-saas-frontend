@@ -4,30 +4,28 @@ import { MenuProfile, MenuSingleOption } from ".";
 import { useAuthManager } from "../features/auth/useAuthManager";
 import { useActiveRole } from "../core/context/useActiveRole";
 import { useGetRolesFromMemberships } from "../core/hooks/useGetRolesFromMemberships";
-import type { UserRole } from "../features/users";
 import { getMenuByRole } from "../features/navigation";
+import { hasAdminActiveAssignment } from "../core/auth/adminAccess";
 
 export const Sidenav = () => {
   const { pathname } = useLocation();
-  const { user } = useAuthManager();
+  const { user, activeAssignmentId } = useAuthManager();
   const { activeRole } = useActiveRole();
+
   const rolesFromMemberships = useGetRolesFromMemberships(user?.memberships);
 
-  const displayName = user?.name
-    ? `${user.name} ${user.lastname || ""}`.trim()
-    : "Usuario";
-
-  // Obtener roles desde memberships o usar legacy roles
-  const displayRoles: UserRole[] =
+  const displayRoles =
     rolesFromMemberships.length > 0
-      ? rolesFromMemberships.map((role) => ({ role }))
+      ? rolesFromMemberships.map((r) => ({ role: r }))
       : user?.roles || [];
 
-  const hasAssignments =
-    (user?.memberships ?? user?.assignments ?? []).length > 0;
-  const shouldHideMenuForAdmin = activeRole === "ADMIN" && !hasAssignments;
+  const hasAssignment = hasAdminActiveAssignment(
+    activeRole,
+    activeAssignmentId,
+  );
 
-  // Obtener el menú específico para el rol activo
+  const hideMenu = activeRole === "ADMIN" && !hasAssignment;
+
   const menuItems = useMemo(
     () => (activeRole ? getMenuByRole(activeRole) : []),
     [activeRole],
@@ -40,20 +38,16 @@ export const Sidenav = () => {
           <li className="nav-header">
             <MenuProfile
               imageUrl="assets/img/profile_small.jpg"
-              name={displayName}
+              name={
+                user?.name
+                  ? `${user.name} ${user.lastname || ""}`.trim()
+                  : "Usuario"
+              }
               roles={displayRoles}
             />
-
-            <div className="logo-element">
-              <img
-                //src="assets/img/olympics.svg"
-                alt="logo"
-                className="sidenav-logo"
-              />
-            </div>
           </li>
 
-          {!shouldHideMenuForAdmin &&
+          {!hideMenu &&
             menuItems.map((item) => (
               <MenuSingleOption
                 key={item.id}

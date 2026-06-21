@@ -1,6 +1,5 @@
 import { useActiveRole } from "../core/context/useActiveRole";
 import { useAuthManager } from "../features/auth/useAuthManager";
-import { usePersistorRehydration } from "../app/usePersistorRehydration";
 import { useGetRolesFromMemberships } from "../core/hooks/useGetRolesFromMemberships";
 import {
   DashboardAdmin,
@@ -11,11 +10,14 @@ import {
   DashboardSuperadmin,
 } from "./dashboard";
 import { NoAssignmentsPage } from "./NoAssignmentsPage";
+import { usePersistorRehydration } from "../app/usePersistorRehydration";
+import { hasAdminActiveAssignment } from "../core/auth/adminAccess";
 
 export const DashboardPage = () => {
   const isRehydrated = usePersistorRehydration();
   const { user, activeAssignmentId } = useAuthManager();
   const { activeRole } = useActiveRole();
+
   const rolesFromMemberships = useGetRolesFromMemberships(user?.memberships);
 
   const currentRole =
@@ -24,27 +26,12 @@ export const DashboardPage = () => {
     user?.roles?.[0]?.role ??
     "ADMIN";
 
-  // Para ADMIN: requiere activeAssignmentId seleccionado (esperar rehydratación)
-  // Para otros roles: solo verifica que hay memberships
-  let hasValidAssignments = false;
+  const hasAssignment = hasAdminActiveAssignment(
+    currentRole,
+    activeAssignmentId,
+  );
 
-  if (currentRole === "ADMIN") {
-    // Para ADMIN, necesitamos esperar la rehydratación y verificar activeAssignmentId
-    if (!isRehydrated) {
-      // Aún no se ha completado la rehydratación, no mostrar NoAssignmentsPage aún
-      hasValidAssignments = true;
-    } else {
-      // Rehydratación completa, verificar activeAssignmentId
-      hasValidAssignments =
-        !!activeAssignmentId && activeAssignmentId.trim().length > 0;
-    }
-  } else {
-    // Para otros roles, no necesita rehydratación, solo verifica memberships
-    hasValidAssignments =
-      (user?.memberships ?? user?.assignments ?? []).length > 0;
-  }
-
-  if (currentRole === "ADMIN" && !hasValidAssignments) {
+  if (currentRole === "ADMIN" && isRehydrated && !hasAssignment) {
     return <NoAssignmentsPage />;
   }
 
