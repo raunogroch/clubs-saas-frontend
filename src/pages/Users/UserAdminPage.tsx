@@ -37,7 +37,10 @@ export const UserAdminPage = (props: UserPageProps) => {
   const { searchValue } = useSearchSetup();
 
   const { users, meta, isLoading, error, refetch } = useUsers({
-    role: props.roleList && props.roleList !== "*" && Array.isArray(props.roleList) ? props.roleList[0] : undefined,
+    role:
+      props.roleList && props.roleList !== "*" && Array.isArray(props.roleList)
+        ? props.roleList[0]
+        : undefined,
     search: searchValue,
     page,
     limit: pageSize,

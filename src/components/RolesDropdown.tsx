@@ -53,9 +53,8 @@ export const RolesDropdown = () => {
         (item: any) => item?.assignmentId,
       ),
     ),
-  ).filter(
-    (value): value is string =>
-      Boolean(value && value.trim().length > 0),
+  ).filter((value): value is string =>
+    Boolean(value && value.trim().length > 0),
   );
 
   // Validar consistencia de roles

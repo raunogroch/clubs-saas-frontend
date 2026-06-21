@@ -12,7 +12,6 @@
 import type { User } from "../../core/interfaces";
 import { shouldFetchUserAssignments as membershipShouldFetch } from "./membershipService";
 
-
 /**
  * Determina si debe obtener assignments del usuario basado en su rol
  *

@@ -58,9 +58,9 @@ const mapUserToForm = (user?: User): UserFormInputs => {
     username: user.username ?? "",
     roles:
       (user.roles?.length ?? 0) > 0
-        ? user.roles?.map((r) => ({
+        ? (user.roles?.map((r) => ({
             role: r.role as Roles,
-          })) ?? [{ role: "" }]
+          })) ?? [{ role: "" }])
         : [{ role: "" }],
     gender: user.gender ?? "",
     birthDate: user.birthDate
