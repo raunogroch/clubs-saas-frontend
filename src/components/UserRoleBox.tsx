@@ -102,37 +102,43 @@ export const UserRoleBox = ({
               <tbody>
                 {users.map((user, index) => (
                   <tr key={user.id}>
-                    <td>{(page - 1) * pageSize + index + 1}</td>
+                    <td className="align-middle">
+                      {(page - 1) * pageSize + index + 1}
+                    </td>
 
-                    <td>
+                    <td className="align-middle">
                       <strong>
                         {user.name} {user.lastname}
                       </strong>
                     </td>
 
-                    <td>{user.username}</td>
+                    <td className="align-middle">{user.username}</td>
 
-                    <td>{user.dni ?? "-"}</td>
+                    <td className="align-middle">{user.dni ?? "-"}</td>
 
-                    <td>{getGenderLabel(user.gender)}</td>
+                    <td className="align-middle">
+                      {getGenderLabel(user.gender)}
+                    </td>
 
-                    <td>
+                    <td className="align-middle">
                       {user.birthDate
                         ? new Date(user.birthDate).toLocaleDateString()
                         : "-"}
                     </td>
 
-                    <td>{user.phone ?? "-"}</td>
+                    <td className="align-middle">{user.phone ?? "-"}</td>
 
-                    <td>{user.address ?? "-"}</td>
+                    <td className="align-middle">{user.address ?? "-"}</td>
 
-                    <td>
-                      <RolesHighlight roles={user.roles} />
+                    <td className="align-middle">
+                      <RolesHighlight roles={user.memberships} />
                     </td>
 
-                    <td>{getStatusLabel(user.status)}</td>
+                    <td className="align-middle">
+                      {getStatusLabel(user.status)}
+                    </td>
 
-                    <td>
+                    <td className="align-middle">
                       <button
                         type="button"
                         className="btn btn-sm btn-rounded btn-primary"
