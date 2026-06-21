@@ -15,8 +15,8 @@ export const RolesHighlight = ({ roles = [] }: RolesHighlightProps) => {
 
   return (
     <>
-      {roles.map((userRole) => (
-        <div key={userRole.id} className="mb-1">
+      {roles.map((userRole, index) => (
+        <div key={index} className="mb-1">
           <LabelHighlight
             text={getRoleLabel(userRole.role)}
             type="info"
