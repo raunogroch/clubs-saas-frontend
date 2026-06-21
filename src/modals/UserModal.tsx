@@ -56,12 +56,14 @@ const mapUserToForm = (user?: User): UserFormInputs => {
     lastname: user.lastname ?? "",
     dni: user.dni ?? "",
     username: user.username ?? "",
+
     roles:
-      (user.roles?.length ?? 0) > 0
-        ? (user.roles?.map((r) => ({
-            role: r.role as Roles,
-          })) ?? [{ role: "" }])
+      (user.memberships?.length ?? 0) > 0
+        ? user.memberships!.map((membership) => ({
+            role: membership.role as Roles,
+          }))
         : [{ role: "" }],
+
     gender: user.gender ?? "",
     birthDate: user.birthDate
       ? new Date(user.birthDate).toISOString().split("T")[0]
