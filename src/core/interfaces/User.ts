@@ -16,19 +16,36 @@ export interface UserAssignments {
   available?: boolean | null;
 }
 
+/**
+ * Membership: Nueva estructura para roles del usuario con estado por rol
+ *
+ * Principios SOLID:
+ * - SRP: Una responsabilidad - representar membresía de un usuario a un rol
+ * - ISP: Interfaz específica para membresía
+ */
+export interface Membership {
+  role: Roles;
+  assignmentId: string;
+  status?: Status | string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface User {
   id: string;
   name: string;
   lastname: string;
   dni: string;
   username: string;
-  roles: UserRole[];
+  password?: string;
+  roles?: UserRole[]; // Deprecated: usar memberships en su lugar
   gender?: Gender;
   birthDate?: Date;
   phone?: string;
   address?: string;
   status?: Status;
-  assignments?: UserAssignments[];
+  assignments?: UserAssignments[]; // Deprecated: usar memberships en su lugar
+  memberships?: Membership[]; // Nueva estructura de roles con estado
 }
 
 export interface CreateUserDto {
@@ -37,7 +54,7 @@ export interface CreateUserDto {
   dni: string;
   username: string;
   password: string;
-  roles: Roles[];
+  memberships: Membership[];
   gender?: Gender;
   birthDate?: Date;
   phone?: string;
@@ -51,7 +68,7 @@ export interface UpdateUserDto {
   lastname: string;
   dni: string;
   username: string;
-  roles: Roles[];
+  memberships: Membership[];
   gender?: Gender;
   birthDate?: Date;
   phone?: string;

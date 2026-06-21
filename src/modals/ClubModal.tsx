@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { InputForm, Modal } from "../components";
 import { useAssignmentPersistence } from "../core/hooks";
 import type { ClubModalProps } from "../core/interfaces/Clubs";
-import { useAppSelector } from "../hooks/reduxHooks";
+import { useAuthManager } from "../features/auth/useAuthManager";
 import { sportOptions, statusOptions } from "../features/clubs/clubFormOptions";
 import {
   emptyForm,
@@ -16,7 +16,7 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
   const { submit, isSaving, error } = useClubSubmit(data, onSaved, onClose);
   const { assignmentId: persistedAssignmentId, setAssignmentId } =
     useAssignmentPersistence();
-  const user = useAppSelector((state) => state.auth.user);
+  const { activeAssignmentId } = useAuthManager();
 
   const {
     register,
@@ -31,10 +31,7 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
 
   const isEdit = Boolean(data?.id);
   const defaultAssignmentId =
-    data?.assignmentId ||
-    persistedAssignmentId ||
-    user?.assignments?.[0]?.assignmentId ||
-    "";
+    data?.assignmentId || persistedAssignmentId || activeAssignmentId || "";
 
   useEffect(() => {
     if (!open) {

@@ -69,6 +69,7 @@ export const UserSuperadminPage = (props: UserPageProps) => {
             key={role}
             role={role}
             searchValue={searchValue}
+            rolesCount={allRoles.length}
             onEdit={handleEdit}
           />
         ))}

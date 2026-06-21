@@ -1,4 +1,5 @@
 import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAssignmentSelection } from "../features/auth/useAssignmentSelection";
 import { getRoleLabel } from "../common/translations";
 import { useActiveRole } from "../core/context/useActiveRole";
 import { useAssignmentPersistence } from "../core/hooks";
@@ -6,6 +7,7 @@ import { useDropdownMenu } from "../core/hooks/useDropdownMenu";
 import { useInitializeActiveRole } from "../core/hooks/useInitializeActiveRole";
 import { useValidateRolesConsistency } from "../core/hooks/useValidateRolesConsistency";
 import { useNormalizeRoles } from "../core/hooks/useNormalizeRoles";
+import { useGetRolesFromMemberships } from "../core/hooks/useGetRolesFromMemberships";
 import type { Roles } from "../common/enums";
 
 /**
@@ -13,33 +15,47 @@ import type { Roles } from "../common/enums";
  *
  * Responsabilidad única: Renderizar un dropdown para cambiar de rol
  *
- * Soporta dos estructuras de roles:
- * - Roles[] directo: ["ADMIN", "SUPER_ADMIN"]
- * - UserRole[]: [{ role: "ADMIN" }, { role: "SUPER_ADMIN" }]
+ * Soporta múltiples estructuras de roles:
+ * - Nueva: user.memberships[] (roles con estado)
+ * - Antigua: user.roles[] (UserRole[] o Roles[])
+ * - Legacy: user.assignments[] (para retrocompatibilidad)
  *
  * Lógica separada en:
- * - useNormalizeRoles: Normaliza estructuras de roles
+ * - useGetRolesFromMemberships: Extrae roles desde memberships
+ * - useNormalizeRoles: Normaliza estructuras de roles antiguas
  * - useDropdownMenu: Gestiona abrir/cerrar y clicks fuera
  * - useInitializeActiveRole: Inicializa el rol si es necesario
  * - useActiveRole: Obtiene/actualiza el rol activo
  * - useValidateRolesConsistency: Valida que los roles sean válidos
+ * - useAssignmentSelection: Actualiza assignment en localStorage y Redux
  */
 export const RolesDropdown = () => {
   const { user, refreshAssignments } = useAuthManager();
+  const { selectAssignment } = useAssignmentSelection();
   const { activeRole, setActiveRole } = useActiveRole();
-  const { assignmentId, setAssignmentId } = useAssignmentPersistence();
+  const { assignmentId } = useAssignmentPersistence();
   const { isOpen, toggleOpen, closeMenu, dropdownRef } = useDropdownMenu();
 
-  // Normalizar roles independientemente de la estructura
-  const rolesArray: Roles[] = useNormalizeRoles(user?.roles);
+  // Obtener roles desde memberships (nueva estructura) o desde roles (antigua)
+  const rolesFromMemberships: Roles[] = useGetRolesFromMemberships(
+    user?.memberships,
+  );
+  const rolesFromLegacy: Roles[] = useNormalizeRoles(user?.roles);
+
+  // Usar memberships si existen, si no usar legacy
+  const rolesArray: Roles[] =
+    rolesFromMemberships.length > 0 ? rolesFromMemberships : rolesFromLegacy;
+
+  // Extraer assignmentIds desde memberships o assignments
   const assignments = Array.from(
     new Set(
-      (user?.assignments ?? [])
-        .map((item) => item.assignmentId)
-        .filter((value): value is string =>
-          Boolean(value && value.trim().length > 0),
-        ),
+      (user?.memberships ?? user?.assignments ?? []).map(
+        (item: any) => item?.assignmentId,
+      ),
     ),
+  ).filter(
+    (value): value is string =>
+      Boolean(value && value.trim().length > 0),
   );
 
   // Validar consistencia de roles
@@ -57,20 +73,49 @@ export const RolesDropdown = () => {
   }
 
   const handleRoleSelect = async (role: Roles) => {
-    setActiveRole(role);
+    // Si es ADMIN o SUPER_ADMIN, cargar los assignments del usuario
+    if (role === "ADMIN" || role === "SUPER_ADMIN") {
+      const refreshedAssignments = await refreshAssignments();
 
-    const refreshedAssignments = await refreshAssignments();
-    const nextAssignmentId = refreshedAssignments[0]?.assignmentId ?? "";
+      // Buscar el PRIMER assignment válido con assignmentId
+      let nextAssignmentId = refreshedAssignments?.find(
+        (a) => a.assignmentId && a.assignmentId.trim().length > 0,
+      )?.assignmentId;
 
-    if (nextAssignmentId) {
-      setAssignmentId(nextAssignmentId);
+      // Si no hay en refreshedAssignments, buscar en memberships del usuario
+      if (!nextAssignmentId) {
+        nextAssignmentId = user?.memberships
+          ?.filter((m) => m.role === role && m.assignmentId)
+          .find(
+            (m) => m.assignmentId && m.assignmentId.trim().length > 0,
+          )?.assignmentId;
+      }
+
+      if (nextAssignmentId) {
+        // Establecer activeAssignmentId PRIMERO (antes de cambiar el rol)
+        selectAssignment(nextAssignmentId);
+      } else {
+        selectAssignment("");
+      }
+    } else {
+      // Para otros roles, obtener el primer assignmentId del rol actual
+      const currentMembership = user?.memberships?.find((m) => m.role === role);
+      if (currentMembership?.assignmentId) {
+        // Establecer activeAssignmentId PRIMERO
+        selectAssignment(currentMembership.assignmentId);
+      } else {
+        selectAssignment("");
+      }
     }
 
+    // Cambiar el rol DESPUÉS de establecer activeAssignmentId
+    // Así cuando DashboardPage se re-renderice, activeAssignmentId ya estará correcto
+    setActiveRole(role);
     closeMenu();
   };
 
   const handleAssignmentSelect = (value: string) => {
-    setAssignmentId(value);
+    selectAssignment(value);
     closeMenu();
   };
 

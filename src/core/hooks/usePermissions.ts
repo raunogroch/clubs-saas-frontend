@@ -4,8 +4,9 @@
  * Hook para validar roles del usuario actual
  *
  * Principios SOLID:
- * - SRP: Una responsabilidad - validar roles
+ * - SRP: Una responsabilidad - validar roles/memberships
  * - ISP: Interfaz específica para roles
+ * - DIP: Depende de membershipService
  *
  * Uso:
  * ```typescript
@@ -20,14 +21,20 @@
 import type { Roles } from "../../common";
 import type { UsePermissionsReturn } from "../interfaces";
 import { useAuth } from "./useAuth";
+import {
+  userHasMembership,
+  userHasAnyMembership,
+  userHasAllMemberships,
+} from "../../features/auth/membershipService";
 
 /**
- * Hook que proporciona métodos para validar roles
+ * Hook que proporciona métodos para validar roles/memberships
  *
  * Características:
  * - Validación de roles individuales
  * - Validación de múltiples roles (ANY / ALL)
  * - Helpers predefinidos (isAdmin, isParent, isAthlete, etc.)
+ * - Soporte para nueva estructura de memberships con retrocompatibilidad
  *
  * @returns {UsePermissionsReturn}
  */
@@ -35,22 +42,15 @@ export const usePermissions = (): UsePermissionsReturn => {
   const { user } = useAuth();
 
   const hasRole = (role: Roles): boolean => {
-    if (!user || !user.roles) return false;
-    return user.roles.some((userRole) => userRole.role === role);
+    return userHasMembership(user, role);
   };
 
   const hasAnyRole = (roles: Roles[]): boolean => {
-    if (!user || !user.roles) return false;
-    return roles.some((role) =>
-      user.roles.some((userRole) => userRole.role === role),
-    );
+    return userHasAnyMembership(user, roles);
   };
 
   const hasAllRoles = (roles: Roles[]): boolean => {
-    if (!user || !user.roles) return false;
-    return roles.every((role) =>
-      user.roles.some((userRole) => userRole.role === role),
-    );
+    return userHasAllMemberships(user, roles);
   };
 
   const isAdmin = (): boolean => {

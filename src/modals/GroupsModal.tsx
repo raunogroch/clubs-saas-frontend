@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { InputForm, Modal } from "../components";
 import { useAssignmentPersistence } from "../core/hooks";
 import type { GroupModalProps } from "../core/interfaces/Groups";
-import { useAppSelector } from "../hooks/reduxHooks";
+import { useAuthManager } from "../features/auth/useAuthManager";
 import {
   emptyForm,
   mapGroupToForm,
@@ -27,7 +27,7 @@ export const GroupsModal = ({
   } = useGroupSubmit(data, onSaved, onClose);
   const { assignmentId: persistedAssignmentId, setAssignmentId } =
     useAssignmentPersistence();
-  const user = useAppSelector((state) => state.auth.user);
+  const { activeAssignmentId } = useAuthManager();
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const {
@@ -43,10 +43,7 @@ export const GroupsModal = ({
 
   const isEdit = Boolean(data?.id);
   const defaultAssignmentId =
-    data?.assignmentId ||
-    persistedAssignmentId ||
-    user?.assignments?.[0]?.assignmentId ||
-    "";
+    data?.assignmentId || persistedAssignmentId || activeAssignmentId || "";
 
   useEffect(() => {
     if (!open) {

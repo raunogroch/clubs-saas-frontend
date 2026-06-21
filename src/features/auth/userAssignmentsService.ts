@@ -10,35 +10,18 @@
  */
 
 import type { User } from "../../core/interfaces";
-import { Roles } from "../../common/enums";
+import { shouldFetchUserAssignments as membershipShouldFetch } from "./membershipService";
 
-/**
- * Verifica si el usuario tiene el rol especificado
- * Maneja tanto objetos UserRole como strings directos
- *
- * @param user - Objeto del usuario
- * @param role - Rol a verificar
- * @returns true si el usuario tiene el rol
- */
-const userHasRole = (user: User, role: string): boolean => {
-  return user.roles.some((userRole) => {
-    // Si es un objeto con propiedad 'role'
-    if (typeof userRole === "object" && "role" in userRole) {
-      return userRole.role === role;
-    }
-    // Si es un string directo
-    return userRole === role;
-  });
-};
 
 /**
  * Determina si debe obtener assignments del usuario basado en su rol
+ *
+ * Usa el nuevo membershipService si es posible, con retrocompatibilidad
  *
  * @param user - Objeto del usuario
  * @returns true si debe obtener assignments
  */
 export const shouldFetchUserAssignments = (user: User): boolean => {
-  const isAdmin = userHasRole(user, Roles.ADMIN);
-  const isSuperAdmin = userHasRole(user, Roles.SUPER_ADMIN);
-  return isAdmin || isSuperAdmin;
+  // Delegar al membershipService que maneja ambas estructuras
+  return membershipShouldFetch(user);
 };

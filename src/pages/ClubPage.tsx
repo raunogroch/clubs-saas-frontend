@@ -18,7 +18,7 @@ import { getClubStatusLabel, getSportLabel } from "../common/translations";
 
 export const ClubPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuthManager();
+  const { activeAssignmentId } = useAuthManager();
   const { activeRole } = useActiveRole();
   const {
     assignmentId: persistedAssignmentId,
@@ -44,7 +44,7 @@ export const ClubPage = () => {
 
   const assignmentFilter =
     activeRole === Roles.ADMIN
-      ? persistedAssignmentId || user?.assignments?.[0]?.assignmentId || ""
+      ? persistedAssignmentId || activeAssignmentId || ""
       : undefined;
 
   const { clubs, meta, isLoading, error, refetch } = useClubs({

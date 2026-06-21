@@ -9,6 +9,8 @@
 export type {
   User,
   UserRole,
+  Membership,
+  UserAssignments,
   CreateUserDto,
   UpdateUserDto,
   UserListResponse,

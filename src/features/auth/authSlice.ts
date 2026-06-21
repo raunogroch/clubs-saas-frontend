@@ -7,11 +7,12 @@
  * - SRP: Una sola responsabilidad - manejar estado de auth
  * - Tipos centralizados en core/types (no duplicados aquí)
  * - Persistencia delegada a redux-persist (no localStorage manual)
+ * - DIP: Actualiza ambas estructuras (assignments y memberships) para compatibilidad
  */
 
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState, User } from "../../core/types";
-import type { UserAssignments } from "../../core/interfaces";
+import type { UserAssignments, Membership } from "../../core/interfaces";
 
 const initialState: AuthState = {
   user: null,
@@ -19,6 +20,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  activeAssignmentId: null,
 };
 
 export const authSlice = createSlice({
@@ -68,6 +70,7 @@ export const authSlice = createSlice({
       state.isAuthenticated = false;
       state.loading = false;
       state.error = null;
+      state.activeAssignmentId = null;
     },
 
     /**
@@ -92,6 +95,8 @@ export const authSlice = createSlice({
      * Principios SOLID:
      * - SRP: Una responsabilidad - actualizar solo assignments
      * - DIP: Recibe array de UserAssignments (abstracción)
+     *
+     * @deprecated - Mantener para retrocompatibilidad, preferir updateUserMemberships
      */
     updateUserAssignments: (
       state,
@@ -100,6 +105,35 @@ export const authSlice = createSlice({
       if (state.user) {
         state.user.assignments = action.payload;
       }
+    },
+
+    /**
+     * Action para actualizar memberships del usuario autenticado
+     *
+     * Nueva estructura de roles con estado por rol
+     *
+     * Principios SOLID:
+     * - SRP: Una responsabilidad - actualizar solo memberships
+     * - DIP: Recibe array de Membership (abstracción)
+     */
+    updateUserMemberships: (state, action: PayloadAction<Membership[]>) => {
+      if (state.user) {
+        state.user.memberships = action.payload;
+      }
+    },
+
+    /**
+     * Action para establecer el assignment actualmente seleccionado
+     *
+     * Persiste en Redux (y automáticamente en localStorage via redux-persist)
+     * Se usa cuando el usuario cambia de assignment/club
+     *
+     * Principios SOLID:
+     * - SRP: Una responsabilidad - establecer assignment activo
+     * - DIP: Depende de abstracción (string assignmentId)
+     */
+    setActiveAssignment: (state, action: PayloadAction<string>) => {
+      state.activeAssignmentId = action.payload || null;
     },
   },
 });
@@ -112,6 +146,8 @@ export const {
   clearError,
   updateUser,
   updateUserAssignments,
+  updateUserMemberships,
+  setActiveAssignment,
 } = authSlice.actions;
 
 export default authSlice.reducer;

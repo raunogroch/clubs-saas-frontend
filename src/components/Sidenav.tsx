@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { MenuProfile, MenuSingleOption } from ".";
 import { useAuthManager } from "../features/auth/useAuthManager";
 import { useActiveRole } from "../core/context/useActiveRole";
+import { useGetRolesFromMemberships } from "../core/hooks/useGetRolesFromMemberships";
 import type { UserRole } from "../features/users";
 import { getMenuByRole } from "../features/navigation";
 
@@ -10,13 +11,20 @@ export const Sidenav = () => {
   const { pathname } = useLocation();
   const { user } = useAuthManager();
   const { activeRole } = useActiveRole();
+  const rolesFromMemberships = useGetRolesFromMemberships(user?.memberships);
 
   const displayName = user?.name
     ? `${user.name} ${user.lastname || ""}`.trim()
     : "Usuario";
 
-  const displayRoles: UserRole[] = user?.roles || [];
-  const hasAssignments = (user?.assignments ?? []).length > 0;
+  // Obtener roles desde memberships o usar legacy roles
+  const displayRoles: UserRole[] =
+    rolesFromMemberships.length > 0
+      ? rolesFromMemberships.map((role) => ({ role }))
+      : user?.roles || [];
+
+  const hasAssignments =
+    (user?.memberships ?? user?.assignments ?? []).length > 0;
   const shouldHideMenuForAdmin = activeRole === "ADMIN" && !hasAssignments;
 
   // Obtener el menú específico para el rol activo

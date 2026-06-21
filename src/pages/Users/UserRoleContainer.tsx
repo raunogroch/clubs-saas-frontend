@@ -8,6 +8,7 @@ interface UserRoleContainerProps {
   role: Roles;
   searchValue: string;
   rolesCount: number;
+  activeAssignmentId?: string;
   onEdit: (user: User) => void;
 }
 
@@ -15,6 +16,7 @@ export const UserRoleContainer = ({
   role,
   searchValue,
   rolesCount,
+  activeAssignmentId,
   onEdit,
 }: UserRoleContainerProps) => {
   const [page, setPage] = useState(1);
@@ -25,6 +27,7 @@ export const UserRoleContainer = ({
     search: searchValue,
     page,
     limit: pageSize,
+    assignmentId: activeAssignmentId,
   });
 
   const totalPages =

@@ -6,6 +6,9 @@ import {
 } from "../../core/hooks";
 import type { User, UserPageProps } from "../../core/interfaces";
 import { UserModal } from "../../modals";
+import { useAuthManager } from "../../features/auth/useAuthManager";
+import { useActiveRole } from "../../core/context/useActiveRole";
+import { Roles } from "../../common";
 import { UserRoleContainer } from "./UserRoleContainer";
 import { UsersPageHeader } from "./UsersPageHeader";
 
@@ -23,6 +26,8 @@ import { UsersPageHeader } from "./UsersPageHeader";
  */
 export const UsersPage = (props: UserPageProps) => {
   const roleList = useRoleList(props.roleList);
+  const { activeAssignmentId } = useAuthManager();
+  const { activeRole } = useActiveRole();
 
   const {
     isOpen: isModalOpen,
@@ -38,11 +43,16 @@ export const UsersPage = (props: UserPageProps) => {
   const handleSaved = useModalSaveHandler({
     isCreating,
     selectedItem: selectedUser,
-    refetch: async () => {
-      // Refetch is handled at the container level
-    },
+    refetch: async () => {},
     onModalClose: handleCloseModal,
   });
+
+  // Solo pasar assignmentId si el rol actual es ADMIN (no SUPER_ADMIN)
+  // SUPER_ADMIN ve todos los ADMIN sin filtrar por assignmentId
+  const assignmentIdForFilter: string | undefined =
+    activeRole === Roles.ADMIN && activeAssignmentId
+      ? activeAssignmentId
+      : undefined;
 
   return (
     <>
@@ -63,6 +73,7 @@ export const UsersPage = (props: UserPageProps) => {
             role={role}
             searchValue={searchValue}
             rolesCount={roleList.length}
+            activeAssignmentId={assignmentIdForFilter}
             onEdit={handleEdit}
           />
         ))}

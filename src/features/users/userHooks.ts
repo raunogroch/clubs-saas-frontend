@@ -13,6 +13,7 @@ interface UseUsersParams {
   search?: string;
   page?: number;
   limit?: number;
+  assignmentId?: string;
 }
 
 /**
@@ -29,6 +30,7 @@ export const useUsers = (params?: UseUsersParams) => {
     search: params?.search,
     page: params?.page ?? 1,
     limit: params?.limit ?? 10,
+    assignmentId: params?.assignmentId,
   };
 
   const { data, isLoading, error, refetch } = useGetUsersQuery(queryParams);

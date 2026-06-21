@@ -23,6 +23,7 @@ import groupApi from "../features/groups/groupApi";
 import groupRelationsApi from "../features/groups/groupRelationsApi";
 import persistenceReducer from "./persistenceSlice";
 import authMiddleware from "./middleware/authMiddleware";
+import { rehydrationMiddleware } from "./middleware/rehydrationMiddleware";
 
 // === PERSISTENCIA REDUX ===
 // Configuración de redux-persist
@@ -67,6 +68,7 @@ export const store = configureStore({
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
     })
+      .concat(rehydrationMiddleware)
       .concat(
         authApi.middleware,
         assignmentApi.middleware,

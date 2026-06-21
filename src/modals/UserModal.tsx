@@ -5,18 +5,21 @@ import { InputForm, Modal } from "../components";
 import { RolesFieldArray } from "../components/RolesFieldArray";
 
 import { useCreateUser, useUpdateUser } from "../features/users/userHooks";
+import { useAuthManager } from "../features/auth/useAuthManager";
+import { useActiveRole } from "../core/context/useActiveRole";
 import type {
   User,
   CreateUserDto,
   UpdateUserDto,
-} from "../features/users/userApi";
+  Membership,
+} from "../core/interfaces";
 
 import {
   genderLabels,
   statusLabels,
   rolesLabels,
 } from "../common/translations";
-import type { Gender, Roles, Status } from "../common/enums";
+import type { Gender, Status, Roles } from "../common/enums";
 import type { UserFormInputs } from "../core/types";
 import type { UserModalProps } from "../core/interfaces";
 
@@ -54,10 +57,10 @@ const mapUserToForm = (user?: User): UserFormInputs => {
     dni: user.dni ?? "",
     username: user.username ?? "",
     roles:
-      user.roles?.length > 0
-        ? user.roles.map((r) => ({
+      (user.roles?.length ?? 0) > 0
+        ? user.roles?.map((r) => ({
             role: r.role as Roles,
-          }))
+          })) ?? [{ role: "" }]
         : [{ role: "" }],
     gender: user.gender ?? "",
     birthDate: user.birthDate
@@ -71,6 +74,8 @@ const mapUserToForm = (user?: User): UserFormInputs => {
 
 export const UserModal = (props: UserModalProps) => {
   const { roleList } = props;
+  const { activeAssignmentId } = useAuthManager();
+  const { activeRole } = useActiveRole();
 
   const {
     createUser,
@@ -127,12 +132,23 @@ export const UserModal = (props: UserModalProps) => {
         return;
       }
 
+      // Construir memberships desde roles
+      // Si el usuario actual es ADMIN, asignar su assignmentId a los nuevos usuarios
+      const memberships: Membership[] = roles.map((role) => ({
+        role: role as any,
+        assignmentId:
+          activeRole === "ADMIN" && activeAssignmentId
+            ? activeAssignmentId
+            : "",
+        status: "ACTIVE",
+      }));
+
       const basePayload = {
         name: formData.name.trim(),
         lastname: formData.lastname.trim(),
         dni: formData.dni.trim(),
         username: formData.username.trim(),
-        roles,
+        memberships,
         ...(formData.gender && { gender: formData.gender as Gender }),
         ...(formData.status && { status: formData.status as Status }),
         ...(formData.phone && { phone: formData.phone.trim() }),

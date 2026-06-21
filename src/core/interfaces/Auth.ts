@@ -1,4 +1,4 @@
-import type { User } from ".";
+import type { User, Membership } from ".";
 import type { Roles } from "../../common";
 
 export interface LoginCredentials {
@@ -6,11 +6,20 @@ export interface LoginCredentials {
   password: string;
 }
 
+/**
+ * LoginResponse puede venir de dos formas:
+ * 1. user.memberships incluida en user (nueva estructura normalizada)
+ * 2. memberships a nivel raíz (estructura del backend actual)
+ *
+ * loginResponseMapper.ts normaliza ambas formas
+ */
 export interface LoginResponse {
   user: User;
   token: string;
   expiresIn?: number; // en segundos
   refreshToken?: string;
+  // Permitir memberships a nivel raíz (será mapeado dentro de user)
+  memberships?: Membership[];
 }
 
 export interface AuthState {
@@ -19,6 +28,7 @@ export interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  activeAssignmentId: string | null; // Assignment actualmente seleccionado
 }
 
 export interface AuthContextType {

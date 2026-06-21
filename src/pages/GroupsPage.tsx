@@ -26,7 +26,7 @@ export const GroupsPage = () => {
   const { clubId: routeClubId } = useParams<{ clubId?: string }>();
   const navigate = useNavigate();
   const previousAssignmentId = useRef<string | undefined>(undefined);
-  const { user } = useAuthManager();
+  const { activeAssignmentId } = useAuthManager();
   const { activeRole } = useActiveRole();
   const { assignmentId: persistedAssignmentId, clubId: persistedClubId } =
     useAssignmentPersistence();
@@ -61,7 +61,7 @@ export const GroupsPage = () => {
 
   const assignmentFilter =
     activeRole === Roles.ADMIN
-      ? persistedAssignmentId || user?.assignments?.[0]?.assignmentId || ""
+      ? persistedAssignmentId || activeAssignmentId || ""
       : undefined;
 
   const { clubs } = useClubs({
