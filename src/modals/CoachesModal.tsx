@@ -1,9 +1,12 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Modal } from "../components/Modal";
+
+import { useGetUsersQuery } from "../features/users/userApi";
 import { useUpdateGroupMutation } from "../features/groups/groupApi";
 import { useCoachesManager } from "../features/groups/useCoachesManager";
-import { coachRoleLabels } from "../common/translations";
-import { MESSAGES } from "../common/messages";
+import { useCoachSearch } from "../features/groups/coaches/useCoachSearch";
+
+import type { User } from "../core/interfaces";
 
 interface CoachesModalProps {
   groupId: string;
@@ -12,14 +15,6 @@ interface CoachesModalProps {
   onSaved?: () => void;
 }
 
-/**
- * Modal para gestionar coaches de un grupo
- * Responsabilidad única: Renderizar UI de gestión de coaches
- *
- * SOLID:
- * - S: Solo responsable de UI (lógica delegada a useCoachesManager)
- * - D: Depende de abstracciones (custom hook + mutación RTK)
- */
 export const CoachesModal = ({
   groupId,
   open,
@@ -28,222 +23,222 @@ export const CoachesModal = ({
 }: CoachesModalProps) => {
   const [updateGroup] = useUpdateGroupMutation();
 
-  const {
-    visibleCoaches,
-    validationError,
-    successMessage,
-    isLoading,
-    isFormSubmitting,
-    register,
-    handleSubmit,
-    errors,
-    handleRemoveCoach,
-    validateCoachForm,
-    clearState,
-    resetState,
-    setValidationError,
-    setSuccessMessage,
-    refetch,
-    COACH_ROLES,
-  } = useCoachesManager(groupId);
+  // 💾 BACKEND (GUARDADOS)
+  const { visibleCoaches, handleRemoveCoach, resetState, refetch } =
+    useCoachesManager(groupId);
 
-  // Resetear estado cuando se abre el modal
+  // 🔎 SEARCH
+  const { search, setSearch, coaches } = useCoachSearch();
+
+  const { data: allCoachesResponse } = useGetUsersQuery({
+    role: "COACH",
+    page: 1,
+    limit: 100,
+  });
+
+  // 🧠 DRAFT (PENDIENTES)
+  const [selectedCoaches, setSelectedCoaches] = useState<User[]>([]);
+
+  // MAPA COACHES
+  const coachMap = useMemo(() => {
+    const map = new Map<string, User>();
+    allCoachesResponse?.data?.forEach((c) => map.set(c.id, c));
+    return map;
+  }, [allCoachesResponse]);
+
+  // IDS GUARDADOS
+  const savedIds = useMemo(
+    () => visibleCoaches.map((c) => c.coachId),
+    [visibleCoaches],
+  );
+
+  // DISPONIBLES
+  const availableCoaches = useMemo(() => {
+    return coaches.filter(
+      (c) =>
+        !savedIds.includes(c.id) && !selectedCoaches.some((s) => s.id === c.id),
+    );
+  }, [coaches, savedIds, selectedCoaches]);
+
+  // RESET
   useEffect(() => {
     if (open && groupId) {
       resetState();
+      setSelectedCoaches([]);
+      setSearch("");
     }
-  }, [open, groupId, resetState]);
+  }, [open, groupId, resetState, setSearch]);
 
-  // Opciones de roles para dropdown
-  const coachRoleOptions = useMemo(
-    () =>
-      COACH_ROLES.map((role) => ({
-        value: role,
-        label: coachRoleLabels[role as keyof typeof coachRoleLabels] || role,
-      })),
-    [],
-  );
+  // HANDLERS
+  const handleSelect = (coach: User) => {
+    setSelectedCoaches((prev) =>
+      prev.some((c) => c.id === coach.id) ? prev : [...prev, coach],
+    );
+  };
 
-  /**
-   * Manejar envío del formulario
-   */
-  const onSubmit = handleSubmit(async (data) => {
-    setValidationError(null);
-    setSuccessMessage(null);
+  const handleRemoveSelected = (id: string) => {
+    setSelectedCoaches((prev) => prev.filter((c) => c.id !== id));
+  };
 
-    try {
-      // Validar formulario
-      const validationError = validateCoachForm(data);
-      if (validationError) {
-        setValidationError(validationError);
-        return;
-      }
+  const handleSave = async () => {
+    const merged = [
+      ...new Set([...savedIds, ...selectedCoaches.map((c) => c.id)]),
+    ];
 
-      // Obtener lista actual de coachIds
-      const currentCoachIds = visibleCoaches
-        .map((coach) => coach.coachId || coach.id)
-        .filter(Boolean) as string[];
+    await updateGroup({
+      id: groupId,
+      coaches: merged,
+    }).unwrap();
 
-      // Agregar nuevo coach
-      currentCoachIds.push(data.coachId.trim());
+    await refetch();
 
-      // Actualizar grupo con la nueva lista de coaches
-      await updateGroup({
-        id: groupId,
-        coaches: currentCoachIds,
-      }).unwrap();
+    setSelectedCoaches([]);
+    onSaved?.();
+    onClose();
+  };
 
-      setSuccessMessage(MESSAGES.SUCCESS.COACH_ADDED);
-      clearState();
-
-      // Refetch para actualizar la lista
-      await refetch();
-
-      // Cerrar modal inmediatamente
-      onSaved?.();
-      onClose();
-    } catch (error) {
-      setValidationError(
-        error instanceof Error
-          ? error.message
-          : MESSAGES.ERROR.COACH_UPDATE_ERROR,
-      );
-    }
-  });
-
-  const isLoadingTotal = isLoading || isFormSubmitting;
-  const hasCoaches = visibleCoaches.length > 0;
+  const getCoachInfo = (id: string) => coachMap.get(id);
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Gestionar Coaches del Grupo"
-      size="lg"
-    >
-      <div className="coaches-modal-content">
-        {/* Mensajes de error/éxito */}
-        {validationError && (
-          <div className="alert alert-danger" role="alert">
-            {validationError}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="alert alert-success" role="alert">
-            {successMessage}
-          </div>
-        )}
-
-        {/* Formulario para agregar coach */}
-        <div className="coach-form-section mb-4">
-          <h5>Agregar Nuevo Coach</h5>
-          <form onSubmit={onSubmit} className="mb-3">
-            <div className="row">
-              <div className="col-md-6">
-                <label className="form-label">ID del Coach</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="ID único del coach"
-                  {...register("coachId")}
-                  disabled={isLoadingTotal}
-                />
-                {errors.coachId && (
-                  <span className="text-danger">{errors.coachId.message}</span>
-                )}
-              </div>
-
-              <div className="col-md-6">
-                <label className="form-label">Rol del Coach</label>
-                <select
-                  {...register("role")}
-                  className="form-select"
-                  disabled={isLoadingTotal}
-                >
-                  {coachRoleOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="btn btn-rounded btn-sm btn-primary mt-3"
-              disabled={isLoadingTotal}
-            >
-              {isFormSubmitting ? (
-                <>
-                  <i className="fa fa-spinner fa-spin"></i> Guardando...
-                </>
-              ) : (
-                <>
-                  <i className="fa fa-plus"></i> Agregar Coach
-                </>
-              )}
-            </button>
-          </form>
+    <Modal open={open} onClose={onClose} title="Gestión de Coaches" size="lg">
+      <div className="mb-3">
+        <div className="input-group">
+          <input
+            className="form-control"
+            placeholder="Buscar enfrenador..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
+      </div>
 
-        {/* Lista de coaches */}
-        <div className="coaches-list-section">
-          <h5>Coaches Registrados</h5>
-          {!hasCoaches ? (
-            <p className="text-muted">No hay coaches registrados aún</p>
-          ) : (
+      {search.length >= 2 && (
+        <div className="mb-3">
+          <div className="d-flex justify-content-between align-items-center">
+            <h3 className="mb-2">Resultados</h3>
+          </div>
+
+          {availableCoaches.length > 0 ? (
             <table className="table table-sm table-hover">
               <thead>
                 <tr>
-                  <th>ID del Coach</th>
-                  <th>Rol</th>
-                  <th>Acciones</th>
+                  <th>Nombre</th>
+                  <th>Carnet</th>
+                  <th className="text-center">Acciones</th>
                 </tr>
               </thead>
+
               <tbody>
-                {visibleCoaches.map((coach) => (
+                {availableCoaches.map((coach) => (
                   <tr key={coach.id}>
-                    <td>{coach.coachId || coach.id}</td>
-                    <td>
-                      {coachRoleLabels[
-                        coach.role as keyof typeof coachRoleLabels
-                      ] || coach.role}
+                    <td className="align-middle">
+                      {coach.name} {coach.lastname}
                     </td>
-                    <td>
+                    <td className="align-middle">{coach.dni}</td>
+                    <td className="text-center">
                       <button
-                        type="button"
-                        className="btn btn-rounded btn-sm btn-danger"
-                        onClick={() => handleRemoveCoach(coach.id || "")}
-                        disabled={isLoadingTotal || !coach.id}
-                        title={
-                          !coach.id
-                            ? MESSAGES.ERROR.INVALID_ID
-                            : MESSAGES.CONFIRMATION.DELETE_COACH
-                        }
+                        className="btn btn-primary btn-sm btn-rounded"
+                        onClick={() => handleSelect(coach)}
                       >
-                        <i className="fa fa-trash"></i> Eliminar
+                        <i className="fa fa-plus" />
+                        &nbsp;Agregar
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          ) : (
+            <div className="alert alert-light border text-center py-2 mb-0">
+              No hay coincidencias
+            </div>
           )}
         </div>
+      )}
 
-        {/* Botones de acción */}
-        <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-rounded btn-sm btn-secondary"
-            onClick={onClose}
-            disabled={isLoadingTotal}
-          >
-            <i className="fa fa-times"></i> Cerrar
-          </button>
+      <div>
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <h3 className="mb-0">Asignados</h3>
         </div>
+
+        {visibleCoaches.length > 0 || selectedCoaches.length > 0 ? (
+          <table className="table table-sm mb-0">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Carnet</th>
+                <th className="text-center">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {visibleCoaches.map((c) => {
+                const info = getCoachInfo(c.coachId);
+
+                return (
+                  <tr key={c.id}>
+                    <td className="align-middle">
+                      {info ? `${info.name} ${info.lastname}` : c.coachId}
+                    </td>
+
+                    <td className="align-middle">{info?.dni ?? "-"}</td>
+
+                    <td className="text-center">
+                      <button
+                        className="btn btn-danger btn-sm btn-rounded"
+                        onClick={() => handleRemoveCoach(c.id)}
+                      >
+                        <i className="fa fa-trash" />
+                        &nbsp;Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {selectedCoaches.map((c) => (
+                <tr key={`draft-${c.id}`} className="table-warning">
+                  <td className="align-middle">
+                    {c.name} {c.lastname}
+                    <span className="badge bg-info ms-2">Nuevo</span>
+                  </td>
+
+                  <td className="align-middle">{c.dni}</td>
+
+                  <td className="text-center">
+                    <button
+                      className="btn btn-outline-danger btn-sm btn-rounded"
+                      onClick={() => handleRemoveSelected(c.id)}
+                    >
+                      <i className="fa fa-trash" />
+                      &nbsp;Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="alert alert-light border text-center py-2">
+            Sin coaches asignados
+          </div>
+        )}
+      </div>
+
+      <div className="modal-footer">
+        <button
+          className="btn btn-sm btn-rounded btn-secondary"
+          onClick={onClose}
+        >
+          Cancelar
+        </button>
+
+        <button
+          className="btn btn-sm btn-rounded btn-primary"
+          onClick={handleSave}
+        >
+          Guardar
+        </button>
       </div>
     </Modal>
   );

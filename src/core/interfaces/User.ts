@@ -38,13 +38,11 @@ export interface User {
   dni: string;
   username: string;
   password?: string;
-  roles?: UserRole[]; // Deprecated: usar memberships en su lugar
   gender?: Gender;
   birthDate?: Date;
   phone?: string;
   address?: string;
   status?: Status;
-  assignments?: UserAssignments[]; // Deprecated: usar memberships en su lugar
   memberships?: Membership[]; // Nueva estructura de roles con estado
 }
 
