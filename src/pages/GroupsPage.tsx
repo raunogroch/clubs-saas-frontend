@@ -251,7 +251,7 @@ export const GroupsPage = () => {
                     <tr>
                       <th>Nombre</th>
                       <th>Horarios</th>
-                      <th>Entregadores</th>
+                      <th>Entrenadores</th>
                       <th>Dirección</th>
                       <th>Atletas</th>
                       <th>Rango de edad</th>
@@ -281,7 +281,7 @@ export const GroupsPage = () => {
                             "Sin asignar"
                           )}
                         </td>
-                        <td>
+                        <td className="align-middle">
                           <button
                             className="btn btn-rounded btn-sm btn-outline-warning"
                             onClick={() => handleOpenGroupTab(group, "coaches")}

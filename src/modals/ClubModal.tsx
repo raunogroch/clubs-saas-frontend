@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { InputForm, Modal } from "../components";
 import { useAssignmentPersistence } from "../core/hooks";
 import type { ClubModalProps } from "../core/interfaces/Clubs";
 import { useAuthManager } from "../features/auth/useAuthManager";
-import { sportOptions, statusOptions } from "../features/clubs/clubFormOptions";
+import { sportOptions } from "../features/clubs/clubFormOptions";
 import {
   emptyForm,
   mapClubToForm,
@@ -18,25 +18,29 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
     useAssignmentPersistence();
   const { activeAssignmentId } = useAuthManager();
 
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [autoLocation, setAutoLocation] = useState(false); // 👈 clave
+  const [manualLocationEnabled, setManualLocationEnabled] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
     clearErrors,
+    setValue,
   } = useForm<ClubFormInputs>({
     mode: "onBlur",
     defaultValues: emptyForm,
   });
 
   const isEdit = Boolean(data?.id);
+
   const defaultAssignmentId =
     data?.assignmentId || persistedAssignmentId || activeAssignmentId || "";
 
   useEffect(() => {
-    if (!open) {
-      return;
-    }
+    if (!open) return;
 
     const nextValues = mapClubToForm(data);
 
@@ -47,6 +51,62 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
     reset(nextValues);
     clearErrors();
   }, [open, data, reset, clearErrors, isEdit, defaultAssignmentId]);
+
+  useEffect(() => {
+    if (!open || isEdit) return;
+
+    setLoadingLocation(true);
+    setAutoLocation(false);
+    setManualLocationEnabled(false);
+
+    if (!navigator.geolocation) {
+      setLoadingLocation(false);
+      setManualLocationEnabled(true);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+          );
+
+          const data = await res.json();
+
+          const city =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.village ||
+            data.address?.municipality ||
+            "";
+
+          const country = data.address?.country || "";
+
+          setValue("city", city);
+          setValue("country", country);
+
+          setAutoLocation(true); // 👈 detectado OK
+        } catch (err) {
+          console.error(err);
+          setManualLocationEnabled(true);
+        } finally {
+          setLoadingLocation(false);
+        }
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        setManualLocationEnabled(true); // 👈 fallback manual
+        setLoadingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      },
+    );
+  }, [open, isEdit, setValue]);
 
   const onSubmit = handleSubmit(async (formData) => {
     try {
@@ -64,6 +124,8 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
     }
   });
 
+  const locationLocked = autoLocation && !manualLocationEnabled;
+
   return (
     <Modal
       open={open}
@@ -78,7 +140,7 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
     >
       <form onSubmit={onSubmit}>
         {error && (
-          <div className="alert alert-danger" role="alert">
+          <div className="alert alert-danger">
             {typeof error === "string" ? error : "No se pudo guardar el club"}
           </div>
         )}
@@ -95,18 +157,7 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
             />
 
             <InputForm<ClubFormInputs>
-              title="Deporte"
-              name="sport"
-              register={register}
-              errors={errors}
-              type="select"
-              options={sportOptions}
-              required="Selecciona un deporte"
-              disabled={isSaving}
-            />
-
-            <InputForm<ClubFormInputs>
-              title="Dirección"
+              title="Oficina"
               name="address"
               register={register}
               errors={errors}
@@ -126,12 +177,23 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
 
           <div className="col-md-6">
             <InputForm<ClubFormInputs>
+              title="Deporte"
+              name="sport"
+              register={register}
+              errors={errors}
+              type="select"
+              options={sportOptions}
+              required="Selecciona un deporte"
+              disabled={isSaving}
+            />
+
+            <InputForm<ClubFormInputs>
               title="Ciudad"
               name="city"
               register={register}
               errors={errors}
               required="La ciudad es obligatoria"
-              disabled={isSaving}
+              disabled={isSaving || locationLocked}
             />
 
             <InputForm<ClubFormInputs>
@@ -140,19 +202,22 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
               register={register}
               errors={errors}
               required="El país es obligatorio"
-              disabled={isSaving}
+              disabled={isSaving || locationLocked}
             />
 
-            <InputForm<ClubFormInputs>
-              title="Estado"
-              name="status"
-              register={register}
-              errors={errors}
-              type="select"
-              options={statusOptions}
-              required="El estado es obligatorio"
-              disabled={isSaving}
-            />
+            {loadingLocation && (
+              <small className="text-muted">Detectando ubicación...</small>
+            )}
+
+            {!loadingLocation && manualLocationEnabled && (
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-primary mt-2"
+                onClick={() => setManualLocationEnabled(false)}
+              >
+                Ingresar ubicación manualmente
+              </button>
+            )}
           </div>
         </div>
 
