@@ -99,7 +99,6 @@ export const authSlice = createSlice({
      * @deprecated - Mantener para retrocompatibilidad, preferir updateUserMemberships
      */
 
-
     /**
      * Action para actualizar memberships del usuario autenticado
      *

@@ -1,10 +1,6 @@
 import React from "react";
 import { getGenderLabel, getStatusLabel, Roles, getRoleLabel } from "../common";
-import {
-  IBox,
-  PaginationOptions,
-  PaginationTable,
-} from "./index";
+import { IBox, PaginationOptions, PaginationTable } from "./index";
 import type { User } from "../core/interfaces";
 
 interface UserRoleBoxProps {

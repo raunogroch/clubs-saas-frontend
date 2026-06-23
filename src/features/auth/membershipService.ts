@@ -28,8 +28,6 @@ export const getUserMemberships = (user: User | null): Membership[] => {
     return user.memberships;
   }
 
-
-
   return [];
 };
 

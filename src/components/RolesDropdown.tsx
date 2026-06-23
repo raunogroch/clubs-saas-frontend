@@ -40,11 +40,7 @@ export const RolesDropdown = () => {
 
   // Extraer assignmentIds desde memberships
   const assignments = Array.from(
-    new Set(
-      (user?.memberships ?? []).map(
-        (item: any) => item?.assignmentId,
-      ),
-    ),
+    new Set((user?.memberships ?? []).map((item: any) => item?.assignmentId)),
   ).filter((value): value is string =>
     Boolean(value && value.trim && value.trim().length > 0),
   );

@@ -20,10 +20,7 @@ export const DashboardPage = () => {
 
   const rolesFromMemberships = useGetRolesFromMemberships(user?.memberships);
 
-  const currentRole =
-    activeRole ??
-    rolesFromMemberships?.[0] ??
-    "ADMIN";
+  const currentRole = activeRole ?? rolesFromMemberships?.[0] ?? "ADMIN";
 
   const hasAssignment = hasAdminActiveAssignment(
     currentRole,
