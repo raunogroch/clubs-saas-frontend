@@ -17,13 +17,22 @@ const api = createApi({
   endpoints: (builder) => ({
     getUsers: builder.query<
       PaginatedResponse<User>,
-      { role?: string; search?: string; page?: number; limit?: number } | void
+      {
+        role?: string;
+        search?: string;
+        page?: number;
+        limit?: number;
+        assignmentId?: string;
+      } | void
     >({
       query: (args) => {
         const params = new URLSearchParams();
 
         if (args?.role) params.append("role", args.role);
         if (args?.search) params.append("search", args.search);
+        if (args?.assignmentId) {
+          params.append("assignmentId", args.assignmentId);
+        }
 
         const page = args?.page ?? 1;
         const limit = args?.limit ?? 10;
@@ -32,6 +41,8 @@ const api = createApi({
         params.append("limit", limit.toString());
 
         const url = `/users?${params.toString()}`;
+
+        console.log("[getUsers]", `/users?${params.toString()}`);
 
         return {
           url,

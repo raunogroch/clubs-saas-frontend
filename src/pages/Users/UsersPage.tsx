@@ -54,6 +54,10 @@ export const UsersPage = (props: UserPageProps) => {
       ? activeAssignmentId
       : undefined;
 
+  console.log("UsersPage", {
+    activeRole,
+    activeAssignmentId,
+  });
   return (
     <>
       <UsersPageHeader onCreateClick={handleCreate} />

@@ -45,6 +45,11 @@ export const UserRoleContainer = ({
     setPage(1);
   };
 
+  console.log("UserRoleContainer", {
+    role,
+    activeAssignmentId,
+  });
+
   return (
     <div className="mb-4">
       <UserRoleBox
