@@ -15,13 +15,7 @@ export const WEEK_DAYS = [
 ] as const;
 
 // ============ COACH ROLES ============
-export const COACH_ROLES = [
-  "HEAD_COACH",
-  "ASSISTANT_COACH",
-  "FITNESS_COACH",
-  "GOALKEEPER_COACH",
-  "TECHNICAL_ASSISTANT",
-] as const;
+export const COACH_ROLES = ["HEAD_COACH", "ASSISTANT_COACH"] as const;
 
 // ============ ENROLLMENT STATUSES ============
 export const ENROLLMENT_STATUSES = {

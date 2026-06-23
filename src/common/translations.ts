@@ -69,9 +69,6 @@ export const weekDayLabels: Record<WeekDay, string> = {
 export const coachRoleLabels: Record<CoachRole, string> = {
   [CoachRole.HEAD_COACH]: "Entrenador Principal",
   [CoachRole.ASSISTANT_COACH]: "Entrenador Asistente",
-  [CoachRole.FITNESS_COACH]: "Entrenador de Fitness",
-  [CoachRole.GOALKEEPER_COACH]: "Entrenador de Porteros",
-  [CoachRole.TECHNICAL_ASSISTANT]: "Asistente Técnico",
 };
 
 export const enrollmentStatusLabels: Record<EnrollmentStatus, string> = {

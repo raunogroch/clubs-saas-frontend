@@ -19,12 +19,7 @@ export type EnrollmentStatus =
   | "WITHDRAWN"
   | "COMPLETED";
 
-export type CoachRole =
-  | "HEAD_COACH"
-  | "ASSISTANT_COACH"
-  | "FITNESS_COACH"
-  | "GOALKEEPER_COACH"
-  | "TECHNICAL_ASSISTANT";
+export type CoachRole = "HEAD_COACH" | "ASSISTANT_COACH";
 
 // ============ COACH INTERFACES ============
 export interface Coach {
