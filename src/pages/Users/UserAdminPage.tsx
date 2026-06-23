@@ -160,7 +160,7 @@ export const UserAdminPage = (props: UserPageProps) => {
                         <td className="align-middle">{user.address ?? "-"}</td>
 
                         <td className="align-middle">
-                          <RolesHighlight roles={user.roles} />
+                          <RolesHighlight roles={user.memberships?.map(m => m.role) || []} />
                         </td>
 
                         <td className="align-middle">

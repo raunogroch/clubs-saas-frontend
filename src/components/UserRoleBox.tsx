@@ -4,7 +4,6 @@ import {
   IBox,
   PaginationOptions,
   PaginationTable,
-  RolesHighlight,
 } from "./index";
 import type { User } from "../core/interfaces";
 

@@ -2,10 +2,10 @@ import { LabelHighlight } from "./LabelHighlight";
 
 import { getRoleLabel } from "../common/translations";
 
-import type { UserRole } from "../features/users/userApi";
+import type { Roles } from "../common/enums";
 
 interface RolesHighlightProps {
-  roles?: UserRole[];
+  roles?: Roles[];
 }
 
 export const RolesHighlight = ({ roles = [] }: RolesHighlightProps) => {
@@ -15,10 +15,10 @@ export const RolesHighlight = ({ roles = [] }: RolesHighlightProps) => {
 
   return (
     <>
-      {roles.map((userRole, index) => (
+      {roles.map((role, index) => (
         <div key={index} className="mb-1">
           <LabelHighlight
-            text={getRoleLabel(userRole.role)}
+            text={getRoleLabel(role)}
             type="info"
             location="center"
           />

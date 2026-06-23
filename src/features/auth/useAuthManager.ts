@@ -8,7 +8,6 @@ import {
   setLoading,
   logout,
   clearError,
-  updateUserAssignments,
   setActiveAssignment,
 } from "./authSlice";
 import { useLoginMutation } from "./authApi";
@@ -112,11 +111,8 @@ export const useAuthManager = () => {
               count: assignments.length,
               assignments,
             });
-
-            dispatch(updateUserAssignments(assignments));
           } catch {
             console.warn("[auth] Error al cargar assignments");
-            dispatch(updateUserAssignments([]));
           }
         }
 
@@ -144,13 +140,11 @@ export const useAuthManager = () => {
       const assignments = await triggerGetCurrentUserAssignments(
         user.id,
       ).unwrap();
-      dispatch(updateUserAssignments(assignments));
       return assignments;
     } catch {
-      dispatch(updateUserAssignments([]));
       return [];
     }
-  }, [dispatch, triggerGetCurrentUserAssignments, user]);
+  }, [triggerGetCurrentUserAssignments, user]);
 
   /**
    * Función de logout

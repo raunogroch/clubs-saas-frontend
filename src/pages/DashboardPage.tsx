@@ -23,7 +23,6 @@ export const DashboardPage = () => {
   const currentRole =
     activeRole ??
     rolesFromMemberships?.[0] ??
-    user?.roles?.[0]?.role ??
     "ADMIN";
 
   const hasAssignment = hasAdminActiveAssignment(

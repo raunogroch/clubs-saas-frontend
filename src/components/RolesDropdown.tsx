@@ -6,7 +6,6 @@ import { useAssignmentPersistence } from "../core/hooks";
 import { useDropdownMenu } from "../core/hooks/useDropdownMenu";
 import { useInitializeActiveRole } from "../core/hooks/useInitializeActiveRole";
 import { useValidateRolesConsistency } from "../core/hooks/useValidateRolesConsistency";
-import { useNormalizeRoles } from "../core/hooks/useNormalizeRoles";
 import { useGetRolesFromMemberships } from "../core/hooks/useGetRolesFromMemberships";
 import type { Roles } from "../common/enums";
 
@@ -36,25 +35,18 @@ export const RolesDropdown = () => {
   const { assignmentId } = useAssignmentPersistence();
   const { isOpen, toggleOpen, closeMenu, dropdownRef } = useDropdownMenu();
 
-  // Obtener roles desde memberships (nueva estructura) o desde roles (antigua)
-  const rolesFromMemberships: Roles[] = useGetRolesFromMemberships(
-    user?.memberships,
-  );
-  const rolesFromLegacy: Roles[] = useNormalizeRoles(user?.roles);
+  // Obtener roles desde memberships
+  const rolesArray: Roles[] = useGetRolesFromMemberships(user?.memberships);
 
-  // Usar memberships si existen, si no usar legacy
-  const rolesArray: Roles[] =
-    rolesFromMemberships.length > 0 ? rolesFromMemberships : rolesFromLegacy;
-
-  // Extraer assignmentIds desde memberships o assignments
+  // Extraer assignmentIds desde memberships
   const assignments = Array.from(
     new Set(
-      (user?.memberships ?? user?.assignments ?? []).map(
+      (user?.memberships ?? []).map(
         (item: any) => item?.assignmentId,
       ),
     ),
   ).filter((value): value is string =>
-    Boolean(value && value.trim().length > 0),
+    Boolean(value && value.trim && value.trim().length > 0),
   );
 
   // Validar consistencia de roles

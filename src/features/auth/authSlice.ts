@@ -12,7 +12,7 @@
 
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState, User } from "../../core/types";
-import type { UserAssignments, Membership } from "../../core/interfaces";
+import type { Membership } from "../../core/interfaces";
 
 const initialState: AuthState = {
   user: null,
@@ -98,14 +98,7 @@ export const authSlice = createSlice({
      *
      * @deprecated - Mantener para retrocompatibilidad, preferir updateUserMemberships
      */
-    updateUserAssignments: (
-      state,
-      action: PayloadAction<UserAssignments[]>,
-    ) => {
-      if (state.user) {
-        state.user.assignments = action.payload;
-      }
-    },
+
 
     /**
      * Action para actualizar memberships del usuario autenticado
@@ -145,7 +138,6 @@ export const {
   logout,
   clearError,
   updateUser,
-  updateUserAssignments,
   updateUserMemberships,
   setActiveAssignment,
 } = authSlice.actions;

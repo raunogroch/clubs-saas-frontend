@@ -28,14 +28,7 @@ export const getUserMemberships = (user: User | null): Membership[] => {
     return user.memberships;
   }
 
-  // Retrocompatibilidad: construir memberships desde roles y assignments antiguos
-  if (user.roles && user.roles.length > 0) {
-    return user.roles.map((role) => ({
-      role: role.role,
-      assignmentId: role.id || "", // Intentar obtener del rol si existe
-      status: Status.ACTIVE,
-    }));
-  }
+
 
   return [];
 };

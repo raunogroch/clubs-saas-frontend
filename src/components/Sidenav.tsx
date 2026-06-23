@@ -17,7 +17,7 @@ export const Sidenav = () => {
   const displayRoles =
     rolesFromMemberships.length > 0
       ? rolesFromMemberships.map((r) => ({ role: r }))
-      : user?.roles || [];
+      : [];
 
   const hasAssignment = hasAdminActiveAssignment(
     activeRole,
