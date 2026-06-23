@@ -93,7 +93,6 @@ export const UserRoleBox = ({
                   <th>Nacimiento</th>
                   <th>Teléfono</th>
                   <th>Dirección</th>
-                  <th>Roles</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
@@ -129,10 +128,6 @@ export const UserRoleBox = ({
                     <td className="align-middle">{user.phone ?? "-"}</td>
 
                     <td className="align-middle">{user.address ?? "-"}</td>
-
-                    <td className="align-middle">
-                      <RolesHighlight roles={user.memberships} />
-                    </td>
 
                     <td className="align-middle">
                       {getStatusLabel(user.status)}
