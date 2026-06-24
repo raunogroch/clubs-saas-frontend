@@ -6,6 +6,11 @@ import { useUpdateGroupMutation } from "../features/groups/groupApi";
 import { useCoachesManager } from "../features/groups/useCoachesManager";
 import { useCoachSearch } from "../features/groups/coaches/useCoachSearch";
 
+import { CoachSearchBar } from "./coaches/CoachSearchBar";
+import { CoachSearchResults } from "./coaches/CoachSearchResults";
+import { CoachAssignedList } from "./coaches/CoachAssignedList";
+import { CoachesModalActions } from "./coaches/CoachesModalActions";
+
 import type { User } from "../core/interfaces";
 import type { CoachRole } from "../core/interfaces/Groups";
 
@@ -49,6 +54,7 @@ export const CoachesModal = ({
   const [updatedCoaches, setUpdatedCoaches] = useState<Map<string, CoachRole>>(
     new Map(),
   );
+  const [isSaving, setIsSaving] = useState(false);
 
   // MAPA COACHES
   const coachMap = useMemo(() => {
@@ -109,92 +115,49 @@ export const CoachesModal = ({
   };
 
   const handleSave = async () => {
-    const existingCoaches = visibleCoaches.map((c) => ({
-      coachId: c.coachId,
-      role: updatedCoaches.get(c.coachId) || c.role || "ASSISTANT_COACH",
-    }));
+    setIsSaving(true);
+    try {
+      const existingCoaches = visibleCoaches.map((c) => ({
+        coachId: c.coachId,
+        role: updatedCoaches.get(c.coachId) || c.role || "ASSISTANT_COACH",
+      }));
 
-    const newCoaches = selectedCoaches.map((c) => ({
-      coachId: c.user.id,
-      role: c.role,
-    }));
+      const newCoaches = selectedCoaches.map((c) => ({
+        coachId: c.user.id,
+        role: c.role,
+      }));
 
-    const payload = {
-      id: groupId,
-      coaches: [...existingCoaches, ...newCoaches],
-    };
+      const payload = {
+        id: groupId,
+        coaches: [...existingCoaches, ...newCoaches],
+      };
 
-    console.log("📤 Payload enviado al backend:", payload);
+      console.log("📤 Payload enviado al backend:", payload);
 
-    await updateGroup(payload).unwrap();
+      await updateGroup(payload).unwrap();
 
-    await refetch();
+      await refetch();
 
-    setSelectedCoaches([]);
-    setUpdatedCoaches(new Map());
-    onSaved?.();
-    onClose();
+      setSelectedCoaches([]);
+      setUpdatedCoaches(new Map());
+      onSaved?.();
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
-
-  const getCoachInfo = (id: string) => coachMap.get(id);
 
   return (
     <Modal open={open} onClose={onClose} title="Gestión de Coaches" size="lg">
       {/* BÚSQUEDA */}
-      <div className="mb-3">
-        <div className="input-group">
-          <input
-            className="form-control"
-            placeholder="Buscar enfrenador..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
+      <CoachSearchBar value={search} onChange={setSearch} />
 
       {/* RESULTADOS DE BÚSQUEDA */}
       {search.length >= 2 && (
-        <div className="mb-3">
-          <div className="d-flex justify-content-between align-items-center">
-            <h3 className="mb-2">Resultados</h3>
-          </div>
-
-          {availableCoaches.length > 0 ? (
-            <table className="table table-sm table-hover">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Carnet</th>
-                  <th className="text-center">Acciones</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {availableCoaches.map((coach) => (
-                  <tr key={coach.id}>
-                    <td className="align-middle">
-                      {coach.name} {coach.lastname}
-                    </td>
-                    <td className="align-middle">{coach.dni}</td>
-                    <td className="text-center">
-                      <button
-                        className="btn btn-primary btn-sm btn-rounded"
-                        onClick={() => handleSelect(coach)}
-                      >
-                        <i className="fa fa-plus" />
-                        &nbsp;Agregar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="alert alert-light border text-center py-2 mb-0">
-              No hay coincidencias
-            </div>
-          )}
-        </div>
+        <CoachSearchResults
+          coaches={availableCoaches}
+          onAddCoach={handleSelect}
+        />
       )}
 
       {/* COACHES ASIGNADOS */}
@@ -203,144 +166,23 @@ export const CoachesModal = ({
           <h3 className="mb-0">Asignados</h3>
         </div>
 
-        {visibleCoaches.length > 0 || selectedCoaches.length > 0 ? (
-          <table className="table table-sm mb-0">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Carnet</th>
-                <th>Rol</th>
-                <th className="text-center">Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {visibleCoaches.map((c) => {
-                const info = getCoachInfo(c.coachId);
-                const currentRole = updatedCoaches.get(c.coachId) || c.role;
-                const roleLabel =
-                  currentRole === "HEAD_COACH"
-                    ? "Entrenador Principal"
-                    : "Entrenador Asistente";
-
-                return (
-                  <tr key={c.id}>
-                    <td className="align-middle">
-                      {info ? `${info.name} ${info.lastname}` : c.coachId}
-                    </td>
-
-                    <td className="align-middle">{info?.dni ?? "-"}</td>
-
-                    <td className="align-middle">
-                      <select
-                        className="form-control"
-                        value={currentRole || "ASSISTANT_COACH"}
-                        onChange={(e) =>
-                          handleChangeRoleForSavedCoach(
-                            c.coachId,
-                            e.target.value as CoachRole,
-                          )
-                        }
-                      >
-                        {(["HEAD_COACH", "ASSISTANT_COACH"] as const).map(
-                          (role) => (
-                            <option key={role} value={role}>
-                              {role === "HEAD_COACH"
-                                ? "Entrenador Principal"
-                                : "Entrenador Asistente"}
-                            </option>
-                          ),
-                        )}
-                      </select>
-                    </td>
-
-                    <td className="text-center">
-                      <button
-                        className="btn btn-danger btn-sm btn-rounded"
-                        onClick={() => handleRemoveCoach(c.id)}
-                      >
-                        <i className="fa fa-trash" />
-                        &nbsp;Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-
-              {selectedCoaches.map((c) => {
-                const roleLabel =
-                  c.role === "HEAD_COACH"
-                    ? "Entrenador Principal"
-                    : "Entrenador Asistente";
-
-                return (
-                  <tr key={`draft-${c.user.id}`} className="table-warning">
-                    <td className="align-middle">
-                      {c.user.name} {c.user.lastname}
-                      <span className="badge bg-info ms-2">Nuevo</span>
-                    </td>
-
-                    <td className="align-middle">{c.user.dni}</td>
-
-                    <td className="align-middle">
-                      <select
-                        className="form-control"
-                        value={c.role}
-                        onChange={(e) =>
-                          handleChangeRoleForNewCoach(
-                            c.user.id,
-                            e.target.value as CoachRole,
-                          )
-                        }
-                      >
-                        {(["HEAD_COACH", "ASSISTANT_COACH"] as const).map(
-                          (role) => (
-                            <option key={role} value={role}>
-                              {role === "HEAD_COACH"
-                                ? "Entrenador Principal"
-                                : "Entrenador Asistente"}
-                            </option>
-                          ),
-                        )}
-                      </select>
-                    </td>
-
-                    <td className="text-center">
-                      <button
-                        className="btn btn-outline-danger btn-sm btn-rounded"
-                        onClick={() => handleRemoveSelected(c.user.id)}
-                      >
-                        <i className="fa fa-trash" />
-                        &nbsp;Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <div className="alert alert-light border text-center py-2">
-            Sin coaches asignados
-          </div>
-        )}
+        <CoachAssignedList
+          savedCoaches={visibleCoaches}
+          newCoaches={selectedCoaches}
+          coachMap={coachMap}
+          onChangeRoleSavedCoach={handleChangeRoleForSavedCoach}
+          onChangeRoleNewCoach={handleChangeRoleForNewCoach}
+          onRemoveSavedCoach={handleRemoveCoach}
+          onRemoveNewCoach={handleRemoveSelected}
+        />
       </div>
 
-      <div className="modal-footer">
-        <button
-          className="btn btn-sm btn-rounded btn-secondary"
-          onClick={onClose}
-        >
-          Cancelar
-        </button>
-
-        <button
-          className="btn btn-sm btn-rounded btn-primary"
-          onClick={handleSave}
-        >
-          Guardar
-        </button>
-      </div>
+      {/* ACCIONES */}
+      <CoachesModalActions
+        onCancel={onClose}
+        onSave={handleSave}
+        isSaving={isSaving}
+      />
     </Modal>
   );
 };
