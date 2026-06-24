@@ -26,7 +26,7 @@ export const CoachNewRow = ({
   return (
     <tr className="table-warning">
       <td className="align-middle">
-        {coach.name} {coach.lastname}
+        {coach.name} {coach.lastname}&nbsp;
         <span className="badge bg-info ms-2">Nuevo</span>
       </td>
       <td className="align-middle">{coach.dni}</td>
@@ -34,7 +34,7 @@ export const CoachNewRow = ({
         <CoachRoleSelect
           value={role}
           onChange={(newRole) => onChangeRole(coach.id, newRole)}
-          className="form-select form-select-sm"
+          className="form-control form-select-sm"
         />
       </td>
       <td className="text-center">

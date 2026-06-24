@@ -63,6 +63,7 @@ export const CoachAssignedList = ({
           return (
             <CoachAssignedRow
               key={c.id}
+              groupCoachId={c.id}
               coach={info}
               role={c.role}
               onChangeRole={onChangeRoleSavedCoach}

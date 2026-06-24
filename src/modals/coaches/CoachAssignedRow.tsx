@@ -4,10 +4,11 @@ import type { User } from "../../core/interfaces";
 import type { CoachRole } from "../../core/interfaces/Groups";
 
 interface CoachAssignedRowProps {
+  groupCoachId: string;
   coach: User;
   role: CoachRole | undefined;
   onChangeRole: (coachId: string, role: CoachRole) => void;
-  onRemove: (coachId: string) => void;
+  onRemove: (groupCoachId: string) => void;
 }
 
 /**
@@ -18,6 +19,7 @@ interface CoachAssignedRowProps {
  * DIP: Recibe handlers como props
  */
 export const CoachAssignedRow = ({
+  groupCoachId,
   coach,
   role,
   onChangeRole,
@@ -39,7 +41,7 @@ export const CoachAssignedRow = ({
       <td className="text-center">
         <ButtonForm
           className="btn btn-danger btn-sm btn-rounded"
-          onClick={() => onRemove(coach.id)}
+          onClick={() => onRemove(groupCoachId)}
         >
           <i className="fa fa-trash" />
           &nbsp;Eliminar

@@ -34,11 +34,9 @@ export const CoachesModal = ({
 }: CoachesModalProps) => {
   const [updateGroup] = useUpdateGroupMutation();
 
-  // 💾 BACKEND (GUARDADOS)
   const { visibleCoaches, handleRemoveCoach, resetState, refetch } =
     useCoachesManager(groupId);
 
-  // 🔎 SEARCH
   const { search, setSearch, coaches } = useCoachSearch();
 
   const { data: allCoachesResponse } = useGetUsersQuery({
@@ -47,7 +45,6 @@ export const CoachesModal = ({
     limit: 100,
   });
 
-  // 🧠 DRAFT (PENDIENTES)
   const [selectedCoaches, setSelectedCoaches] = useState<
     SelectedCoachWithRole[]
   >([]);
@@ -56,20 +53,17 @@ export const CoachesModal = ({
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  // MAPA COACHES
   const coachMap = useMemo(() => {
     const map = new Map<string, User>();
     allCoachesResponse?.data?.forEach((c) => map.set(c.id, c));
     return map;
   }, [allCoachesResponse]);
 
-  // IDS GUARDADOS
   const savedIds = useMemo(
     () => visibleCoaches.map((c) => c.coachId),
     [visibleCoaches],
   );
 
-  // DISPONIBLES
   const availableCoaches = useMemo(() => {
     return coaches.filter(
       (c) =>
@@ -78,7 +72,6 @@ export const CoachesModal = ({
     );
   }, [coaches, savedIds, selectedCoaches]);
 
-  // RESET
   useEffect(() => {
     if (open && groupId) {
       resetState();
@@ -88,7 +81,6 @@ export const CoachesModal = ({
     }
   }, [open, groupId, resetState, setSearch]);
 
-  // HANDLERS
   const handleSelect = (coach: User) => {
     setSelectedCoaches((prev) => [
       ...prev,
@@ -132,8 +124,6 @@ export const CoachesModal = ({
         coaches: [...existingCoaches, ...newCoaches],
       };
 
-      console.log("📤 Payload enviado al backend:", payload);
-
       await updateGroup(payload).unwrap();
 
       await refetch();
@@ -163,7 +153,7 @@ export const CoachesModal = ({
       {/* COACHES ASIGNADOS */}
       <div>
         <div className="d-flex justify-content-between align-items-center mb-2">
-          <h3 className="mb-0">Asignados</h3>
+          <h5 className="mb-0">Asignados</h5>
         </div>
 
         <CoachAssignedList

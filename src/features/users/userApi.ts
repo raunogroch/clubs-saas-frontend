@@ -42,8 +42,6 @@ const api = createApi({
 
         const url = `/users?${params.toString()}`;
 
-        console.log("[getUsers]", `/users?${params.toString()}`);
-
         return {
           url,
           method: "GET",
@@ -97,5 +95,4 @@ export const {
 export const userApi = api;
 export default api;
 
-// Re-export tipos para compatibilidad hacia atrás
 export type { User, UserRole, CreateUserDto, UpdateUserDto, PaginatedResponse };
