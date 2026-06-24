@@ -7,6 +7,12 @@ import { useCoachesManager } from "../features/groups/useCoachesManager";
 import { useCoachSearch } from "../features/groups/coaches/useCoachSearch";
 
 import type { User } from "../core/interfaces";
+import type { CoachRole } from "../core/interfaces/Groups";
+
+interface SelectedCoachWithRole {
+  user: User;
+  role: CoachRole;
+}
 
 interface CoachesModalProps {
   groupId: string;
@@ -37,7 +43,12 @@ export const CoachesModal = ({
   });
 
   // 🧠 DRAFT (PENDIENTES)
-  const [selectedCoaches, setSelectedCoaches] = useState<User[]>([]);
+  const [selectedCoaches, setSelectedCoaches] = useState<
+    SelectedCoachWithRole[]
+  >([]);
+  const [updatedCoaches, setUpdatedCoaches] = useState<Map<string, CoachRole>>(
+    new Map(),
+  );
 
   // MAPA COACHES
   const coachMap = useMemo(() => {
@@ -56,7 +67,8 @@ export const CoachesModal = ({
   const availableCoaches = useMemo(() => {
     return coaches.filter(
       (c) =>
-        !savedIds.includes(c.id) && !selectedCoaches.some((s) => s.id === c.id),
+        !savedIds.includes(c.id) &&
+        !selectedCoaches.some((s) => s.user.id === c.id),
     );
   }, [coaches, savedIds, selectedCoaches]);
 
@@ -66,33 +78,60 @@ export const CoachesModal = ({
       resetState();
       setSelectedCoaches([]);
       setSearch("");
+      setUpdatedCoaches(new Map());
     }
   }, [open, groupId, resetState, setSearch]);
 
   // HANDLERS
   const handleSelect = (coach: User) => {
+    setSelectedCoaches((prev) => [
+      ...prev,
+      { user: coach, role: "HEAD_COACH" },
+    ]);
+    setSearch("");
+  };
+
+  const handleRemoveSelected = (coachId: string) => {
+    setSelectedCoaches((prev) => prev.filter((c) => c.user.id !== coachId));
+  };
+
+  const handleChangeRoleForSavedCoach = (
+    coachId: string,
+    newRole: CoachRole,
+  ) => {
+    setUpdatedCoaches((prev) => new Map(prev).set(coachId, newRole));
+  };
+
+  const handleChangeRoleForNewCoach = (coachId: string, newRole: CoachRole) => {
     setSelectedCoaches((prev) =>
-      prev.some((c) => c.id === coach.id) ? prev : [...prev, coach],
+      prev.map((c) => (c.user.id === coachId ? { ...c, role: newRole } : c)),
     );
   };
 
-  const handleRemoveSelected = (id: string) => {
-    setSelectedCoaches((prev) => prev.filter((c) => c.id !== id));
-  };
-
   const handleSave = async () => {
-    const merged = [
-      ...new Set([...savedIds, ...selectedCoaches.map((c) => c.id)]),
-    ];
+    const existingCoaches = visibleCoaches.map((c) => ({
+      coachId: c.coachId,
+      role: updatedCoaches.get(c.coachId) || c.role || "ASSISTANT_COACH",
+    }));
 
-    await updateGroup({
+    const newCoaches = selectedCoaches.map((c) => ({
+      coachId: c.user.id,
+      role: c.role,
+    }));
+
+    const payload = {
       id: groupId,
-      coaches: merged,
-    }).unwrap();
+      coaches: [...existingCoaches, ...newCoaches],
+    };
+
+    console.log("📤 Payload enviado al backend:", payload);
+
+    await updateGroup(payload).unwrap();
 
     await refetch();
 
     setSelectedCoaches([]);
+    setUpdatedCoaches(new Map());
     onSaved?.();
     onClose();
   };
@@ -101,6 +140,7 @@ export const CoachesModal = ({
 
   return (
     <Modal open={open} onClose={onClose} title="Gestión de Coaches" size="lg">
+      {/* BÚSQUEDA */}
       <div className="mb-3">
         <div className="input-group">
           <input
@@ -112,6 +152,7 @@ export const CoachesModal = ({
         </div>
       </div>
 
+      {/* RESULTADOS DE BÚSQUEDA */}
       {search.length >= 2 && (
         <div className="mb-3">
           <div className="d-flex justify-content-between align-items-center">
@@ -156,6 +197,7 @@ export const CoachesModal = ({
         </div>
       )}
 
+      {/* COACHES ASIGNADOS */}
       <div>
         <div className="d-flex justify-content-between align-items-center mb-2">
           <h3 className="mb-0">Asignados</h3>
@@ -167,6 +209,7 @@ export const CoachesModal = ({
               <tr>
                 <th>Nombre</th>
                 <th>Carnet</th>
+                <th>Rol</th>
                 <th className="text-center">Acciones</th>
               </tr>
             </thead>
@@ -174,6 +217,11 @@ export const CoachesModal = ({
             <tbody>
               {visibleCoaches.map((c) => {
                 const info = getCoachInfo(c.coachId);
+                const currentRole = updatedCoaches.get(c.coachId) || c.role;
+                const roleLabel =
+                  currentRole === "HEAD_COACH"
+                    ? "Entrenador Principal"
+                    : "Entrenador Asistente";
 
                 return (
                   <tr key={c.id}>
@@ -182,6 +230,29 @@ export const CoachesModal = ({
                     </td>
 
                     <td className="align-middle">{info?.dni ?? "-"}</td>
+
+                    <td className="align-middle">
+                      <select
+                        className="form-control"
+                        value={currentRole || "ASSISTANT_COACH"}
+                        onChange={(e) =>
+                          handleChangeRoleForSavedCoach(
+                            c.coachId,
+                            e.target.value as CoachRole,
+                          )
+                        }
+                      >
+                        {(["HEAD_COACH", "ASSISTANT_COACH"] as const).map(
+                          (role) => (
+                            <option key={role} value={role}>
+                              {role === "HEAD_COACH"
+                                ? "Entrenador Principal"
+                                : "Entrenador Asistente"}
+                            </option>
+                          ),
+                        )}
+                      </select>
+                    </td>
 
                     <td className="text-center">
                       <button
@@ -196,26 +267,56 @@ export const CoachesModal = ({
                 );
               })}
 
-              {selectedCoaches.map((c) => (
-                <tr key={`draft-${c.id}`} className="table-warning">
-                  <td className="align-middle">
-                    {c.name} {c.lastname}
-                    <span className="badge bg-info ms-2">Nuevo</span>
-                  </td>
+              {selectedCoaches.map((c) => {
+                const roleLabel =
+                  c.role === "HEAD_COACH"
+                    ? "Entrenador Principal"
+                    : "Entrenador Asistente";
 
-                  <td className="align-middle">{c.dni}</td>
+                return (
+                  <tr key={`draft-${c.user.id}`} className="table-warning">
+                    <td className="align-middle">
+                      {c.user.name} {c.user.lastname}
+                      <span className="badge bg-info ms-2">Nuevo</span>
+                    </td>
 
-                  <td className="text-center">
-                    <button
-                      className="btn btn-outline-danger btn-sm btn-rounded"
-                      onClick={() => handleRemoveSelected(c.id)}
-                    >
-                      <i className="fa fa-trash" />
-                      &nbsp;Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    <td className="align-middle">{c.user.dni}</td>
+
+                    <td className="align-middle">
+                      <select
+                        className="form-control"
+                        value={c.role}
+                        onChange={(e) =>
+                          handleChangeRoleForNewCoach(
+                            c.user.id,
+                            e.target.value as CoachRole,
+                          )
+                        }
+                      >
+                        {(["HEAD_COACH", "ASSISTANT_COACH"] as const).map(
+                          (role) => (
+                            <option key={role} value={role}>
+                              {role === "HEAD_COACH"
+                                ? "Entrenador Principal"
+                                : "Entrenador Asistente"}
+                            </option>
+                          ),
+                        )}
+                      </select>
+                    </td>
+
+                    <td className="text-center">
+                      <button
+                        className="btn btn-outline-danger btn-sm btn-rounded"
+                        onClick={() => handleRemoveSelected(c.user.id)}
+                      >
+                        <i className="fa fa-trash" />
+                        &nbsp;Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (

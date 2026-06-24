@@ -4,6 +4,7 @@ import type {
   Group,
   GroupListResponse,
   CreateGroupDto,
+  CoachRole,
 } from "../../core/interfaces/Groups";
 
 /**
@@ -103,7 +104,7 @@ const api = createApi({
         minAge?: number | null;
         maxAge?: number | null;
         status?: any;
-        coaches?: string[];
+        coaches?: Array<{ coachId: string; role: CoachRole }> | string[];
         schedules?: any[];
       }
     >({
