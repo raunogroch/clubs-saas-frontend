@@ -42,11 +42,7 @@ export const CoachSearchResults = ({
 
         <tbody>
           {coaches.map((coach) => (
-            <CoachSearchRow
-              key={coach.id}
-              coach={coach}
-              onAdd={onAddCoach}
-            />
+            <CoachSearchRow key={coach.id} coach={coach} onAdd={onAddCoach} />
           ))}
         </tbody>
       </table>
