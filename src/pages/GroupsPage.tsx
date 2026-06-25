@@ -1,10 +1,5 @@
 import { Breadcumbs, IBox, PaginationOptions } from "../components";
-import {
-  GroupsModal,
-  SchedulesModal,
-  CoachesModal,
-  EnrollmentsModal,
-} from "../modals";
+import { GroupsModal, SchedulesModal, CoachesModal } from "../modals";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useGroups } from "../features/groups/groupHooks";
@@ -34,7 +29,6 @@ export const GroupsPage = () => {
   // Estados para los modales independientes de sub-recursos
   const [schedulesModalOpen, setSchedulesModalOpen] = useState(false);
   const [coachesModalOpen, setCoachesModalOpen] = useState(false);
-  const [enrollmentsModalOpen, setEnrollmentsModalOpen] = useState(false);
   const [selectedGroupForSubResources, setSelectedGroupForSubResources] =
     useState<Group | null>(null);
 
@@ -120,7 +114,7 @@ export const GroupsPage = () => {
     } else if (tab === "coaches") {
       setCoachesModalOpen(true);
     } else if (tab === "athletes") {
-      setEnrollmentsModalOpen(true);
+      navigate(`/clubs/${activeClubId}/groups/${group.id}/enrollments`);
     }
   };
 
@@ -204,14 +198,6 @@ export const GroupsPage = () => {
             groupId={selectedGroupForSubResources.id}
             open={coachesModalOpen}
             onClose={() => setCoachesModalOpen(false)}
-            onSaved={() => {
-              refetch();
-            }}
-          />
-          <EnrollmentsModal
-            groupId={selectedGroupForSubResources.id}
-            open={enrollmentsModalOpen}
-            onClose={() => setEnrollmentsModalOpen(false)}
             onSaved={() => {
               refetch();
             }}
@@ -301,6 +287,15 @@ export const GroupsPage = () => {
                           {group.address || "N/A"}
                         </td>
                         <td className="align-middle">
+                          <button
+                            className="btn btn-rounded btn-sm btn-outline-info"
+                            onClick={() => handleOpenGroupTab(group, "athletes")}
+                            aria-label={`Ver inscripciones de ${group.name}`}
+                            title="Gestionar inscripciones"
+                          >
+                            <i className="fa fa-user-plus" />
+                          </button>
+                          &nbsp;
                           {group.maxAthletes
                             ? `${group.enrollments?.length || 0}/${group.maxAthletes}`
                             : `${group.enrollments?.length || 0}`}

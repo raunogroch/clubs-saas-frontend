@@ -1,6 +1,7 @@
 export * from "./AssignmentPage";
 export * from "./ClubPage";
 export * from "./GroupsPage";
+export * from "./EnrollmentsPage";
 export * from "./dashboard";
 export * from "./LoginPage";
 export * from "./NotFoundPage";

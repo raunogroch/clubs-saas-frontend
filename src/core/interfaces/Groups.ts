@@ -71,7 +71,14 @@ export interface UpdateGroupScheduleDto extends CreateGroupScheduleDto {
 export interface Athlete {
   id: string;
   name: string;
+  lastname?: string;
+  username?: string;
+  dni?: string;
   email?: string;
+  gender?: string;
+  birthDate?: string;
+  phone?: string;
+  address?: string;
 }
 
 export interface Schedule {
@@ -98,6 +105,22 @@ export interface CreateEnrollmentDto {
   athleteId: string;
   status?: EnrollmentStatus;
   notes?: string;
+}
+
+export interface GroupEnrollmentPayload {
+  id: string;
+  enrollments: Array<{
+    assignmentId: string;
+    clubId: string;
+    groupId: string;
+    athleteId: string;
+    status: EnrollmentStatus;
+    notes?: string;
+    enrollmentDate?: string;
+    joinedAt?: string | null;
+    leftAt?: string | null;
+    available?: boolean;
+  }>;
 }
 
 export interface UpdateEnrollmentDto extends CreateEnrollmentDto {

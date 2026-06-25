@@ -91,6 +91,7 @@ export interface UserModalProps {
   data?: User;
   onSaved?: () => void;
   roleList?: "*" | Roles[];
+  hideRoles?: boolean;
 }
 
 export interface UserPageProps {

@@ -1,10 +1,12 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
+import { groupApi } from "./groupApi";
 import type {
   GroupCoach,
   GroupSchedule,
   Enrollment,
   CreateEnrollmentDto,
+  GroupEnrollmentPayload,
   UpdateEnrollmentDto,
 } from "../../core/interfaces/Groups";
 
@@ -18,7 +20,13 @@ import type {
  */
 const api = createApi({
   reducerPath: "groupRelationsApi",
-  tagTypes: ["GroupCoaches", "GroupSchedules", "GroupEnrollments"],
+  tagTypes: [
+    "GroupCoaches",
+    "GroupSchedules",
+    "GroupEnrollments",
+    "Groups",
+    "GroupsByClub",
+  ],
   baseQuery: createBaseQueryWithAuth(
     import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   ),
@@ -103,20 +111,68 @@ const api = createApi({
     }),
 
     /**
-     * POST /groups/:groupId/enrollments
+     * POST /groups/:groupId
      * Inscribe un atleta en un grupo
      */
     createEnrollment: builder.mutation<
       Enrollment,
-      { groupId: string; data: CreateEnrollmentDto }
+      { groupId: string; data: GroupEnrollmentPayload | CreateEnrollmentDto }
     >({
+      async onQueryStarted({ groupId, data }, { dispatch, queryFulfilled }) {
+        const optimisticEnrollment =
+          "enrollments" in data && data.enrollments?.length
+            ? data.enrollments[0]
+            : null;
+
+        if (!optimisticEnrollment) {
+          return;
+        }
+
+        const patchResult = dispatch(
+          groupApi.util.updateQueryData("getGroup", groupId, (draft) => {
+            const existingEnrollments = draft.enrollments ?? [];
+            const alreadyExists = existingEnrollments.some(
+              (item) => item.athleteId === optimisticEnrollment.athleteId,
+            );
+
+            if (!alreadyExists) {
+              draft.enrollments = [
+                ...existingEnrollments,
+                {
+                  id: `${groupId}-${optimisticEnrollment.athleteId}`,
+                  groupId,
+                  athleteId: optimisticEnrollment.athleteId,
+                  status: optimisticEnrollment.status ?? "PENDING",
+                  notes: optimisticEnrollment.notes ?? null,
+                  joinedAt: optimisticEnrollment.joinedAt ?? null,
+                  leftAt: optimisticEnrollment.leftAt ?? null,
+                  createdAt:
+                    optimisticEnrollment.enrollmentDate ??
+                    new Date().toISOString(),
+                  updatedAt:
+                    optimisticEnrollment.enrollmentDate ??
+                    new Date().toISOString(),
+                },
+              ];
+            }
+          }),
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
       query: ({ groupId, data }) => ({
-        url: `/groups/${groupId}/enrollments`,
-        method: "POST",
+        url: `/groups/${groupId}`,
+        method: "PATCH",
         body: data,
       }),
       invalidatesTags: (_result, _error, { groupId }) => [
         { type: "GroupEnrollments", id: groupId },
+        { type: "GroupsByClub", id: "all" },
+        "Groups",
       ],
     }),
 

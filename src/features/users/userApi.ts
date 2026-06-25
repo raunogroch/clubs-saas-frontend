@@ -87,6 +87,7 @@ const api = createApi({
 
 export const {
   useGetUsersQuery,
+  useLazyGetUsersQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
   useGetUserByIdQuery,

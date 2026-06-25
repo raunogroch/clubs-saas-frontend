@@ -31,6 +31,9 @@ const ClubPage = lazy(() =>
 const GroupsPage = lazy(() =>
   import("../pages/GroupsPage").then((m) => ({ default: m.GroupsPage })),
 );
+const EnrollmentsPage = lazy(() =>
+  import("../pages/EnrollmentsPage").then((m) => ({ default: m.EnrollmentsPage })),
+);
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -110,6 +113,14 @@ export const router = createBrowserRouter([
             element: (
               <RouteLoader>
                 <GroupsPage />
+              </RouteLoader>
+            ),
+          },
+          {
+            path: "clubs/:clubId/groups/:groupId/enrollments",
+            element: (
+              <RouteLoader>
+                <EnrollmentsPage />
               </RouteLoader>
             ),
           },

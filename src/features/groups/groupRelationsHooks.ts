@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import type {
   CreateEnrollmentDto,
+  GroupEnrollmentPayload,
   UpdateEnrollmentDto,
 } from "../../core/interfaces/Groups";
 import { useGetGroupQuery } from "./groupApi";
@@ -163,7 +164,7 @@ export const useCreateEnrollment = () => {
     useCreateEnrollmentMutation();
 
   const createEnrollment = useCallback(
-    async (groupId: string, data: CreateEnrollmentDto) => {
+    async (groupId: string, data: GroupEnrollmentPayload | CreateEnrollmentDto) => {
       return await createEnrollmentMutation({ groupId, data }).unwrap();
     },
     [createEnrollmentMutation],
