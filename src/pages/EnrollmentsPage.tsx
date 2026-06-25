@@ -7,8 +7,7 @@ import { useGroups } from "../features/groups/groupHooks";
 import { useGroupEnrollments } from "../features/groups/groupRelationsHooks";
 import { useAssignmentPersistence } from "../core/hooks";
 import { useAuthManager } from "../features/auth/useAuthManager";
-import { useClubs } from "../features/clubs/clubHooks";
-import { getEnrollmentStatusLabel, statusLabels } from "../common/translations";
+import { getEnrollmentStatusLabel } from "../common/translations";
 import type { User } from "../core/interfaces";
 import { useGetUsersQuery } from "../features/users/userApi";
 
@@ -29,10 +28,6 @@ export const EnrollmentsPage = () => {
   const activeClubId = clubId || persistedClubId;
   const resolvedAssignmentId =
     persistedAssignmentId || activeAssignmentId || "";
-
-  const { clubs } = useClubs({
-    assignmentId: activeAssignmentId || persistedAssignmentId || undefined,
-  });
 
   const {
     groups,
@@ -72,10 +67,6 @@ export const EnrollmentsPage = () => {
   const handleEnrollmentSaved = () => {
     void refetchEnrollments();
     void refetchGroups();
-  };
-
-  const getClubName = (id?: string) => {
-    return clubs.find((club) => club.id === id)?.name || "N/A";
   };
 
   const pageTitle = activeGroup?.name || "Inscripciones";
