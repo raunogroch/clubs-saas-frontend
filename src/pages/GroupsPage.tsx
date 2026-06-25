@@ -289,7 +289,9 @@ export const GroupsPage = () => {
                         <td className="align-middle">
                           <button
                             className="btn btn-rounded btn-sm btn-outline-info"
-                            onClick={() => handleOpenGroupTab(group, "athletes")}
+                            onClick={() =>
+                              handleOpenGroupTab(group, "athletes")
+                            }
                             aria-label={`Ver inscripciones de ${group.name}`}
                             title="Gestionar inscripciones"
                           >

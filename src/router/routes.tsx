@@ -32,7 +32,9 @@ const GroupsPage = lazy(() =>
   import("../pages/GroupsPage").then((m) => ({ default: m.GroupsPage })),
 );
 const EnrollmentsPage = lazy(() =>
-  import("../pages/EnrollmentsPage").then((m) => ({ default: m.EnrollmentsPage })),
+  import("../pages/EnrollmentsPage").then((m) => ({
+    default: m.EnrollmentsPage,
+  })),
 );
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),

@@ -7,7 +7,12 @@ import { useCreateEnrollment } from "../features/groups/groupRelationsHooks";
 import { useLazyGetUsersQuery } from "../features/users/userApi";
 import { Roles } from "../common/enums";
 import type { Gender } from "../common/enums";
-import type { CreateUserDto, UpdateUserDto, Membership, User } from "../core/interfaces";
+import type {
+  CreateUserDto,
+  UpdateUserDto,
+  Membership,
+  User,
+} from "../core/interfaces";
 import { useDebounce } from "../hooks/useDebounce";
 
 interface AthleteEnrollmentModalProps {
@@ -42,7 +47,9 @@ const emptyForm: AthleteEnrollmentFormValues = {
   address: "",
 };
 
-const mapAthleteToForm = (athlete?: User | null): AthleteEnrollmentFormValues => {
+const mapAthleteToForm = (
+  athlete?: User | null,
+): AthleteEnrollmentFormValues => {
   if (!athlete) {
     return emptyForm;
   }
@@ -74,7 +81,8 @@ const buildSuggestedUsername = (name: string, lastname: string) => {
     .replace(/[\u0300-\u036f]/g, "");
 
   const firstName = normalizedName.split(/\s+/).filter(Boolean)[0] ?? "";
-  const firstLastname = normalizedLastname.split(/\s+/).filter(Boolean)[0] ?? "";
+  const firstLastname =
+    normalizedLastname.split(/\s+/).filter(Boolean)[0] ?? "";
 
   if (!firstName || !firstLastname) {
     return "";
@@ -94,14 +102,19 @@ export const AthleteEnrollmentModal = ({
 }: AthleteEnrollmentModalProps) => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
-  const [isUsernameManuallyEdited, setIsUsernameManuallyEdited] = useState(false);
+  const [isUsernameManuallyEdited, setIsUsernameManuallyEdited] =
+    useState(false);
   const [usernameAvailability, setUsernameAvailability] = useState<
     "idle" | "checking" | "available" | "taken"
   >("idle");
-  const [usernameAvailabilityMessage, setUsernameAvailabilityMessage] = useState<string | null>(null);
+  const [usernameAvailabilityMessage, setUsernameAvailabilityMessage] =
+    useState<string | null>(null);
 
-  const { createUser, isLoading: isCreatingUser, error: createUserError } =
-    useCreateUser();
+  const {
+    createUser,
+    isLoading: isCreatingUser,
+    error: createUserError,
+  } = useCreateUser();
   const {
     updateUser,
     isLoading: isUpdatingUser,
@@ -147,7 +160,10 @@ export const AthleteEnrollmentModal = ({
       return;
     }
 
-    const suggestedUsername = buildSuggestedUsername(watchedName, watchedLastname);
+    const suggestedUsername = buildSuggestedUsername(
+      watchedName,
+      watchedLastname,
+    );
 
     if (!suggestedUsername) {
       return;
@@ -159,7 +175,13 @@ export const AthleteEnrollmentModal = ({
         shouldValidate: true,
       });
     }
-  }, [isUsernameManuallyEdited, watchedName, watchedLastname, watchedUsername, setValue]);
+  }, [
+    isUsernameManuallyEdited,
+    watchedName,
+    watchedLastname,
+    watchedUsername,
+    setValue,
+  ]);
 
   useEffect(() => {
     const candidate = debouncedUsername.trim();
@@ -255,9 +277,7 @@ export const AthleteEnrollmentModal = ({
         dni: normalizedDni,
         username: normalizedUsername,
         status: "ACTIVE" as const,
-        ...(formData.gender
-          ? { gender: formData.gender as Gender }
-          : {}),
+        ...(formData.gender ? { gender: formData.gender as Gender } : {}),
         ...(normalizedBirthDate ? { birthDate: normalizedBirthDate } : {}),
         ...(normalizedPhone ? { phone: normalizedPhone } : {}),
         ...(normalizedAddress ? { address: normalizedAddress } : {}),
@@ -307,7 +327,8 @@ export const AthleteEnrollmentModal = ({
 
         const existingUser = usersResponse?.data?.find((user) => {
           const matchesUsername =
-            user.username?.trim().toLowerCase() === normalizedUsername.toLowerCase();
+            user.username?.trim().toLowerCase() ===
+            normalizedUsername.toLowerCase();
           const matchesDni = user.dni?.trim() === normalizedDni;
           return matchesUsername || matchesDni;
         });
@@ -385,7 +406,9 @@ export const AthleteEnrollmentModal = ({
       }
 
       setFormSuccess(
-        isEditMode ? "Atleta actualizado correctamente." : "Atleta creado e inscrito correctamente.",
+        isEditMode
+          ? "Atleta actualizado correctamente."
+          : "Atleta creado e inscrito correctamente.",
       );
       onSaved?.();
       reset(emptyForm);
@@ -502,18 +525,23 @@ export const AthleteEnrollmentModal = ({
             {errors.username && (
               <small className="text-danger">{errors.username.message}</small>
             )}
-            {usernameAvailability === "taken" && usernameAvailabilityMessage && (
-              <small className="text-danger d-block mt-1">
-                {usernameAvailabilityMessage}
-              </small>
-            )}
+            {usernameAvailability === "taken" &&
+              usernameAvailabilityMessage && (
+                <small className="text-danger d-block mt-1">
+                  {usernameAvailabilityMessage}
+                </small>
+              )}
           </div>
         </div>
 
         <div className="row">
           <div className="col-md-6 mb-3">
             <label className="form-label">Género</label>
-            <select className="form-control" {...register("gender")} disabled={isSaving}>
+            <select
+              className="form-control"
+              {...register("gender")}
+              disabled={isSaving}
+            >
               <option value="">No especificado</option>
               <option value="MALE">Masculino</option>
               <option value="FEMALE">Femenino</option>

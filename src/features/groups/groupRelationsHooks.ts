@@ -164,7 +164,10 @@ export const useCreateEnrollment = () => {
     useCreateEnrollmentMutation();
 
   const createEnrollment = useCallback(
-    async (groupId: string, data: GroupEnrollmentPayload | CreateEnrollmentDto) => {
+    async (
+      groupId: string,
+      data: GroupEnrollmentPayload | CreateEnrollmentDto,
+    ) => {
       return await createEnrollmentMutation({ groupId, data }).unwrap();
     },
     [createEnrollmentMutation],
