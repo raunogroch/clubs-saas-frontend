@@ -7,6 +7,7 @@ import { useGroups } from "../features/groups/groupHooks";
 import { useGroupEnrollments } from "../features/groups/groupRelationsHooks";
 import { useAssignmentPersistence } from "../core/hooks";
 import { useAuthManager } from "../features/auth/useAuthManager";
+import { useSearchSetup } from "../core/hooks/useSearchSetup";
 import { getEnrollmentStatusLabel } from "../common/translations";
 import type { User } from "../core/interfaces";
 import { useGetUsersQuery } from "../features/users/userApi";
@@ -23,7 +24,7 @@ export const EnrollmentsPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [searchValue, setSearchValue] = useState("");
+  const { searchValue } = useSearchSetup();
 
   const activeClubId = clubId || persistedClubId;
   const resolvedAssignmentId =
@@ -155,16 +156,6 @@ export const EnrollmentsPage = () => {
 
           {!isLoading && activeGroup && (
             <>
-              <div className="mb-3">
-                <input
-                  className="form-control"
-                  type="text"
-                  placeholder="Buscar por nombre"
-                  value={searchValue}
-                  onChange={(event) => setSearchValue(event.target.value)}
-                />
-              </div>
-
               <div className="table-responsive">
                 <table className="table table-striped table-hover">
                   <thead>
