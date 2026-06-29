@@ -298,9 +298,17 @@ export const GroupsPage = () => {
                             <i className="fa fa-user-plus" />
                           </button>
                           &nbsp;
-                          {group.maxAthletes
-                            ? `${group.enrollments?.length || 0}/${group.maxAthletes}`
-                            : `${group.enrollments?.length || 0}`}
+                          {(() => {
+                            const total = group.enrollments?.length ?? 0;
+
+                            if (total === 0) {
+                              return "Sin registros";
+                            }
+
+                            return group.maxAthletes
+                              ? `${total}/${group.maxAthletes} atletas`
+                              : `${total} atletas`;
+                          })()}
                         </td>
                         <td className="align-middle">
                           {group.minAge && group.maxAge

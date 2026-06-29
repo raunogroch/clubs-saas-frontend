@@ -9971,3 +9971,7 @@ body.md-skin {
 .dropdown-link-grey {
   color: grey;
 }
+
+.gap-2 {
+  gap: 0.5rem;
+}

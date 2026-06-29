@@ -593,12 +593,14 @@ export const AthleteEnrollmentModal = ({
             className="btn btn-sm btn-rounded btn-primary"
             disabled={isSaving}
           >
+            <i className="fa fa-save" />
+            &nbsp;
             {isSaving ? (
               <>
                 <i className="fa fa-spinner fa-spin" /> Guardando...
               </>
             ) : (
-              "Guardar atleta"
+              "Guardar"
             )}
           </button>
         </div>
