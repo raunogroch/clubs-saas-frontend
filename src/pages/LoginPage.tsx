@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ButtonForm } from "../components";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 
 export const LoginPage = () => {
   const navigate = useNavigate();

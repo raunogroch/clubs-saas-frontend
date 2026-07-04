@@ -2,7 +2,7 @@ import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import { AssignmentTable } from "../components/AssignmentTable";
 import { AssignmentTableState } from "../components/AssignmentTableState";
 import { AssignmentModal } from "../modals/AssignmentModal";
-import { useAssignments } from "../features/assignments/assignmentHooks";
+import { useAssignments } from "../features/assignments";
 import { useAssignmentOwners } from "../core/hooks/useAssignmentOwners";
 import { PaginationTable } from "../components/PaginationTable";
 import {

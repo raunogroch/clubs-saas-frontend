@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { Modal } from "../components/Modal";
-import { useCreateUser, useUpdateUser } from "../features/users/userHooks";
-import { useCreateEnrollment } from "../features/groups/groupRelationsHooks";
-import { useLazyGetUsersQuery } from "../features/users/userApi";
+import { FormRow } from "../components/FormRow";
+import {
+  useCreateUser,
+  useUpdateUser,
+  useLazyGetUsersQuery,
+} from "../features/users";
+import { useCreateEnrollment } from "../features/groups";
 import { Roles } from "../common/enums";
 import type { Gender } from "../common/enums";
 import type {
@@ -132,15 +136,18 @@ export const AthleteEnrollmentModal = ({
     handleSubmit,
     reset,
     setValue,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<AthleteEnrollmentFormValues>({
     defaultValues: emptyForm,
   });
-
-  const watchedName = watch("name");
-  const watchedLastname = watch("lastname");
-  const watchedUsername = watch("username");
+  const watchedName = useWatch({ control, name: "name" }) as string | undefined;
+  const watchedLastname = useWatch({ control, name: "lastname" }) as
+    | string
+    | undefined;
+  const watchedUsername = useWatch({ control, name: "username" }) as
+    | string
+    | undefined;
   const debouncedUsername = useDebounce(watchedUsername?.trim() ?? "", 400);
   const isEditMode = Boolean(athlete?.id);
 
@@ -148,11 +155,14 @@ export const AthleteEnrollmentModal = ({
     if (!open) return;
 
     reset(mapAthleteToForm(athlete));
-    setFormError(null);
-    setFormSuccess(null);
-    setIsUsernameManuallyEdited(Boolean(athlete?.id));
-    setUsernameAvailability("idle");
-    setUsernameAvailabilityMessage(null);
+    // Deferir updates de estado para evitar setState síncrono en el effect
+    setTimeout(() => {
+      setFormError(null);
+      setFormSuccess(null);
+      setIsUsernameManuallyEdited(Boolean(athlete?.id));
+      setUsernameAvailability("idle");
+      setUsernameAvailabilityMessage(null);
+    }, 0);
   }, [open, athlete, reset]);
 
   useEffect(() => {
@@ -161,8 +171,8 @@ export const AthleteEnrollmentModal = ({
     }
 
     const suggestedUsername = buildSuggestedUsername(
-      watchedName,
-      watchedLastname,
+      watchedName ?? "",
+      watchedLastname ?? "",
     );
 
     if (!suggestedUsername) {
@@ -187,8 +197,11 @@ export const AthleteEnrollmentModal = ({
     const candidate = debouncedUsername.trim();
 
     if (!candidate) {
-      setUsernameAvailability("idle");
-      setUsernameAvailabilityMessage(null);
+      // Deferir para evitar setState síncrono en el effect
+      setTimeout(() => {
+        setUsernameAvailability("idle");
+        setUsernameAvailabilityMessage(null);
+      }, 0);
       return;
     }
 
@@ -457,80 +470,88 @@ export const AthleteEnrollmentModal = ({
         )}
 
         <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Nombre</label>
-            <input
-              className="form-control"
-              {...register("name", { required: "El nombre es obligatorio" })}
-              disabled={isSaving}
-            />
-            {errors.name && (
-              <small className="text-danger">{errors.name.message}</small>
-            )}
+          <div className="col-md-6">
+            <FormRow
+              label="Nombre"
+              className="mb-3"
+              error={errors.name?.message}
+            >
+              <input
+                className="form-control"
+                {...register("name", { required: "El nombre es obligatorio" })}
+                disabled={isSaving}
+              />
+            </FormRow>
           </div>
 
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Apellido</label>
-            <input
-              className="form-control"
-              {...register("lastname", {
-                required: "El apellido es obligatorio",
-              })}
-              disabled={isSaving}
-            />
-            {errors.lastname && (
-              <small className="text-danger">{errors.lastname.message}</small>
-            )}
+          <div className="col-md-6">
+            <FormRow
+              label="Apellido"
+              className="mb-3"
+              error={errors.lastname?.message}
+            >
+              <input
+                className="form-control"
+                {...register("lastname", {
+                  required: "El apellido es obligatorio",
+                })}
+                disabled={isSaving}
+              />
+            </FormRow>
           </div>
         </div>
 
         <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Carnet</label>
-            <input
-              className="form-control"
-              {...register("dni", { required: "El carnet es obligatorio" })}
-              disabled={isSaving}
-            />
-            {errors.dni && (
-              <small className="text-danger">{errors.dni.message}</small>
-            )}
+          <div className="col-md-6">
+            <FormRow
+              label="Carnet"
+              className="mb-3"
+              error={errors.dni?.message}
+            >
+              <input
+                className="form-control"
+                {...register("dni", { required: "El carnet es obligatorio" })}
+                disabled={isSaving}
+              />
+            </FormRow>
           </div>
 
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Usuario</label>
-            <div className="position-relative">
-              <input
-                className="form-control pe-5"
-                {...register("username", {
-                  required: "El usuario es obligatorio",
-                })}
-                disabled={isSaving}
-                onChange={(event) => {
-                  register("username").onChange(event);
-                  setIsUsernameManuallyEdited(true);
-                }}
-              />
-              {usernameAvailability === "available" && (
-                <span
-                  className="position-absolute top-50 end-0 translate-middle-y me-3 text-success"
-                  style={{ right: "10px" }}
-                  aria-label="Usuario disponible"
-                  title="Usuario disponible"
-                >
-                  <i className="fa fa-check-circle" />
-                </span>
-              )}
-            </div>
-            {errors.username && (
-              <small className="text-danger">{errors.username.message}</small>
-            )}
-            {usernameAvailability === "taken" &&
-              usernameAvailabilityMessage && (
-                <small className="text-danger d-block mt-1">
-                  {usernameAvailabilityMessage}
-                </small>
-              )}
+          <div className="col-md-6">
+            <FormRow
+              label="Usuario"
+              className="mb-3"
+              error={errors.username?.message}
+            >
+              <div className="position-relative">
+                <input
+                  className="form-control pe-5"
+                  {...register("username", {
+                    required: "El usuario es obligatorio",
+                  })}
+                  disabled={isSaving}
+                  onChange={(event) => {
+                    register("username").onChange(event);
+                    setIsUsernameManuallyEdited(true);
+                  }}
+                />
+                {usernameAvailability === "available" && (
+                  <span
+                    className="position-absolute top-50 end-0 translate-middle-y me-3 text-success"
+                    style={{ right: "10px" }}
+                    aria-label="Usuario disponible"
+                    title="Usuario disponible"
+                  >
+                    <i className="fa fa-check-circle" />
+                  </span>
+                )}
+              </div>
+              {usernameAvailability === "taken" &&
+                usernameAvailabilityMessage && (
+                  <small className="text-danger d-block mt-1">
+                    {usernameAvailabilityMessage}
+                  </small>
+                )}
+            </FormRow>
           </div>
         </div>
 

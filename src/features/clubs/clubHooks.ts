@@ -4,7 +4,7 @@ import {
   useDeleteClubMutation,
   useGetClubsQuery,
   useUpdateClubMutation,
-} from "./clubApi";
+} from "./services/clubApi";
 import type {
   Club,
   CreateClubDto,
@@ -27,7 +27,9 @@ export const useClubs = (params?: UseClubsParams) => {
 
   const { data, isLoading, error, refetch } = useGetClubsQuery(queryParams);
 
-  const filteredClubs = (data?.data ?? []).filter((club) => {
+  const clubsData = (data?.data ?? []) as Club[];
+
+  const filteredClubs = clubsData.filter((club: Club) => {
     const assignmentId = params?.assignmentId?.trim();
 
     if (!assignmentId) {

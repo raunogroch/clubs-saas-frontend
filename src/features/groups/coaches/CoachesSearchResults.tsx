@@ -1,6 +1,8 @@
+import type { User } from "../../../core/interfaces/User";
+
 interface Props {
-  coaches: any[];
-  onSelect: (coach: any) => void;
+  coaches: User[];
+  onSelect: (coach: User) => void;
   isLoading: boolean;
 }
 

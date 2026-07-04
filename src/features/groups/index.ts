@@ -1,7 +1,5 @@
-export * from "./groupApi";
-export * from "./groupHooks";
-export * from "./groupFormMapper";
-export * from "./groupFormOptions";
-export * from "./useGroupSubmit";
-export * from "./groupRelationsApi";
-export * from "./groupRelationsHooks";
+export * from "./services";
+export * from "./hooks";
+export * from "./ui";
+export * from "./coaches/coachUtils";
+export { groupApi } from "./services";

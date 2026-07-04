@@ -1,5 +1,7 @@
+import type { User } from "../../../core/interfaces/User";
+
 interface Props {
-  coaches: any[];
+  coaches: User[];
   onRemove: (id: string) => void;
 }
 

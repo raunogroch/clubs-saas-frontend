@@ -4,9 +4,9 @@ import type {
   GroupStatus,
   CreateGroupDto,
   UpdateGroupDto,
-} from "../../core/interfaces/Groups";
+} from "../../../core/interfaces/Groups";
 import { useCreateGroup, useUpdateGroup } from "./groupHooks";
-import type { GroupFormInputs } from "./groupFormMapper";
+import type { GroupFormInputs } from "../ui/groupFormMapper";
 
 /**
  * Valida que los campos requeridos tengan valor
@@ -94,7 +94,7 @@ export const useGroupSubmit = (
         onClose();
       }
     },
-    [isEdit, data?.id, createGroup, updateGroup, onSaved, onClose],
+    [isEdit, data, createGroup, updateGroup, onSaved, onClose],
   );
 
   return { submit, isSaving, error };

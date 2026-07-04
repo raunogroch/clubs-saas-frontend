@@ -1,5 +1,5 @@
 import { useActiveRole } from "../core/context/useActiveRole";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 import { useGetRolesFromMemberships } from "../core/hooks/useGetRolesFromMemberships";
 import {
   DashboardAdmin,

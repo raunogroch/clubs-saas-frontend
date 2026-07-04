@@ -2,7 +2,7 @@ import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import { GroupsModal, SchedulesModal, CoachesModal } from "../modals";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { useGroups } from "../features/groups/groupHooks";
+import { useGroups } from "../features/groups";
 import {
   useModalManagement,
   useModalSaveHandler,
@@ -10,8 +10,9 @@ import {
 } from "../core/hooks";
 import { useAssignmentPersistence } from "../core/hooks";
 import { useActiveRole } from "../core/context/useActiveRole";
-import { useAuthManager } from "../features/auth/useAuthManager";
-import { useClubs } from "../features/clubs/clubHooks";
+import { useAuthManager } from "../features/auth";
+import type { Club } from "../core/interfaces/Clubs";
+import { useClubs } from "../features/clubs";
 import type { Group } from "../core/interfaces/Groups";
 import { Roles } from "../common/enums";
 import { statusLabels } from "../common/translations";
@@ -101,7 +102,7 @@ export const GroupsPage = () => {
   });
 
   const getClubName = (clubId: string): string => {
-    return clubs.find((club) => club.id === clubId)?.name || "N/A";
+    return clubs.find((club: Club) => club.id === clubId)?.name || "N/A";
   };
 
   /**

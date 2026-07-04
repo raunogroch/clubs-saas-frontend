@@ -2,13 +2,15 @@ import type { SubmitHandler } from "react-hook-form";
 import {
   useCreateAssignment,
   useUpdateAssignment,
-} from "../features/assignments/assignmentHooks";
+} from "../features/assignments";
 import type { AssignmentModalProps } from "../core/interfaces";
 
 type Inputs = {
   name: string;
   owners: string[];
 };
+
+import { error as logError } from "../app/logger";
 
 interface UseAssignmentSubmitOptions {
   data?: AssignmentModalProps["data"];
@@ -70,7 +72,7 @@ export const useAssignmentSubmit = ({
       onSaved?.();
       onClose();
     } catch (err) {
-      console.error("Error al guardar asignación:", err);
+      logError("Error al guardar asignación:", err);
     }
   };
 

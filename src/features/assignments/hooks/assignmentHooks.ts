@@ -1,12 +1,12 @@
-// features/assignments/assignmentHooks.ts
+// features/assignments/hooks/assignmentHooks.ts
 
 import { useCallback, useMemo } from "react";
 import {
   useCreateAssignmentMutation,
   useGetAssignmentsQuery,
   useUpdateAssignmentMutation,
-} from "./assignmentApi";
-import type { Assignment } from "../../core/interfaces";
+} from "../services/assignmentApi";
+import type { Assignment } from "../../../core/interfaces";
 
 /**
  * Hook para obtener todas las asignaciones

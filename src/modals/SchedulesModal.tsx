@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import { Modal } from "../components/Modal";
-import { useUpdateGroupMutation } from "../features/groups/groupApi";
-import { useSchedulesManager } from "../features/groups/useSchedulesManager";
+import { Modal, ModalFooter } from "../components";
+import {
+  useUpdateGroupMutation,
+  useSchedulesManager,
+} from "../features/groups";
 import type { WeekDay } from "../core/interfaces/Groups";
 import { weekDayLabels } from "../common/translations";
 import { WEEK_DAYS } from "../common/constants";
@@ -333,33 +335,15 @@ export const SchedulesModal = ({
         </div>
 
         {/* Botones de acción */}
-        <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-secondary btn-rounded"
-            onClick={onClose}
-            disabled={isLoadingTotal}
-          >
-            <i className="fa fa-times"></i> Cancelar
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-primary btn-rounded"
-            onClick={handleSaveAll}
-            disabled={isLoadingTotal || !hasChanges()}
-          >
-            {isLoadingTotal ? (
-              <>
-                <i className="fa fa-spinner fa-spin"></i> Guardando...
-              </>
-            ) : (
-              <>
-                <i className="fa fa-save"></i>&nbsp;Guardar
-              </>
-            )}
-          </button>
-        </div>
+        <ModalFooter
+          onCancel={onClose}
+          cancelLabel="Cancelar"
+          primaryLabel={isLoadingTotal ? "Guardando..." : "Guardar"}
+          primaryType="button"
+          disabled={isLoadingTotal || !hasChanges()}
+          isLoading={isLoadingTotal}
+          primaryOnClick={handleSaveAll}
+        />
       </div>
     </Modal>
   );

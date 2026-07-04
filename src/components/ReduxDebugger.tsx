@@ -17,8 +17,7 @@
 
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
-import { logout } from "../features/auth/authSlice";
-import { getUserMemberships } from "../features/auth/membershipService";
+import { logout, getUserMemberships } from "../features/auth";
 
 export const ReduxDebugger: React.FC = () => {
   const [expanded, setExpanded] = useState(false);

@@ -4,6 +4,7 @@
  * Utilidad segura para acceder a localStorage
  * Maneja casos donde localStorage no está disponible (SSR, tests, etc.)
  */
+import { warn } from "../../app/logger";
 
 /**
  * Storage en memoria (fallback cuando localStorage no está disponible)
@@ -20,8 +21,8 @@ export const getLocalStorageItem = (key: string): string | null => {
     if (typeof window !== "undefined" && window?.localStorage) {
       return window.localStorage.getItem(key);
     }
-  } catch (error) {
-    console.warn(`Error al leer localStorage["${key}"]:`, error);
+  } catch (err) {
+    warn(`Error al leer localStorage["${key}"]:`, err);
   }
   return inMemory[key] || null;
 };
@@ -37,8 +38,8 @@ export const setLocalStorageItem = (key: string, value: string): void => {
       window.localStorage.setItem(key, value);
     }
     inMemory[key] = value;
-  } catch (error) {
-    console.warn(`Error al guardar en localStorage["${key}"]:`, error);
+  } catch (err) {
+    warn(`Error al guardar en localStorage["${key}"]:`, err);
     inMemory[key] = value;
   }
 };
@@ -53,8 +54,8 @@ export const removeLocalStorageItem = (key: string): void => {
       window.localStorage.removeItem(key);
     }
     delete inMemory[key];
-  } catch (error) {
-    console.warn(`Error al eliminar localStorage["${key}"]:`, error);
+  } catch (err) {
+    warn(`Error al eliminar localStorage["${key}"]:`, err);
     delete inMemory[key];
   }
 };
@@ -70,8 +71,8 @@ export const clearLocalStorage = (): void => {
     Object.keys(inMemory).forEach((key) => {
       delete inMemory[key];
     });
-  } catch (error) {
-    console.warn("Error al limpiar localStorage:", error);
+  } catch (err) {
+    warn("Error al limpiar localStorage:", err);
     Object.keys(inMemory).forEach((key) => {
       delete inMemory[key];
     });

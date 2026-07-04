@@ -3,14 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Breadcumbs, IBox } from "../components";
 import { AthleteEnrollmentModal } from "../modals/AthleteEnrollmentModal";
-import { useGroups } from "../features/groups/groupHooks";
-import { useGroupEnrollments } from "../features/groups/groupRelationsHooks";
+import { useGroups, useGroupEnrollments } from "../features/groups";
 import { useAssignmentPersistence } from "../core/hooks";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 import { useSearchSetup } from "../core/hooks/useSearchSetup";
 import { getEnrollmentStatusLabel } from "../common/translations";
 import type { User } from "../core/interfaces";
-import { useGetUsersQuery } from "../features/users/userApi";
+import { useGetUsersQuery } from "../features/users";
 
 export const EnrollmentsPage = () => {
   const navigate = useNavigate();

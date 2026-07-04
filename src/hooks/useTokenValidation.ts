@@ -11,7 +11,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./reduxHooks";
 import { watchTokenChanges, validateToken } from "../app/tokenVerification";
-import { logout as logoutAction } from "../features/auth/authSlice";
+import { logout as logoutAction } from "../features/auth";
 
 /**
  * Hook que monitorea cambios de token desde otras pestañas

@@ -1,14 +1,13 @@
 import { useEffect } from "react";
 import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
 
-import { InputForm, Modal } from "../components";
+import { InputForm, Modal, ModalFooter } from "../components";
 import { RolesFieldArray } from "../components/RolesFieldArray";
 
-import { useCreateUser, useUpdateUser } from "../features/users/userHooks";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useCreateUser, useUpdateUser } from "../features/users";
+import { useAuthManager } from "../features/auth";
 import { useActiveRole } from "../core/context/useActiveRole";
 import type {
-  User,
   CreateUserDto,
   UpdateUserDto,
   Membership,
@@ -20,6 +19,7 @@ import {
   rolesLabels,
 } from "../common/translations";
 import type { Gender, Status, Roles } from "../common/enums";
+import { error as logError } from "../app/logger";
 import type { UserFormInputs } from "../core/types";
 import type { UserModalProps } from "../core/interfaces";
 
@@ -34,45 +34,7 @@ const statusOptions = Object.entries(statusLabels).map(([value, label]) => ({
   label,
 }));
 
-// Valores por defecto
-const emptyForm: UserFormInputs = {
-  name: "",
-  lastname: "",
-  dni: "",
-  username: "",
-  roles: [{ role: "" }],
-  gender: "",
-  birthDate: "",
-  phone: "",
-  address: "",
-  status: "",
-};
-
-const mapUserToForm = (user?: User): UserFormInputs => {
-  if (!user) return emptyForm;
-
-  return {
-    name: user.name ?? "",
-    lastname: user.lastname ?? "",
-    dni: user.dni ?? "",
-    username: user.username ?? "",
-
-    roles:
-      (user.memberships?.length ?? 0) > 0
-        ? user.memberships!.map((membership) => ({
-            role: membership.role as Roles,
-          }))
-        : [{ role: "" }],
-
-    gender: user.gender ?? "",
-    birthDate: user.birthDate
-      ? new Date(user.birthDate).toISOString().split("T")[0]
-      : "",
-    phone: user.phone ?? "",
-    address: user.address ?? "",
-    status: user.status ?? "",
-  };
-};
+import { emptyForm, mapUserToForm } from "../features/users";
 
 export const UserModal = (props: UserModalProps) => {
   const { roleList } = props;
@@ -137,7 +99,7 @@ export const UserModal = (props: UserModalProps) => {
       // Construir memberships desde roles
       // Si el usuario actual es ADMIN, asignar su assignmentId a los nuevos usuarios
       const memberships: Membership[] = roles.map((role) => ({
-        role: role as any,
+        role: role as Roles,
         assignmentId:
           activeRole === "ADMIN" && activeAssignmentId
             ? activeAssignmentId
@@ -176,7 +138,7 @@ export const UserModal = (props: UserModalProps) => {
       props.onSaved?.();
       props.onClose();
     } catch (err) {
-      console.error("Error al guardar usuario:", err);
+      logError("Error al guardar usuario:", err);
     }
   };
 
@@ -319,24 +281,16 @@ export const UserModal = (props: UserModalProps) => {
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-sm btn-rounded btn-white"
-            onClick={props.onClose}
-            disabled={isSaving}
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="submit"
-            className="btn btn-sm btn-rounded btn-primary"
-            disabled={isSaving || isSubmitting}
-          >
-            {isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
-          </button>
-        </div>
+        <ModalFooter
+          onCancel={props.onClose}
+          cancelLabel="Cancelar"
+          primaryLabel={
+            isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"
+          }
+          primaryType="submit"
+          disabled={isSaving || isSubmitting}
+          isLoading={isSaving}
+        />
       </form>
     </Modal>
   );

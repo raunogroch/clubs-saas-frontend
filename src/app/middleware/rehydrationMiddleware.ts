@@ -11,6 +11,14 @@
 import React from "react";
 import type { Middleware } from "@reduxjs/toolkit";
 
+const getActionType = (action: unknown): string | undefined => {
+  if (action && typeof action === "object" && "type" in action) {
+    const a = action as { type?: unknown };
+    return typeof a.type === "string" ? a.type : undefined;
+  }
+  return undefined;
+};
+
 // Variable global para mantener estado de rehydratación
 // Se usa en el hook useRehydrationStatus
 let rehydrationComplete = false;
@@ -23,12 +31,13 @@ const listeners: Set<() => void> = new Set();
  * Se ejecuta DESPUÉS de cada acción y puede filtrar por tipo
  */
 export const rehydrationMiddleware: Middleware =
-  (_store) => (next) => (action: unknown) => {
+  (store) => (next) => (action: unknown) => {
+    void store;
     const result = next(action);
 
     // Redux-persist dispara la acción 'persist/REHYDRATE' cuando termina
     // de restaurar el estado desde localStorage/storage
-    if ((action as any).type === "persist/REHYDRATE") {
+    if (getActionType(action) === "persist/REHYDRATE") {
       rehydrationComplete = true;
       // Notificar a todos los listeners (hooks)
       listeners.forEach((listener) => listener());
@@ -45,13 +54,9 @@ export const useRehydrationStatus = (): boolean => {
   const [isRehydrated, setIsRehydrated] = React.useState(rehydrationComplete);
 
   React.useEffect(() => {
-    // Si ya está rehydratado, no hacer nada más
-    if (rehydrationComplete) {
-      setIsRehydrated(true);
-      return;
-    }
+    // Si ya está rehydratado, el estado inicial ya fue inicializado
+    if (rehydrationComplete) return;
 
-    // Agregar listener
     const handleRehydrate = () => {
       setIsRehydrated(true);
     };

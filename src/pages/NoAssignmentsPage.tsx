@@ -1,4 +1,4 @@
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 
 export const NoAssignmentsPage = () => {
   const { user } = useAuthManager();

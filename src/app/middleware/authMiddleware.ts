@@ -1,14 +1,15 @@
 import type { Middleware } from "@reduxjs/toolkit";
 import { isRejectedWithValue } from "@reduxjs/toolkit";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { logout } from "../../features/auth/authSlice";
+import { logout } from "../../features/auth";
 import storage from "../storage";
+import { log, warn, error } from "../logger";
 
 export const authMiddleware: Middleware = (store) => (next) => (action) => {
   if (typeof action === "object" && action !== null && "type" in action) {
     const actionType = (action as { type: string }).type;
     if (actionType === logout.type) {
-      console.log("Logout detectado. Limpiando localStorage completamente...");
+      log("Logout detectado. Limpiando localStorage completamente...");
       storage.clear();
     }
   }
@@ -18,7 +19,7 @@ export const authMiddleware: Middleware = (store) => (next) => (action) => {
     const payload = action.payload as FetchBaseQueryError;
 
     if (payload.status === 401) {
-      console.warn(
+      warn(
         "Token rechazado por servidor (401). Disparando logout automático...",
       );
 
@@ -28,7 +29,7 @@ export const authMiddleware: Middleware = (store) => (next) => (action) => {
     }
 
     if (payload.status === 403) {
-      console.error("Usuario sin permisos para esta acción (403)");
+      error("Usuario sin permisos para esta acción (403)");
     }
   }
 

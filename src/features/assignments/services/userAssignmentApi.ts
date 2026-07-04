@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
-import type { UserAssignments } from "../../core/interfaces";
+import { createBaseQueryWithAuth } from "../../../app/baseQueryWithAuth";
+import type { UserAssignments } from "../../../core/interfaces";
 
 export const userAssignmentApi = createApi({
   reducerPath: "userAssignmentApi",

@@ -4,11 +4,11 @@ import {
   useDeleteGroupMutation,
   useGetGroupsQuery,
   useUpdateGroupMutation,
-} from "./groupApi";
+} from "../services/groupApi";
 import type {
   CreateGroupDto,
   UpdateGroupDto,
-} from "../../core/interfaces/Groups";
+} from "../../../core/interfaces/Groups";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 interface UseGroupsParams {
@@ -17,9 +17,6 @@ interface UseGroupsParams {
   clubId?: string;
 }
 
-/**
- * Traduce errores de RTK Query a mensajes amigables en español
- */
 const getErrorMessage = (error: unknown): string | null => {
   if (!error) return null;
 
@@ -43,32 +40,17 @@ const getErrorMessage = (error: unknown): string | null => {
   return null;
 };
 
-/**
- * Hook para obtener grupos de un club específico
- *
- * IMPORTANTE: Si no hay clubId válido, retorna lista vacía sin hacer query
- * Esto evita traer todos los grupos indiscriminadamente
- */
 export const useGroups = (params?: UseGroupsParams) => {
-  // Validación: SOLO hacer query si hay clubId
-  if (!params?.clubId?.trim()) {
-    return {
-      groups: [],
-      meta: undefined,
-      isLoading: false,
-      error: null,
-      refetch: () => Promise.resolve(),
-      isEmpty: true,
-    };
-  }
-
   const queryParams = {
-    page: params.page ?? 1,
-    limit: params.limit ?? 10,
-    clubId: params.clubId,
+    page: params?.page ?? 1,
+    limit: params?.limit ?? 10,
+    clubId: params?.clubId,
   };
 
-  const { data, isLoading, error, refetch } = useGetGroupsQuery(queryParams);
+  const skip = !params?.clubId?.trim();
+  const { data, isLoading, error, refetch } = useGetGroupsQuery(queryParams, {
+    skip,
+  });
 
   return {
     groups: data?.data ?? [],
@@ -82,9 +64,6 @@ export const useGroups = (params?: UseGroupsParams) => {
   };
 };
 
-/**
- * Hook para crear un grupo
- */
 export const useCreateGroup = () => {
   const [createGroupMutation, { isLoading, error }] = useCreateGroupMutation();
 
@@ -103,9 +82,6 @@ export const useCreateGroup = () => {
   };
 };
 
-/**
- * Hook para actualizar un grupo
- */
 export const useUpdateGroup = () => {
   const [updateGroupMutation, { isLoading, error }] = useUpdateGroupMutation();
 
@@ -125,9 +101,6 @@ export const useUpdateGroup = () => {
   };
 };
 
-/**
- * Hook para eliminar un grupo
- */
 export const useDeleteGroup = () => {
   const [deleteGroupMutation, { isLoading, error }] = useDeleteGroupMutation();
 

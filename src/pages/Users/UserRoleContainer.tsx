@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { log } from "../../app/logger";
 import { Roles } from "../../common";
 import type { User } from "../../core/interfaces";
 import { useUsers } from "../../features/users";
@@ -45,10 +46,9 @@ export const UserRoleContainer = ({
     setPage(1);
   };
 
-  console.log("UserRoleContainer", {
-    role,
-    activeAssignmentId,
-  });
+  if (import.meta.env.MODE !== "production") {
+    log("UserRoleContainer", { role, activeAssignmentId });
+  }
 
   return (
     <div className="mb-4">

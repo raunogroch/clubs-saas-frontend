@@ -2,7 +2,7 @@ import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import { PaginationTable } from "../components/PaginationTable";
 import { ClubModal } from "../modals/ClubModal";
 import { useNavigate } from "react-router-dom";
-import { useClubs } from "../features/clubs/clubHooks";
+import { useClubs } from "../features/clubs";
 import {
   useModalManagement,
   useModalSaveHandler,
@@ -10,7 +10,7 @@ import {
 } from "../core/hooks";
 import { useAssignmentPersistence } from "../core/hooks";
 import { useActiveRole } from "../core/context/useActiveRole";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 import type { Club } from "../core/interfaces/Clubs";
 import { Roles } from "../common/enums";
 //import { useNotification } from "../core/hooks/useNotification";

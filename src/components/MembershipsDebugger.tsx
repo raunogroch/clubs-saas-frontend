@@ -12,7 +12,7 @@
 
 import React from "react";
 import { useAuth } from "../core/hooks";
-import { getUserMemberships } from "../features/auth/membershipService";
+import { getUserMemberships } from "../features/auth";
 
 export const MembershipsDebugger: React.FC = () => {
   const { user } = useAuth();

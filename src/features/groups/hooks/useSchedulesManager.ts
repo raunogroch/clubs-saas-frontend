@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
-import type { CreateGroupScheduleDto } from "../../core/interfaces/Groups";
+import { useState, useCallback, useMemo } from "react";
+import type { CreateGroupScheduleDto } from "../../../core/interfaces/Groups";
 import { useGroupSchedules } from "./groupRelationsHooks";
-import { MESSAGES } from "../../common/messages";
+import { MESSAGES } from "../../../common/messages";
 
 /**
  * Extensión de DTO para schedules pendientes con ID temporal
@@ -38,7 +38,10 @@ export const useSchedulesManager = (groupId?: string) => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const schedulesList = fetchedSchedules || [];
+  const schedulesList = useMemo(
+    () => fetchedSchedules || [],
+    [fetchedSchedules],
+  );
 
   /**
    * Agregar nueva fila de horario
@@ -154,6 +157,7 @@ export const useSchedulesManager = (groupId?: string) => {
       .map((s) => {
         if (editingSchedules[s.id]) {
           const { tempId, ...edited } = editingSchedules[s.id];
+          void tempId;
           return {
             day: edited.day,
             startTime: edited.startTime,
@@ -168,10 +172,10 @@ export const useSchedulesManager = (groupId?: string) => {
       });
 
     // Nuevos horarios (sin id)
-    const newSchedules = pendingSchedules.map(({ tempId, ...schedule }) => ({
-      day: schedule.day,
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
+    const newSchedules = pendingSchedules.map((s) => ({
+      day: s.day,
+      startTime: s.startTime,
+      endTime: s.endTime,
     }));
 
     return [...existingSchedules, ...newSchedules];

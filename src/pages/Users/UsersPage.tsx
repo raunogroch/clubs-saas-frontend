@@ -6,11 +6,12 @@ import {
 } from "../../core/hooks";
 import type { User, UserPageProps } from "../../core/interfaces";
 import { UserModal } from "../../modals";
-import { useAuthManager } from "../../features/auth/useAuthManager";
+import { useAuthManager } from "../../features/auth";
 import { useActiveRole } from "../../core/context/useActiveRole";
 import { Roles } from "../../common";
 import { UserRoleContainer } from "./UserRoleContainer";
 import { UsersPageHeader } from "./UsersPageHeader";
+import { log } from "../../app/logger";
 
 /**
  * UsersPage Component
@@ -54,10 +55,9 @@ export const UsersPage = (props: UserPageProps) => {
       ? activeAssignmentId
       : undefined;
 
-  console.log("UsersPage", {
-    activeRole,
-    activeAssignmentId,
-  });
+  if (import.meta.env.MODE !== "production") {
+    log("UsersPage", { activeRole, activeAssignmentId });
+  }
   return (
     <>
       <UsersPageHeader onCreateClick={handleCreate} />

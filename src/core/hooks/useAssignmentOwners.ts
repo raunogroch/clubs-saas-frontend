@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useUsers } from "../../features/users/userHooks";
+import { useUsers } from "../../features/users";
 import { Roles } from "../../common/enums";
 
 export const useAssignmentOwners = () => {

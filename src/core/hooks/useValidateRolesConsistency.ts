@@ -1,4 +1,5 @@
 import { Roles } from "../../common/enums";
+import { warn } from "../../app/logger";
 
 export const useValidateRolesConsistency = (rolesArray: Roles[]) => {
   const validRoles = Object.values(Roles);
@@ -13,7 +14,7 @@ export const useValidateRolesConsistency = (rolesArray: Roles[]) => {
   );
 
   if (invalidRoles.length > 0) {
-    console.warn(
+    warn(
       "[useValidateRolesConsistency] ⚠️ Roles inválidos encontrados:",
       invalidRoles,
       "Roles válidos:",

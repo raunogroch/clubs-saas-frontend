@@ -6,7 +6,7 @@ import type {
   CreateClubDto,
   UpdateClubDto,
 } from "../../core/interfaces/Clubs";
-import { useCreateClub, useUpdateClub } from "./clubHooks";
+import { useCreateClub, useUpdateClub } from "./hooks";
 import type { ClubFormInputs } from "./clubFormMapper";
 
 export const useClubSubmit = (

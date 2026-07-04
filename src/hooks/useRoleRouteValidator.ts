@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useActiveRole } from "../core/context/useActiveRole";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 import { usePersistorRehydration } from "../app/usePersistorRehydration";
 import { isRouteAllowedForRole } from "../features/navigation";
 import { hasAdminActiveAssignment } from "../core/auth/adminAccess";

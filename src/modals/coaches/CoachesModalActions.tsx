@@ -1,4 +1,4 @@
-import { ButtonForm } from "../../components";
+import { ModalFooter } from "../../components";
 
 interface CoachesModalActionsProps {
   onCancel: () => void;
@@ -19,29 +19,14 @@ export const CoachesModalActions = ({
   isSaving = false,
 }: CoachesModalActionsProps) => {
   return (
-    <div className="modal-footer">
-      <ButtonForm
-        className="btn btn-sm btn-rounded btn-secondary"
-        onClick={onCancel}
-        disabled={isSaving}
-      >
-        Cancelar
-      </ButtonForm>
-
-      <ButtonForm
-        className="btn btn-sm btn-rounded btn-primary"
-        onClick={onSave}
-        disabled={isSaving}
-      >
-        {isSaving ? (
-          <>
-            <i className="fa fa-spinner fa-spin" />
-            &nbsp;Guardando...
-          </>
-        ) : (
-          "Guardar"
-        )}
-      </ButtonForm>
-    </div>
+    <ModalFooter
+      onCancel={onCancel}
+      cancelLabel="Cancelar"
+      primaryLabel={isSaving ? "Guardando..." : "Guardar"}
+      primaryType="button"
+      disabled={isSaving}
+      isLoading={isSaving}
+      primaryOnClick={onSave}
+    />
   );
 };

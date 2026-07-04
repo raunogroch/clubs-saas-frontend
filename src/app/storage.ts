@@ -6,6 +6,7 @@
  */
 
 import type { Storage } from "redux-persist";
+import { warn } from "./logger";
 
 /**
  * Interfaz extendida que incluye el método clear()
@@ -36,7 +37,7 @@ const storage: ExtendedStorage = {
       // Fallback a almacenamiento en memoria
       return Promise.resolve(inMemoryStorage[key] || null);
     } catch (error) {
-      console.warn(`Error al leer del storage para key "${key}":`, error);
+      warn(`Error al leer del storage para key "${key}":`, error);
       // Fallback a almacenamiento en memoria si hay error
       return Promise.resolve(inMemoryStorage[key] || null);
     }
@@ -52,7 +53,7 @@ const storage: ExtendedStorage = {
       inMemoryStorage[key] = value;
       return Promise.resolve();
     } catch (error) {
-      console.warn(`Error al guardar en storage la key "${key}":`, error);
+      warn(`Error al guardar en storage la key "${key}":`, error);
       // Fallback a almacenamiento en memoria si hay error
       inMemoryStorage[key] = value;
       return Promise.resolve();
@@ -69,7 +70,7 @@ const storage: ExtendedStorage = {
       delete inMemoryStorage[key];
       return Promise.resolve();
     } catch (error) {
-      console.warn(`Error al eliminar del storage la key "${key}":`, error);
+      warn(`Error al eliminar del storage la key "${key}":`, error);
       // Fallback a almacenamiento en memoria si hay error
       delete inMemoryStorage[key];
       return Promise.resolve();
@@ -88,7 +89,7 @@ const storage: ExtendedStorage = {
       });
       return Promise.resolve();
     } catch (error) {
-      console.warn("Error al limpiar storage:", error);
+      warn("Error al limpiar storage:", error);
       // Fallback a almacenamiento en memoria
       Object.keys(inMemoryStorage).forEach((key) => {
         delete inMemoryStorage[key];

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import { DropdownMenu } from "./DropdownMenu";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 import { useActiveRole } from "../core/context/useActiveRole";
 import { getRoleLabel } from "../common/translations";
 import type { MenuProfileProps } from "../core/interfaces";

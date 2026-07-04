@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGetUsersQuery, type User } from "../../users";
+import { useGetUsersQuery, type User } from "../../../users/userApi";
 
 export const useCoachSearch = () => {
   const [search, setSearch] = useState("");

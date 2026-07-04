@@ -15,7 +15,7 @@
  */
 
 import { useAppSelector, useAppDispatch } from "../../hooks/reduxHooks";
-import { logout as logoutAction } from "../../features/auth/authSlice";
+import { logout as logoutAction } from "../../features/auth";
 import type { User } from "../types";
 
 export interface UseAuthReturn {

@@ -1,5 +1,5 @@
-import { Status } from "../../common/enums";
-import { statusLabels } from "../../common/translations";
+import { Status } from "../../../common/enums";
+import { statusLabels } from "../../../common/translations";
 
 export const statusOptions = Object.values(Status).map((value) => ({
   value,

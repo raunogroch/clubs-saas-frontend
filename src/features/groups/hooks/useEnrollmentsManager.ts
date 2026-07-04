@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useGroupEnrollments } from "./groupRelationsHooks";
-import { ENROLLMENT_STATUSES } from "../../common/constants";
-import { MESSAGES } from "../../common/messages";
+import { ENROLLMENT_STATUSES } from "../../../common/constants";
+import { MESSAGES } from "../../../common/messages";
 
 /**
  * Hook para gestionar la lógica de inscripciones de un grupo

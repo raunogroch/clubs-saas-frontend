@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
+import { error as logError } from "../app/logger";
 import { useForm } from "react-hook-form";
-import { InputForm, Modal } from "../components";
+import { InputForm, Modal, ModalFooter } from "../components";
 import { useAssignmentPersistence } from "../core/hooks";
 import type { GroupModalProps } from "../core/interfaces/Groups";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 import {
   emptyForm,
   mapGroupToForm,
   type GroupFormInputs,
-} from "../features/groups/groupFormMapper";
-import { useGroupSubmit } from "../features/groups/useGroupSubmit";
-
-interface GroupsModalProps extends GroupModalProps {}
+} from "../features/groups";
+import { useGroupSubmit } from "../features/groups";
 
 export const GroupsModal = ({
   open,
@@ -19,7 +18,7 @@ export const GroupsModal = ({
   data,
   onSaved,
   defaultClubId,
-}: GroupsModalProps) => {
+}: GroupModalProps) => {
   const {
     submit,
     isSaving,
@@ -62,7 +61,8 @@ export const GroupsModal = ({
 
     reset(nextValues);
     clearErrors();
-    setValidationError(null);
+    // Deferir setState para evitar setState síncrono en effect
+    setTimeout(() => setValidationError(null), 0);
   }, [
     open,
     data,
@@ -86,13 +86,13 @@ export const GroupsModal = ({
 
       await submit({ ...formData, assignmentId: resolvedAssignmentId });
       reset(emptyForm);
-    } catch (error) {
-      if (error instanceof Error && error.message) {
-        setValidationError(error.message);
+    } catch (err) {
+      if (err instanceof Error && err.message) {
+        setValidationError(err.message);
       } else {
         setValidationError("Ocurrió un error al guardar el grupo");
       }
-      console.error("Error al guardar grupo:", error);
+      logError("Error al guardar grupo:", err);
     }
   });
 
@@ -179,25 +179,16 @@ export const GroupsModal = ({
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-sm btn-rounded btn-white"
-            onClick={onClose}
-            disabled={isSaving}
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="submit"
-            className="btn btn-sm btn-rounded btn-primary"
-            disabled={isSaving || isSubmitting}
-          >
-            <i className="fa fa-save"></i>&nbsp;
-            {isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
-          </button>
-        </div>
+        <ModalFooter
+          onCancel={onClose}
+          cancelLabel="Cancelar"
+          primaryLabel={
+            isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"
+          }
+          primaryType="submit"
+          disabled={isSaving || isSubmitting}
+          isLoading={isSaving}
+        />
       </form>
     </Modal>
   );

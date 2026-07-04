@@ -1,10 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
+import { createBaseQueryWithAuth } from "../../../app/baseQueryWithAuth";
 import type {
   Assignment,
   PaginatedResponse,
   UserAssignments,
-} from "../../core/interfaces";
+} from "../../../core/interfaces";
 
 const api = createApi({
   reducerPath: "assignmentApi",

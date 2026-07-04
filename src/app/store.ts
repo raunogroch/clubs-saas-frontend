@@ -13,14 +13,11 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "./storage";
-import authReducer from "../features/auth/authSlice";
-import authApi from "../features/auth/authApi";
-import assignmentApi from "../features/assignments/assignmentApi";
-import userAssignmentApi from "../features/assignments/userAssignmentApi";
-import userApi from "../features/users/userApi";
-import clubApi from "../features/clubs/clubApi";
-import groupApi from "../features/groups/groupApi";
-import groupRelationsApi from "../features/groups/groupRelationsApi";
+import { authApi, authReducer } from "../features/auth";
+import { assignmentApi, userAssignmentApi } from "../features/assignments";
+import { userApi } from "../features/users";
+import { clubApi } from "../features/clubs";
+import { groupApi } from "../features/groups";
 import persistenceReducer from "./persistenceSlice";
 import authMiddleware from "./middleware/authMiddleware";
 import { rehydrationMiddleware } from "./middleware/rehydrationMiddleware";
@@ -46,7 +43,6 @@ const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
   [clubApi.reducerPath]: clubApi.reducer,
   [groupApi.reducerPath]: groupApi.reducer,
-  [groupRelationsApi.reducerPath]: groupRelationsApi.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -68,7 +64,6 @@ export const store = configureStore({
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
     })
-      .concat(rehydrationMiddleware)
       .concat(
         authApi.middleware,
         assignmentApi.middleware,
@@ -76,8 +71,8 @@ export const store = configureStore({
         userApi.middleware,
         clubApi.middleware,
         groupApi.middleware,
-        groupRelationsApi.middleware,
       )
+      .concat(rehydrationMiddleware)
       .concat(authMiddleware),
 });
 

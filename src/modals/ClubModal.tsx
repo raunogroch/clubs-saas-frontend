@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
+import { error as logError } from "../app/logger";
 import { useForm } from "react-hook-form";
-import { InputForm, Modal } from "../components";
+import { InputForm, Modal, ModalFooter } from "../components";
 import { useAssignmentPersistence } from "../core/hooks";
 import type { ClubModalProps } from "../core/interfaces/Clubs";
-import { useAuthManager } from "../features/auth/useAuthManager";
-import { sportOptions } from "../features/clubs/clubFormOptions";
-import {
-  emptyForm,
-  mapClubToForm,
-  type ClubFormInputs,
-} from "../features/clubs/clubFormMapper";
-import { useClubSubmit } from "../features/clubs/useClubSubmit";
+import { useAuthManager } from "../features/auth";
+import { sportOptions, emptyForm, mapClubToForm } from "../features/clubs";
+import type { ClubFormInputs } from "../features/clubs";
+import { useClubSubmit } from "../features/clubs";
 
 export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
   const { submit, isSaving, error } = useClubSubmit(data, onSaved, onClose);
@@ -55,13 +52,19 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
   useEffect(() => {
     if (!open || isEdit) return;
 
-    setLoadingLocation(true);
-    setAutoLocation(false);
-    setManualLocationEnabled(false);
+    // Deferir cambios de estado para evitar setState síncrono en effect
+    setTimeout(() => {
+      setLoadingLocation(true);
+      setAutoLocation(false);
+      setManualLocationEnabled(false);
+    }, 0);
 
     if (!navigator.geolocation) {
-      setLoadingLocation(false);
-      setManualLocationEnabled(true);
+      // Deferir para evitar setState síncrono en el effect
+      setTimeout(() => {
+        setLoadingLocation(false);
+        setManualLocationEnabled(true);
+      }, 0);
       return;
     }
 
@@ -90,14 +93,14 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
 
           setAutoLocation(true); // 👈 detectado OK
         } catch (err) {
-          console.error(err);
+          logError(err);
           setManualLocationEnabled(true);
         } finally {
           setLoadingLocation(false);
         }
       },
       (err) => {
-        console.error("Geolocation error:", err);
+        logError("Geolocation error:", err);
         setManualLocationEnabled(true); // 👈 fallback manual
         setLoadingLocation(false);
       },
@@ -119,8 +122,8 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
 
       await submit({ ...formData, assignmentId: resolvedAssignmentId });
       reset(emptyForm);
-    } catch (error) {
-      console.error("Error al guardar club:", error);
+    } catch (err) {
+      logError("Error al guardar club:", err);
     }
   });
 
@@ -221,24 +224,16 @@ export const ClubModal = ({ open, onClose, data, onSaved }: ClubModalProps) => {
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-sm btn-rounded btn-white"
-            onClick={onClose}
-            disabled={isSaving}
-          >
-            Cancelar
-          </button>
-
-          <button
-            type="submit"
-            className="btn btn-sm btn-rounded btn-primary"
-            disabled={isSaving || isSubmitting}
-          >
-            {isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
-          </button>
-        </div>
+        <ModalFooter
+          onCancel={onClose}
+          cancelLabel="Cancelar"
+          primaryLabel={
+            isSaving ? "Guardando..." : isEdit ? "Actualizar" : "Crear"
+          }
+          primaryType="submit"
+          disabled={isSaving || isSubmitting}
+          isLoading={isSaving}
+        />
       </form>
     </Modal>
   );

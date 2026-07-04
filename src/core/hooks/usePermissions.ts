@@ -25,7 +25,7 @@ import {
   userHasMembership,
   userHasAnyMembership,
   userHasAllMemberships,
-} from "../../features/auth/membershipService";
+} from "../../features/auth";
 
 /**
  * Hook que proporciona métodos para validar roles/memberships

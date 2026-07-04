@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { MenuProfile, MenuSingleOption } from ".";
-import { useAuthManager } from "../features/auth/useAuthManager";
+import { useAuthManager } from "../features/auth";
 import { useActiveRole } from "../core/context/useActiveRole";
 import { useGetRolesFromMemberships } from "../core/hooks/useGetRolesFromMemberships";
 import { getMenuByRole } from "../features/navigation";

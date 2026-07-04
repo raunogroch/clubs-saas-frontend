@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Modal } from "../components/Modal";
 
-import { useGetUsersQuery } from "../features/users/userApi";
-import { useUpdateGroupMutation } from "../features/groups/groupApi";
-import { useCoachesManager } from "../features/groups/useCoachesManager";
-import { useCoachSearch } from "../features/groups/coaches/useCoachSearch";
+import { useGetUsersQuery } from "../features/users";
+import {
+  useUpdateGroupMutation,
+  useCoachesManager,
+  useCoachSearch,
+} from "../features/groups";
+import { buildCoachesPayload } from "../features/groups";
 
 import { CoachSearchBar } from "./coaches/CoachSearchBar";
 import { CoachSearchResults } from "./coaches/CoachSearchResults";
@@ -55,7 +58,7 @@ export const CoachesModal = ({
 
   const coachMap = useMemo(() => {
     const map = new Map<string, User>();
-    allCoachesResponse?.data?.forEach((c) => map.set(c.id, c));
+    allCoachesResponse?.data?.forEach((c: User) => map.set(c.id, c));
     return map;
   }, [allCoachesResponse]);
 
@@ -74,10 +77,13 @@ export const CoachesModal = ({
 
   useEffect(() => {
     if (open && groupId) {
-      resetState();
-      setSelectedCoaches([]);
-      setSearch("");
-      setUpdatedCoaches(new Map());
+      // Deferir para evitar setState síncrono en el effect
+      setTimeout(() => {
+        resetState();
+        setSelectedCoaches([]);
+        setSearch("");
+        setUpdatedCoaches(new Map());
+      }, 0);
     }
   }, [open, groupId, resetState, setSearch]);
 
@@ -109,20 +115,12 @@ export const CoachesModal = ({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const existingCoaches = visibleCoaches.map((c) => ({
-        coachId: c.coachId,
-        role: updatedCoaches.get(c.coachId) || c.role || "ASSISTANT_COACH",
-      }));
-
-      const newCoaches = selectedCoaches.map((c) => ({
-        coachId: c.user.id,
-        role: c.role,
-      }));
-
-      const payload = {
-        id: groupId,
-        coaches: [...existingCoaches, ...newCoaches],
-      };
+      const payload = buildCoachesPayload(
+        groupId,
+        visibleCoaches,
+        updatedCoaches,
+        selectedCoaches,
+      );
 
       await updateGroup(payload).unwrap();
 

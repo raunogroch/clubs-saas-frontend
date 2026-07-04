@@ -8,7 +8,7 @@
 import { useMemo } from "react";
 import { useTokenExpiration } from "../hooks/useTokenValidation";
 import { useAppDispatch } from "../hooks/reduxHooks";
-import { logout } from "../features/auth/authSlice";
+import { logout } from "../features/auth";
 
 export const TokenExpirationWarning = () => {
   const { expiresIn, isExpired } = useTokenExpiration();

@@ -1,7 +1,7 @@
 import type {
   Group,
   CreateGroupScheduleDto,
-} from "../../core/interfaces/Groups";
+} from "../../../core/interfaces/Groups";
 
 export interface GroupFormInputs {
   name: string;

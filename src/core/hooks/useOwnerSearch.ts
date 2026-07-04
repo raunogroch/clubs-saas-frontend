@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
-import { useUsers } from "../../features/users/userHooks";
+import { useUsers } from "../../features/users";
 import { Roles } from "../../common/enums";
 import type { User } from "../../core/interfaces";
 

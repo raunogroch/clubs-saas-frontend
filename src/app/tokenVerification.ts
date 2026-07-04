@@ -6,6 +6,8 @@
  * Detecta si el token desaparece y dispara logout automático
  */
 
+import { error } from "./logger";
+
 /**
  * Interfaz para datos persistidos por redux-persist
  */
@@ -34,8 +36,8 @@ export const getTokenFromStorage = (): string | null => {
 
     const parsedData: PersistRoot = JSON.parse(persistedData);
     return parsedData.auth?.token || null;
-  } catch (error) {
-    console.error("Error obteniendo token de localStorage:", error);
+  } catch (err) {
+    error("Error obteniendo token de localStorage:", err);
     return null;
   }
 };
@@ -223,8 +225,8 @@ export const clearTokenFromStorage = (): void => {
       data.auth.isAuthenticated = false;
       window.localStorage.setItem("persist:root", JSON.stringify(data));
     }
-  } catch (error) {
-    console.error("Error limpiando token de localStorage:", error);
+  } catch (err) {
+    error("Error limpiando token de localStorage:", err);
   }
 };
 

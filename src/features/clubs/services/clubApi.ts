@@ -1,11 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
+import { createBaseQueryWithAuth } from "../../../app/baseQueryWithAuth";
 import type {
   Club,
   ClubListResponse,
   CreateClubDto,
   UpdateClubDto,
-} from "../../core/interfaces/Clubs";
+} from "../../../core/interfaces/Clubs";
 
 const api = createApi({
   reducerPath: "clubApi",

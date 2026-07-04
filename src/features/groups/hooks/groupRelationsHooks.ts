@@ -3,20 +3,17 @@ import type {
   CreateEnrollmentDto,
   GroupEnrollmentPayload,
   UpdateEnrollmentDto,
-} from "../../core/interfaces/Groups";
-import { useGetGroupQuery } from "./groupApi";
+} from "../../../core/interfaces/Groups";
+import { useGetGroupQuery } from "../services/groupApi";
 import {
   useRemoveGroupCoachMutation,
   useDeleteGroupScheduleMutation,
   useCreateEnrollmentMutation,
   useUpdateEnrollmentMutation,
   useDeleteEnrollmentMutation,
-} from "./groupRelationsApi";
+} from "../services/groupApi";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-/**
- * Traduce errores de RTK Query a mensajes en español
- */
 const getErrorMessage = (error: unknown): string | null => {
   if (!error) return null;
 
@@ -40,12 +37,6 @@ const getErrorMessage = (error: unknown): string | null => {
   return null;
 };
 
-// ============ GROUP COACHES HOOKS ============
-
-/**
- * Hook para obtener coaches de un grupo
- * Responsabilidad única: obtener y formatear coaches del grupo completo
- */
 export const useGroupCoaches = (groupId?: string) => {
   const {
     data: group,
@@ -63,10 +54,6 @@ export const useGroupCoaches = (groupId?: string) => {
   };
 };
 
-/**
- * Hook para eliminar un coach de un grupo
- * Responsabilidad única: eliminar coach
- */
 export const useRemoveGroupCoach = () => {
   const [removeCoachMutation, { isLoading, error }] =
     useRemoveGroupCoachMutation();
@@ -85,12 +72,6 @@ export const useRemoveGroupCoach = () => {
   };
 };
 
-// ============ GROUP SCHEDULES HOOKS ============
-
-/**
- * Hook para obtener horarios de un grupo
- * Responsabilidad única: obtener y formatear horarios del grupo completo
- */
 export const useGroupSchedules = (groupId?: string) => {
   const {
     data: group,
@@ -108,10 +89,6 @@ export const useGroupSchedules = (groupId?: string) => {
   };
 };
 
-/**
- * Hook para eliminar un horario de un grupo
- * Responsabilidad única: eliminar horario
- */
 export const useDeleteGroupSchedule = () => {
   const [deleteScheduleMutation, { isLoading, error }] =
     useDeleteGroupScheduleMutation();
@@ -131,12 +108,6 @@ export const useDeleteGroupSchedule = () => {
   };
 };
 
-// ============ GROUP ENROLLMENTS HOOKS ============
-
-/**
- * Hook para obtener inscripciones de atletas en un grupo
- * Responsabilidad única: obtener y formatear inscripciones del grupo completo
- */
 export const useGroupEnrollments = (groupId?: string) => {
   const {
     data: group,
@@ -155,10 +126,6 @@ export const useGroupEnrollments = (groupId?: string) => {
   };
 };
 
-/**
- * Hook para inscribir un atleta en un grupo
- * Responsabilidad única: crear inscripción
- */
 export const useCreateEnrollment = () => {
   const [createEnrollmentMutation, { isLoading, error }] =
     useCreateEnrollmentMutation();
@@ -181,10 +148,6 @@ export const useCreateEnrollment = () => {
   };
 };
 
-/**
- * Hook para actualizar una inscripción de atleta
- * Responsabilidad única: actualizar inscripción
- */
 export const useUpdateEnrollment = () => {
   const [updateEnrollmentMutation, { isLoading, error }] =
     useUpdateEnrollmentMutation();
@@ -213,10 +176,6 @@ export const useUpdateEnrollment = () => {
   };
 };
 
-/**
- * Hook para eliminar una inscripción de atleta
- * Responsabilidad única: eliminar inscripción
- */
 export const useDeleteEnrollment = () => {
   const [deleteEnrollmentMutation, { isLoading, error }] =
     useDeleteEnrollmentMutation();

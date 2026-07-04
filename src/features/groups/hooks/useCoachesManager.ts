@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useGroupCoaches } from "./groupRelationsHooks";
-import { COACH_ROLES } from "../../common/constants";
-import { MESSAGES } from "../../common/messages";
+import { COACH_ROLES } from "../../../common/constants";
+import { MESSAGES } from "../../../common/messages";
 
 /**
  * Hook para gestionar la lógica de coaches de un grupo

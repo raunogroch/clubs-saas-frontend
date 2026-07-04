@@ -1,41 +1,123 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { createBaseQueryWithAuth } from "../../app/baseQueryWithAuth";
-import { groupApi } from "./groupApi";
+import { createBaseQueryWithAuth } from "../../../app/baseQueryWithAuth";
 import type {
-  GroupCoach,
+  Group,
+  GroupListResponse,
+  CreateGroupDto,
+  CoachRole,
+  GroupStatus,
   GroupSchedule,
+  CreateGroupScheduleDto,
+  GroupCoach,
   Enrollment,
-  CreateEnrollmentDto,
   GroupEnrollmentPayload,
+  CreateEnrollmentDto,
   UpdateEnrollmentDto,
-} from "../../core/interfaces/Groups";
+} from "../../../core/interfaces/Groups";
 
-/**
- * API para operaciones relacionadas con Grupos:
- * - Coaches (GroupCoach)
- * - Schedules (GroupSchedule)
- * - Enrollments (Athletes)
- *
- * Mantiene SOLID: cada endpoint está separado por responsabilidad
- */
 const api = createApi({
-  reducerPath: "groupRelationsApi",
+  reducerPath: "groupApi",
   tagTypes: [
+    "Groups",
+    "GroupsByClub",
     "GroupCoaches",
     "GroupSchedules",
     "GroupEnrollments",
-    "Groups",
-    "GroupsByClub",
   ],
   baseQuery: createBaseQueryWithAuth(
     import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   ),
   endpoints: (builder) => ({
-    // ============ GROUP COACHES ============
-    /**
-     * GET /groups/:groupId/coaches
-     * Obtiene todos los coaches de un grupo
-     */
+    getGroups: builder.query<
+      GroupListResponse,
+      { page?: number; limit?: number; clubId?: string }
+    >({
+      query: (args) => {
+        const params = new URLSearchParams();
+
+        if (args?.clubId?.trim()) {
+          params.append("clubId", args.clubId);
+        }
+
+        const page = args?.page ?? 1;
+        const limit = args?.limit ?? 10;
+
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
+
+        return {
+          url: `/groups?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: (_result, _error, arg) => [
+        "Groups",
+        { type: "GroupsByClub", id: arg?.clubId || "all" },
+      ],
+    }),
+
+    getGroup: builder.query<Group, string>({
+      query: (groupId) => ({
+        url: `/groups/${groupId}`,
+        method: "GET",
+      }),
+      providesTags: (_result, _error, _groupId) => {
+        void _result;
+        void _error;
+        void _groupId;
+        return [{ type: "GroupsByClub", id: "all" }, "Groups"];
+      },
+    }),
+
+    createGroup: builder.mutation<Group, CreateGroupDto>({
+      query: (body) => ({
+        url: "/groups",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "GroupsByClub", id: arg.clubId },
+        "Groups",
+      ],
+    }),
+
+    updateGroup: builder.mutation<
+      Group,
+      {
+        id: string;
+        name?: string;
+        description?: string | null;
+        clubId?: string;
+        assignmentId?: string;
+        address?: string | null;
+        maxAthletes?: number | null;
+        minAge?: number | null;
+        maxAge?: number | null;
+        status?: GroupStatus;
+        coaches?: Array<{ coachId: string; role: CoachRole }> | string[];
+        schedules?: Array<GroupSchedule | CreateGroupScheduleDto>;
+      }
+    >({
+      query: (body) => ({
+        url: `/groups/${body.id}`,
+        method: "PATCH",
+        body: body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "GroupsByClub", id: arg.clubId || "all" },
+        "Groups",
+      ],
+    }),
+
+    deleteGroup: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/groups/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Groups", "GroupsByClub"],
+    }),
+
+    // ---- Group relations endpoints ----
     getGroupCoaches: builder.query<GroupCoach[], string>({
       query: (groupId) => ({
         url: `/groups/${groupId}/coaches`,
@@ -46,10 +128,6 @@ const api = createApi({
       ],
     }),
 
-    /**
-     * DELETE /groups/:groupId/coaches/:coachId
-     * Elimina un coach de un grupo
-     */
     removeGroupCoach: builder.mutation<
       void,
       { groupId: string; coachId: string }
@@ -63,11 +141,6 @@ const api = createApi({
       ],
     }),
 
-    // ============ GROUP SCHEDULES ============
-    /**
-     * GET /groups/:groupId/schedules
-     * Obtiene todos los horarios de un grupo
-     */
     getGroupSchedules: builder.query<GroupSchedule[], string>({
       query: (groupId) => ({
         url: `/groups/${groupId}/schedules`,
@@ -78,10 +151,6 @@ const api = createApi({
       ],
     }),
 
-    /**
-     * DELETE /groups/:groupId/schedules/:scheduleId
-     * Elimina un horario de un grupo
-     */
     deleteGroupSchedule: builder.mutation<
       void,
       { groupId: string; scheduleId: string }
@@ -95,11 +164,6 @@ const api = createApi({
       ],
     }),
 
-    // ============ GROUP ENROLLMENTS ============
-    /**
-     * GET /groups/:groupId/enrollments
-     * Obtiene todos los atletas inscritos en un grupo
-     */
     getGroupEnrollments: builder.query<Enrollment[], string>({
       query: (groupId) => ({
         url: `/groups/${groupId}/enrollments`,
@@ -110,10 +174,6 @@ const api = createApi({
       ],
     }),
 
-    /**
-     * POST /groups/:groupId
-     * Inscribe un atleta en un grupo
-     */
     createEnrollment: builder.mutation<
       Enrollment,
       { groupId: string; data: GroupEnrollmentPayload | CreateEnrollmentDto }
@@ -129,7 +189,7 @@ const api = createApi({
         }
 
         const patchResult = dispatch(
-          groupApi.util.updateQueryData("getGroup", groupId, (draft) => {
+          api.util.updateQueryData("getGroup", groupId, (draft) => {
             const existingEnrollments = draft.enrollments ?? [];
             const alreadyExists = existingEnrollments.some(
               (item) => item.athleteId === optimisticEnrollment.athleteId,
@@ -176,10 +236,6 @@ const api = createApi({
       ],
     }),
 
-    /**
-     * PATCH /groups/:groupId/enrollments/:enrollmentId
-     * Actualiza la inscripción de un atleta
-     */
     updateEnrollment: builder.mutation<
       Enrollment,
       { groupId: string; enrollmentId: string; data: UpdateEnrollmentDto }
@@ -194,10 +250,6 @@ const api = createApi({
       ],
     }),
 
-    /**
-     * DELETE /groups/:groupId/enrollments/:enrollmentId
-     * Elimina la inscripción de un atleta
-     */
     deleteEnrollment: builder.mutation<
       void,
       { groupId: string; enrollmentId: string }
@@ -214,6 +266,12 @@ const api = createApi({
 });
 
 export const {
+  useGetGroupsQuery,
+  useGetGroupQuery,
+  useCreateGroupMutation,
+  useUpdateGroupMutation,
+  useDeleteGroupMutation,
+
   useGetGroupCoachesQuery,
   useRemoveGroupCoachMutation,
   useGetGroupSchedulesQuery,
@@ -224,5 +282,5 @@ export const {
   useDeleteEnrollmentMutation,
 } = api;
 
-export const groupRelationsApi = api;
+export const groupApi = api;
 export default api;

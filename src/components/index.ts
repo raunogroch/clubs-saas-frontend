@@ -14,6 +14,8 @@ export * from "./InputForm";
 export * from "./PaginationTable";
 export * from "./PaginationOptions";
 export * from "./IBox";
+export * from "./FormRow";
+export * from "./ModalFooter";
 export * from "./SplashScreen";
 export * from "./TokenExpirationWarning";
 export * from "./RolesDropdown";

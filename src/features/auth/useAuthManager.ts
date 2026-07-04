@@ -16,8 +16,9 @@ import {
   normalizeLoginResponse,
   getLoginResponseDebugInfo,
 } from "./loginResponseMapper";
-import { useLazyGetCurrentUserAssignmentsQuery } from "../assignments/userAssignmentApi";
+import { useLazyGetCurrentUserAssignmentsQuery } from "../assignments/services/userAssignmentApi";
 import type { LoginRequest } from "../../core/interfaces";
+import { log, warn } from "../../app/logger";
 
 /**
  * Hook personalizado para manejar la autenticación
@@ -94,7 +95,7 @@ export const useAuthManager = () => {
         // Obtener información de debug para logging
         const debugInfo = getLoginResponseDebugInfo(normalizedResult);
 
-        console.log("[auth] Usuario autenticado con memberships:", {
+        log("[auth] Usuario autenticado con memberships:", {
           ...debugInfo,
           tokenLength: token.length,
         });
@@ -106,13 +107,13 @@ export const useAuthManager = () => {
               loginUser.id,
             ).unwrap();
 
-            console.log("[auth] Assignments cargados para admin/super_admin:", {
+            log("[auth] Assignments cargados para admin/super_admin:", {
               userId: loginUser.id,
               count: assignments.length,
               assignments,
             });
           } catch {
-            console.warn("[auth] Error al cargar assignments");
+            warn("[auth] Error al cargar assignments");
           }
         }
 

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import type { Roles } from "../../common/enums";
+import { warn } from "../../app/logger";
 
 const ACTIVE_ROLE_STORAGE_KEY = "activeRole";
 const HYDRATED_KEY = "activeRole_hydrated";
@@ -32,12 +33,9 @@ export const useRolePersistence = (initialRole: Roles | undefined) => {
   const setActiveRole = useCallback((role: Roles) => {
     // Guard: asegurar que el rol es válido
     if (!role || (typeof role === "string" && role.trim().length === 0)) {
-      console.warn(
-        "[useRolePersistence] Intento de setear un rol vacío o inválido",
-        {
-          role,
-        },
-      );
+      warn("[useRolePersistence] Intento de setear un rol vacío o inválido", {
+        role,
+      });
       return;
     }
 

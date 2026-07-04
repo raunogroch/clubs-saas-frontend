@@ -1,7 +1,9 @@
 import { useEffect } from "react";
-import { Modal } from "../components/Modal";
-import { useCreateEnrollmentMutation } from "../features/groups/groupRelationsApi";
-import { useEnrollmentsManager } from "../features/groups/useEnrollmentsManager";
+import { Modal, ModalFooter } from "../components";
+import {
+  useCreateEnrollmentMutation,
+  useEnrollmentsManager,
+} from "../features/groups";
 import { MESSAGES } from "../common/messages";
 
 interface EnrollmentsModalProps {
@@ -232,16 +234,13 @@ export const EnrollmentsModal = ({
         </div>
 
         {/* Botones de acción */}
-        <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-sm btn-rounded btn-secondary"
-            onClick={onClose}
-            disabled={isLoadingTotal}
-          >
-            <i className="fa fa-times"></i> Cerrar
-          </button>
-        </div>
+        <ModalFooter
+          onCancel={onClose}
+          cancelLabel="Cerrar"
+          primaryLabel=""
+          primaryType="button"
+          disabled={isLoadingTotal}
+        />
       </div>
     </Modal>
   );
