@@ -9,6 +9,7 @@ export const MenuProfile = (props: MenuProfileProps) => {
   const navigate = useNavigate();
   const { logout } = useAuthManager();
   const { activeRole } = useActiveRole();
+  const profileImage = props.imageUrl || "assets/img/profile_empty.jpeg";
 
   const handleLogout = () => {
     logout();
@@ -17,7 +18,7 @@ export const MenuProfile = (props: MenuProfileProps) => {
 
   return (
     <div className="dropdown profile-element">
-      <img alt="image" className="rounded-circle" src={props.imageUrl} />
+      <img alt="profile" className="rounded-circle" src={profileImage} />
       <Link data-toggle="dropdown" className="dropdown-toggle" to="#">
         <span className="block m-t-xs font-bold">{props.name}</span>
         <span className="text-muted text-xs block">

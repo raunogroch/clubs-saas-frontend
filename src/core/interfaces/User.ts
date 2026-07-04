@@ -38,12 +38,13 @@ export interface User {
   dni: string;
   username: string;
   password?: string;
+  imageProfile?: string;
   gender?: Gender;
   birthDate?: Date;
   phone?: string;
   address?: string;
   status?: Status;
-  memberships?: Membership[]; // Nueva estructura de roles con estado
+  memberships?: Membership[];
 }
 
 export interface CreateUserDto {
