@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { createBaseQueryWithAuth } from "../../../app/baseQueryWithAuth";
+import { userApi } from "../../users/userApi";
 import type {
   Assignment,
   PaginatedResponse,
@@ -36,6 +37,14 @@ const api = createApi({
         method: "POST",
         body,
       }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          await dispatch(userApi.util.invalidateTags([{ type: "Users" }]));
+        } catch {
+          // No-op: keep the mutation error behavior unchanged.
+        }
+      },
       invalidatesTags: ["Assignments"],
     }),
 
@@ -46,6 +55,14 @@ const api = createApi({
           method: "PATCH",
           body: body,
         };
+      },
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          await dispatch(userApi.util.invalidateTags([{ type: "Users" }]));
+        } catch {
+          // No-op: keep the mutation error behavior unchanged.
+        }
       },
       invalidatesTags: ["Assignments"],
     }),

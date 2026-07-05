@@ -64,16 +64,18 @@ export const RolesDropdown = () => {
 
         // Buscar el PRIMER assignment válido con assignmentId
         let nextAssignmentId = refreshedAssignments?.find(
-          (a) => a.assignmentId && a.assignmentId.trim().length > 0,
+          (a) => typeof a.assignmentId === "string" && a.assignmentId.trim().length > 0,
         )?.assignmentId;
 
         // Si no hay en refreshedAssignments, buscar en memberships del usuario
         if (!nextAssignmentId) {
           nextAssignmentId = user?.memberships
-            ?.filter((m) => m.role === role && m.assignmentId)
+            ?.filter((m) => m?.role === role)
+            .map((m) => m.assignmentId)
             .find(
-              (m) => m.assignmentId && m.assignmentId.trim().length > 0,
-            )?.assignmentId;
+              (assignmentId): assignmentId is string =>
+                typeof assignmentId === "string" && assignmentId.trim().length > 0,
+            );
         }
 
         if (nextAssignmentId) {
