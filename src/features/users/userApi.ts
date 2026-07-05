@@ -93,7 +93,9 @@ const api = createApi({
         url: `/users/${userId}`,
         method: "GET",
       }),
-      providesTags: (_result, _error, userId) => [{ type: "Users", id: userId }],
+      providesTags: (_result, _error, userId) => [
+        { type: "Users", id: userId },
+      ],
     }),
   }),
 });
