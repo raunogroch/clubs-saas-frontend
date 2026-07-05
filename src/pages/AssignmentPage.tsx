@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react";
 import { Breadcumbs, IBox, PaginationOptions } from "../components";
 import { AssignmentTable } from "../components/AssignmentTable";
 import { AssignmentTableState } from "../components/AssignmentTableState";
@@ -10,7 +11,7 @@ import {
   usePaginationState,
   useModalSaveHandler,
 } from "../core/hooks";
-import type { Assignment } from "../core/interfaces";
+import type { Assignment, AssignmentModalMode } from "../core/interfaces";
 
 export const AssignmentPage = () => {
   const {
@@ -19,8 +20,10 @@ export const AssignmentPage = () => {
     isCreating,
     handleCreate,
     handleEdit,
-    handleClose: handleCloseModal,
+    handleClose,
   } = useModalManagement<Assignment>();
+
+  const [modalMode, setModalMode] = useState<AssignmentModalMode>("full");
 
   const {
     page,
@@ -42,6 +45,32 @@ export const AssignmentPage = () => {
   });
 
   const { getOwnerNames } = useAssignmentOwners();
+
+  const handleCreateAssignment = useCallback(() => {
+    setModalMode("name");
+    handleCreate();
+  }, [handleCreate]);
+
+  const handleEditName = useCallback(
+    (assignment: Assignment) => {
+      setModalMode("name");
+      handleEdit(assignment);
+    },
+    [handleEdit],
+  );
+
+  const handleManageOwners = useCallback(
+    (assignment: Assignment) => {
+      setModalMode("owners");
+      handleEdit(assignment);
+    },
+    [handleEdit],
+  );
+
+  const handleCloseModal = useCallback(() => {
+    setModalMode("full");
+    handleClose();
+  }, [handleClose]);
 
   const totalPages = calculateTotalPages(meta?.total, {
     totalPages: meta?.totalPages,
@@ -67,7 +96,7 @@ export const AssignmentPage = () => {
       >
         <button
           className="btn btn-rounded btn-primary"
-          onClick={handleCreate}
+          onClick={handleCreateAssignment}
           aria-label="Crear nueva asignación"
         >
           <i className="fa fa-plus" />
@@ -80,6 +109,7 @@ export const AssignmentPage = () => {
         onClose={handleCloseModal}
         data={selectedAssignment}
         onSaved={handleSaved}
+        mode={modalMode}
       />
 
       <div className="wrapper wrapper-content animated fadeInRight">
@@ -105,7 +135,8 @@ export const AssignmentPage = () => {
                 page={page}
                 pageSize={pageSize}
                 getOwnerNames={getOwnerNames}
-                onEdit={handleEdit}
+                onEdit={handleEditName}
+                onManageOwners={handleManageOwners}
               />
 
               <PaginationTable

@@ -1,7 +1,8 @@
 import type { AssignmentTableProps } from "../core/interfaces";
 
 export const AssignmentTable = (props: AssignmentTableProps) => {
-  const { assignments, page, pageSize, getOwnerNames, onEdit } = props;
+  const { assignments, page, pageSize, onEdit, onManageOwners } = props;
+
   return (
     <div className="table-responsive">
       <table className="table table-striped">
@@ -15,7 +16,11 @@ export const AssignmentTable = (props: AssignmentTableProps) => {
         </thead>
         <tbody>
           {assignments.map((assignment, index) => {
-            const ownersList = getOwnerNames(assignment.owners);
+            const ownerCount = assignment.owners?.length ?? 0;
+            const ownerLabel =
+              ownerCount === 0
+                ? "0 asignados"
+                : `${ownerCount} ${ownerCount === 1 ? "propietario" : "propietarios"}`;
 
             return (
               <tr key={assignment.id}>
@@ -24,21 +29,22 @@ export const AssignmentTable = (props: AssignmentTableProps) => {
                 </td>
                 <td className="align-middle">{assignment.name}</td>
                 <td className="align-middle">
-                  {ownersList.length === 0 ? (
-                    <span className="text-muted">N/A</span>
-                  ) : (
-                    <ul className="list-unstyled mb-0">
-                      {ownersList.map((name, i) => (
-                        <li key={i}>- {name}</li>
-                      ))}
-                    </ul>
-                  )}
+                  <div className="d-flex align-items-center gap-2 flex-wrap">
+                    <button
+                      className="btn btn-rounded btn-sm btn-outline-primary"
+                      onClick={() => onManageOwners(assignment)}
+                      aria-label={`Gestionar propietarios de ${assignment.name}`}
+                    >
+                      <i className="fa fa-user-plus me-1" />
+                    </button>
+                    <span>{ownerLabel}</span>
+                  </div>
                 </td>
                 <td className="align-middle">
                   <button
                     className="btn btn-rounded btn-sm btn-primary"
                     onClick={() => onEdit(assignment)}
-                    aria-label={`Editar asignación ${assignment.name}`}
+                    aria-label={`Editar nombre de ${assignment.name}`}
                   >
                     <i className="fa fa-edit me-1" />
                     &nbsp;Editar

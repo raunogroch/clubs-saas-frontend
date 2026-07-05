@@ -3,7 +3,10 @@ import {
   useCreateAssignment,
   useUpdateAssignment,
 } from "../features/assignments";
-import type { AssignmentModalProps } from "../core/interfaces";
+import type {
+  AssignmentModalMode,
+  AssignmentModalProps,
+} from "../core/interfaces";
 
 type Inputs = {
   name: string;
@@ -15,6 +18,7 @@ import { error as logError } from "../app/logger";
 interface UseAssignmentSubmitOptions {
   data?: AssignmentModalProps["data"];
   ownerIds: string[];
+  mode?: AssignmentModalMode;
   onSaved?: () => void;
   onClose: () => void;
   onReset: () => void;
@@ -33,6 +37,7 @@ interface UseAssignmentSubmitReturn {
 export const useAssignmentSubmit = ({
   data,
   ownerIds,
+  mode = "full",
   onSaved,
   onClose,
   onReset,
@@ -56,11 +61,25 @@ export const useAssignmentSubmit = ({
   const onSubmit: SubmitHandler<Inputs> = async (formData) => {
     try {
       if (isEdit && data?.id) {
-        await updateAssignment({
-          id: data.id,
-          name: formData.name,
-          owners: ownerIds,
-        });
+        if (mode === "name") {
+          await updateAssignment({
+            id: data.id,
+            name: formData.name,
+            owners: data?.owners ?? ownerIds,
+          });
+        } else if (mode === "owners") {
+          await updateAssignment({
+            id: data.id,
+            name: data?.name ?? formData.name,
+            owners: ownerIds,
+          });
+        } else {
+          await updateAssignment({
+            id: data.id,
+            name: formData.name,
+            owners: ownerIds,
+          });
+        }
       } else {
         await createAssignment({
           name: formData.name,

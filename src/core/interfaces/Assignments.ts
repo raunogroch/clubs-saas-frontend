@@ -11,11 +11,14 @@ export interface Assignment {
   updatedAt?: string;
 }
 
+export type AssignmentModalMode = "full" | "name" | "owners";
+
 export interface AssignmentModalProps {
   open: boolean;
   onClose: () => void;
   data?: Assignment;
   onSaved?: () => void;
+  mode?: AssignmentModalMode;
 }
 
 export interface AssignmentTableStateProps {
@@ -39,6 +42,7 @@ export interface AssignmentTableProps {
   pageSize: number;
   getOwnerNames: (owners?: Array<string | { userId?: string }>) => string[];
   onEdit: (assignment: Assignment) => void;
+  onManageOwners: (assignment: Assignment) => void;
 }
 
 export interface OwnerSelectionTableProps {

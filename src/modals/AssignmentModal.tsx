@@ -14,6 +14,7 @@ export const AssignmentModal = ({
   onClose,
   data,
   onSaved,
+  mode = "full",
 }: AssignmentModalProps) => {
   const { form, onClearErrors } = useAssignmentModalForm(open, data);
   const {
@@ -40,9 +41,13 @@ export const AssignmentModal = ({
     clearSearch,
   } = ownerSearch;
 
+  const isOwnersMode = mode === "owners";
+  const isNameMode = mode === "name";
+
   const { onSubmit, error, isSaving } = useAssignmentSubmit({
     data,
     ownerIds: owners,
+    mode,
     onSaved,
     onClose,
     onReset: () => {
@@ -52,17 +57,32 @@ export const AssignmentModal = ({
   });
 
   const isEdit = Boolean(data?.id);
+  const modalTitle = isOwnersMode
+    ? "Actualizar propietarios"
+    : isNameMode
+      ? isEdit
+        ? "Actualizar nombre"
+        : "Crear asignación"
+      : isEdit
+        ? "Actualizar asignación"
+        : "Crear asignación";
+
+  const modalDescription = isOwnersMode
+    ? "Selecciona los administradores que serán propietarios"
+    : isNameMode
+      ? isEdit
+        ? "Modifica únicamente el nombre de la asignación"
+        : "Ingresa el nombre de la nueva asignación"
+      : isEdit
+        ? "Modifica los datos de la asignación"
+        : "Crea una nueva asignación";
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? "Actualizar asignación" : "Crear asignación"}
-      description={
-        isEdit
-          ? "Modifica los datos de la asignación"
-          : "Crea una nueva asignación"
-      }
+      title={modalTitle}
+      description={modalDescription}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         {error && (
@@ -80,54 +100,60 @@ export const AssignmentModal = ({
           </div>
         )}
 
-        <InputForm
-          title="Nombre"
-          name="name"
-          register={register}
-          errors={errors}
-          required="El nombre es obligatorio"
-          disabled={isSaving}
-        />
+        {mode !== "owners" && (
+          <InputForm
+            title="Nombre"
+            name="name"
+            register={register}
+            errors={errors}
+            required="El nombre es obligatorio"
+            disabled={isSaving}
+          />
+        )}
 
-        <div className="form-group row" ref={searchContainerRef}>
-          <label className="col-sm-2 col-form-label">
-            Propietarios
-            <span className="text-danger">*</span>
-          </label>
-          <div className="col-sm-10">
-            <div className="position-relative">
-              <OwnerSearchInput
-                searchTerm={searchTerm}
-                onSearchChange={(term) => {
-                  setSearchTerm(term);
-                  setShowSearchResults(true);
-                }}
-                showResults={showSearchResults}
-                onFocus={() => setShowSearchResults(true)}
-                onClear={clearSearch}
-                disabled={isSaving}
-              />
+        {mode !== "name" && (
+          <>
+            <div className="form-group row" ref={searchContainerRef}>
+              <label className="col-sm-2 col-form-label">
+                Propietarios
+                <span className="text-danger">*</span>
+              </label>
+              <div className="col-sm-10">
+                <div className="position-relative">
+                  <OwnerSearchInput
+                    searchTerm={searchTerm}
+                    onSearchChange={(term) => {
+                      setSearchTerm(term);
+                      setShowSearchResults(true);
+                    }}
+                    showResults={showSearchResults}
+                    onFocus={() => setShowSearchResults(true)}
+                    onClear={clearSearch}
+                    disabled={isSaving}
+                  />
 
-              {showSearchResults && (
-                <OwnerSearchResults
-                  searchTerm={searchTerm}
-                  debouncedSearchTerm={debouncedSearchTerm}
-                  isLoadingUsers={isLoadingUsers}
-                  filteredUsers={filteredUsers}
-                  users={[]}
-                  isSaving={isSaving}
-                  onSelectUser={handleAddOwner}
-                />
-              )}
+                  {showSearchResults && (
+                    <OwnerSearchResults
+                      searchTerm={searchTerm}
+                      debouncedSearchTerm={debouncedSearchTerm}
+                      isLoadingUsers={isLoadingUsers}
+                      filteredUsers={filteredUsers}
+                      users={[]}
+                      isSaving={isSaving}
+                      onSelectUser={handleAddOwner}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <OwnerSelectionTable
-          selectedUsers={selectedUsers}
-          isSaving={isSaving}
-          onRemove={handleRemoveOwner}
-        />
+            <OwnerSelectionTable
+              selectedUsers={selectedUsers}
+              isSaving={isSaving}
+              onRemove={handleRemoveOwner}
+            />
+          </>
+        )}
 
         <input type="hidden" {...register("owners")} />
 
@@ -153,6 +179,8 @@ export const AssignmentModal = ({
                 <span className="fa fa-spinner fa-spin me-2" />
                 Guardando...
               </>
+            ) : isOwnersMode ? (
+              "Guardar"
             ) : isEdit ? (
               "Actualizar"
             ) : (
