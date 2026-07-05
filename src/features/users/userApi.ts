@@ -47,7 +47,13 @@ const api = createApi({
           method: "GET",
         };
       },
-      providesTags: ["Users"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ id }) => ({ type: "Users" as const, id })),
+              { type: "Users", id: "LIST" },
+            ]
+          : [{ type: "Users", id: "LIST" }],
     }),
 
     createUser: builder.mutation<User, CreateUserDto>({
@@ -56,7 +62,7 @@ const api = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Users"],
+      invalidatesTags: [{ type: "Users", id: "LIST" }],
     }),
 
     updateUser: builder.mutation<User, UpdateUserDto>({
@@ -65,7 +71,13 @@ const api = createApi({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: ["Users"],
+      invalidatesTags: (result) =>
+        result
+          ? [
+              { type: "Users", id: "LIST" },
+              { type: "Users", id: result.id },
+            ]
+          : [{ type: "Users", id: "LIST" }],
     }),
 
     /**

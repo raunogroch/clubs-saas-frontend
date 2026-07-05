@@ -18,6 +18,7 @@ interface RolesFieldArrayProps {
     value: string;
     label: string;
   }[];
+  lockedIndexes?: number[];
 }
 
 export const RolesFieldArray = ({
@@ -28,6 +29,7 @@ export const RolesFieldArray = ({
   isSaving,
   error,
   roleOptions,
+  lockedIndexes = [],
 }: RolesFieldArrayProps) => {
   const handleAddRole = () => {
     append({ role: "" });
@@ -47,39 +49,53 @@ export const RolesFieldArray = ({
 
       <div className="col-sm-10">
         <div className="roles-container">
-          {fields.map((field, index) => (
-            <div key={field.id} className="input-group mb-2">
-              <select
-                className={`form-control h-auto ${error ? "is-invalid" : ""}`}
-                {...register(`roles.${index}.role`, {
-                  required: "Seleccione un rol",
-                })}
-                disabled={isSaving}
-                aria-label={`Rol ${index + 1}`}
-              >
-                <option value="">-- Seleccionar rol --</option>
+          {fields.map((field, index) => {
+            const isLocked = lockedIndexes.includes(index);
 
-                {roleOptions.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </select>
-
-              <div className="input-group-append">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-danger"
-                  onClick={() => handleRemoveRole(index)}
-                  disabled={isSaving || fields.length === 1}
-                  aria-label={`Eliminar rol ${index + 1}`}
-                  title="Eliminar rol"
+            return (
+              <div key={field.id} className="input-group mb-2">
+                <select
+                  className={`form-control h-auto ${error ? "is-invalid" : ""}`}
+                  {...register(`roles.${index}.role`, {
+                    required: "Seleccione un rol",
+                  })}
+                  disabled={isSaving || isLocked}
+                  aria-label={`Rol ${index + 1}`}
+                  title={isLocked ? "Este rol está protegido" : undefined}
                 >
-                  <i className="fa fa-trash" />
-                </button>
+                  <option value="">-- Seleccionar rol --</option>
+
+                  {roleOptions.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      {role.label}
+                    </option>
+                  ))}
+                </select>
+
+                <div className="input-group-append">
+                  {isLocked ? (
+                    <span
+                      className="input-group-text text-warning"
+                      title="Este rol no puede quitarse"
+                    >
+                      <i className="fa fa-lock" />
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleRemoveRole(index)}
+                      disabled={isSaving || fields.length === 1}
+                      aria-label={`Eliminar rol ${index + 1}`}
+                      title="Eliminar rol"
+                    >
+                      <i className="fa fa-trash" />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {error && <div className="invalid-feedback d-block">{error}</div>}
         </div>

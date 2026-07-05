@@ -1,4 +1,4 @@
-import type { User } from "../../core/interfaces";
+import type { User, Membership } from "../../core/interfaces";
 import type { UserFormInputs } from "../../core/types";
 import type { Roles } from "../../common/enums";
 
@@ -39,6 +39,32 @@ export const mapUserToForm = (user?: User): UserFormInputs => {
     address: user.address ?? "",
     status: user.status ?? "",
   };
+};
+
+export const buildMembershipPayload = ({
+  roles,
+  existingMemberships = [],
+  activeAssignmentId,
+  activeRole,
+}: {
+  roles: Roles[];
+  existingMemberships?: Membership[];
+  activeAssignmentId?: string | null;
+  activeRole?: string;
+}): Membership[] => {
+  return roles.map((role, index) => {
+    const existingMembership = existingMemberships[index];
+    const assignmentId =
+      existingMembership?.assignmentId ??
+      (activeRole === "ADMIN" && activeAssignmentId ? activeAssignmentId : "");
+
+    return {
+      ...(existingMembership?.id ? { id: existingMembership.id } : {}),
+      role,
+      assignmentId,
+      status: existingMembership?.status ?? "ACTIVE",
+    };
+  });
 };
 
 export default {};

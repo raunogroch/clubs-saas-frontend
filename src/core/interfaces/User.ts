@@ -24,8 +24,9 @@ export interface UserAssignments {
  * - ISP: Interfaz específica para membresía
  */
 export interface Membership {
+  id?: string;
   role: Roles;
-  assignmentId: string;
+  assignmentId?: string | null;
   status?: Status | string;
   createdAt?: string;
   updatedAt?: string;

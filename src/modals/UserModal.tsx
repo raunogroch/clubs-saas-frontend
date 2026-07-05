@@ -5,6 +5,7 @@ import { InputForm, Modal, ModalFooter } from "../components";
 import { RolesFieldArray } from "../components/RolesFieldArray";
 
 import { useCreateUser, useUpdateUser } from "../features/users";
+import { useGetUserByIdQuery } from "../features/users/userApi";
 import { useAuthManager } from "../features/auth";
 import { useActiveRole } from "../core/context/useActiveRole";
 import type {
@@ -18,7 +19,7 @@ import {
   statusLabels,
   rolesLabels,
 } from "../common/translations";
-import type { Gender, Status, Roles } from "../common/enums";
+import { Roles, type Gender, type Status } from "../common/enums";
 import { error as logError } from "../app/logger";
 import type { UserFormInputs } from "../core/types";
 import type { UserModalProps } from "../core/interfaces";
@@ -34,7 +35,11 @@ const statusOptions = Object.entries(statusLabels).map(([value, label]) => ({
   label,
 }));
 
-import { emptyForm, mapUserToForm } from "../features/users";
+import {
+  emptyForm,
+  mapUserToForm,
+  buildMembershipPayload,
+} from "../features/users";
 
 export const UserModal = (props: UserModalProps) => {
   const { roleList } = props;
@@ -54,6 +59,12 @@ export const UserModal = (props: UserModalProps) => {
   } = useUpdateUser();
 
   const isEdit = Boolean(props.data?.id);
+
+  // Obtener datos frescos del usuario en background para refrescar después de guardar
+  useGetUserByIdQuery(isEdit && props.open ? (props.data?.id ?? "") : "", {
+    skip: !isEdit || !props.open,
+  });
+
   const isSaving = isCreating || isUpdating;
   const error = createError || updateError;
 
@@ -70,17 +81,19 @@ export const UserModal = (props: UserModalProps) => {
     defaultValues: emptyForm,
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "roles",
   });
 
   useEffect(() => {
     if (props.open) {
-      reset(mapUserToForm(props.data));
+      const formData = mapUserToForm(props.data);
+      replace(formData.roles);
+      reset(formData);
       clearErrors();
     }
-  }, [props.open, props.data, reset, clearErrors]);
+  }, [props.open, props.data, reset, clearErrors, replace]);
 
   const onSubmit: SubmitHandler<UserFormInputs> = async (formData) => {
     try {
@@ -96,16 +109,12 @@ export const UserModal = (props: UserModalProps) => {
         return;
       }
 
-      // Construir memberships desde roles
-      // Si el usuario actual es ADMIN, asignar su assignmentId a los nuevos usuarios
-      const memberships: Membership[] = roles.map((role) => ({
-        role: role as Roles,
-        assignmentId:
-          activeRole === "ADMIN" && activeAssignmentId
-            ? activeAssignmentId
-            : "",
-        status: "ACTIVE",
-      }));
+      const memberships: Membership[] = buildMembershipPayload({
+        roles,
+        existingMemberships: props.data?.memberships ?? [],
+        activeAssignmentId,
+        activeRole,
+      });
 
       const basePayload = {
         name: formData.name.trim(),
@@ -277,6 +286,20 @@ export const UserModal = (props: UserModalProps) => {
               isSaving={isSaving}
               error={errors.roles?.message}
               roleOptions={roleOptions}
+              lockedIndexes={
+                props.data?.memberships?.reduce<number[]>(
+                  (acc, membership, index) => {
+                    if (
+                      membership.role === Roles.ADMIN &&
+                      Boolean(membership.assignmentId)
+                    ) {
+                      acc.push(index);
+                    }
+                    return acc;
+                  },
+                  [],
+                ) ?? []
+              }
             />
           </div>
         </div>
