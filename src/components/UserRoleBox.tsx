@@ -135,8 +135,7 @@ export const UserRoleBox = ({
                         onClick={() => onEdit(user)}
                         aria-label={`Editar usuario ${user.name} ${user.lastname}`}
                       >
-                        <i className="fa fa-edit me-1" />
-                        Editar
+                        <i className="fa fa-edit" /> Editar
                       </button>
                     </td>
                   </tr>

@@ -20,7 +20,7 @@ export const resolveRoleList = (
   // Determinar dinámicamente según el rol del usuario
   switch (userRole) {
     case Roles.SUPER_ADMIN:
-      return [Roles.ADMIN];
+      return [Roles.SUPER_ADMIN, Roles.ADMIN];
 
     case Roles.ADMIN:
       return [Roles.ASSISTANT, Roles.COACH, Roles.PARENT, Roles.ATHLETE];
