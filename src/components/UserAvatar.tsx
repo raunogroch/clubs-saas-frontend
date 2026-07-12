@@ -65,6 +65,7 @@ export const UserAvatar = ({
   const [hasImageError, setHasImageError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const cropperRef = useRef<ReactCropperElement>(null);
@@ -141,6 +142,7 @@ export const UserAvatar = ({
     if (!canvas) return;
 
     const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.9);
+    setIsSaving(true);
 
     try {
       const updatedUser = await uploadProfileImage({
@@ -165,6 +167,8 @@ export const UserAvatar = ({
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error al guardar foto:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -283,11 +287,24 @@ export const UserAvatar = ({
                   <button
                     className="btn btn-secondary"
                     onClick={resetModalState}
+                    disabled={isSaving}
                   >
                     Volver a elegir
                   </button>
-                  <button className="btn btn-primary" onClick={handleCropSave}>
-                    Guardar foto
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => void handleCropSave()}
+                    disabled={isSaving}
+                    aria-busy={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <span className="me-2 spinner-border spinner-border-sm" />
+                        Guardando...
+                      </>
+                    ) : (
+                      "Guardar foto"
+                    )}
                   </button>
                 </div>
               </div>
