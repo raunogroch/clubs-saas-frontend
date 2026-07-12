@@ -8,6 +8,32 @@ import type {
   PaginatedResponse,
 } from "../../core/interfaces";
 
+interface UserListQueryArgs {
+  role?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+  assignmentId?: string;
+}
+
+const buildUsersQueryUrl = (args?: UserListQueryArgs | void) => {
+  const params = new URLSearchParams();
+
+  if (args?.role) params.append("role", args.role);
+  if (args?.search) params.append("search", args.search);
+  if (args?.assignmentId) {
+    params.append("assignmentId", args.assignmentId);
+  }
+
+  const page = args?.page ?? 1;
+  const limit = args?.limit ?? 10;
+
+  params.append("page", page.toString());
+  params.append("limit", limit.toString());
+
+  return `/users?${params.toString()}`;
+};
+
 const api = createApi({
   reducerPath: "userApi",
   tagTypes: ["Users"],
@@ -15,38 +41,11 @@ const api = createApi({
     import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   ),
   endpoints: (builder) => ({
-    getUsers: builder.query<
-      PaginatedResponse<User>,
-      {
-        role?: string;
-        search?: string;
-        page?: number;
-        limit?: number;
-        assignmentId?: string;
-      } | void
-    >({
-      query: (args) => {
-        const params = new URLSearchParams();
-
-        if (args?.role) params.append("role", args.role);
-        if (args?.search) params.append("search", args.search);
-        if (args?.assignmentId) {
-          params.append("assignmentId", args.assignmentId);
-        }
-
-        const page = args?.page ?? 1;
-        const limit = args?.limit ?? 10;
-
-        params.append("page", page.toString());
-        params.append("limit", limit.toString());
-
-        const url = `/users?${params.toString()}`;
-
-        return {
-          url,
-          method: "GET",
-        };
-      },
+    getUsers: builder.query<PaginatedResponse<User>, UserListQueryArgs | void>({
+      query: (args) => ({
+        url: buildUsersQueryUrl(args),
+        method: "GET",
+      }),
       providesTags: (result) =>
         result
           ? [
@@ -80,6 +79,28 @@ const api = createApi({
           : [{ type: "Users", id: "LIST" }],
     }),
 
+    uploadProfileImage: builder.mutation<
+      User,
+      {
+        id: string;
+        base64Data: string;
+        type: string;
+      }
+    >({
+      query: ({ id, base64Data, type }) => ({
+        url: `/users/upload-file/${id}`,
+        method: "PATCH",
+        body: {
+          base64Data,
+          type,
+        },
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "Users", id: "LIST" },
+        { type: "Users", id },
+      ],
+    }),
+
     /**
      * Obtiene un usuario por ID con todos sus datos incluyendo assignments
      *
@@ -105,6 +126,7 @@ export const {
   useLazyGetUsersQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
+  useUploadProfileImageMutation,
   useGetUserByIdQuery,
   useLazyGetUserByIdQuery,
 } = api;

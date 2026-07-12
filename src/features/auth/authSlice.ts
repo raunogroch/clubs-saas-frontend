@@ -47,9 +47,12 @@ export const authSlice = createSlice({
      * Action para error en login
      */
     loginFailure: (state, action: PayloadAction<string>) => {
+      state.user = null;
+      state.token = null;
       state.loading = false;
       state.error = action.payload;
       state.isAuthenticated = false;
+      state.activeAssignmentId = null;
     },
 
     /**
@@ -85,28 +88,18 @@ export const authSlice = createSlice({
      */
     updateUser: (state, action: PayloadAction<User>) => {
       if (state.user) {
-        state.user = { ...state.user, ...action.payload };
+        state.user = {
+          ...state.user,
+          ...action.payload,
+          id: state.user.id,
+        };
       }
     },
-
-    /**
-     * Action para actualizar assignments del usuario autenticado
-     *
-     * Principios SOLID:
-     * - SRP: Una responsabilidad - actualizar solo assignments
-     * - DIP: Recibe array de UserAssignments (abstracción)
-     *
-     * @deprecated - Mantener para retrocompatibilidad, preferir updateUserMemberships
-     */
 
     /**
      * Action para actualizar memberships del usuario autenticado
      *
      * Nueva estructura de roles con estado por rol
-     *
-     * Principios SOLID:
-     * - SRP: Una responsabilidad - actualizar solo memberships
-     * - DIP: Recibe array de Membership (abstracción)
      */
     updateUserMemberships: (state, action: PayloadAction<Membership[]>) => {
       if (state.user) {

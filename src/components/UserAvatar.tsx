@@ -1,12 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Cropper, type ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.min.css";
+import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
+import { updateUser as updateAuthUser } from "../features/auth";
+import {
+  useLazyGetUserByIdQuery,
+  useUploadProfileImageMutation,
+} from "../features/users/userApi";
 import { Modal } from "./Modal";
 
 interface UserAvatarProps {
   imageUrl?: string | null;
   name?: string;
   size?: number;
+  userId?: string | null;
 }
 
 const resolveProfileImageUrl = (imageUrl?: string | null) => {
@@ -30,18 +37,49 @@ const resolveProfileImageUrl = (imageUrl?: string | null) => {
   return `${cleanedValue.slice(0, lastDotIndex)}_small${cleanedValue.slice(lastDotIndex)}`;
 };
 
+const readFileAsDataUrl = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        resolve(result);
+        return;
+      }
+
+      reject(new Error("No se pudo leer la imagen."));
+    };
+
+    reader.onerror = () => reject(new Error("No se pudo leer la imagen."));
+    reader.readAsDataURL(file);
+  });
+};
+
 export const UserAvatar = ({
   imageUrl,
   name = "Usuario",
   size = 40,
+  userId,
 }: UserAvatarProps) => {
   const [hasImageError, setHasImageError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const cropperRef = useRef<ReactCropperElement>(null);
-  const resolvedImageUrl = resolveProfileImageUrl(imageUrl);
-  const shouldShowPlaceholder = !resolvedImageUrl || hasImageError;
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const [uploadProfileImage] = useUploadProfileImageMutation();
+  const [triggerGetUserById] = useLazyGetUserByIdQuery();
+  const resolvedImageUrl = useMemo(
+    () => resolveProfileImageUrl(imageUrl),
+    [imageUrl],
+  );
+  const shouldShowPlaceholder = useMemo(
+    () => !resolvedImageUrl || hasImageError,
+    [resolvedImageUrl, hasImageError],
+  );
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -50,25 +88,24 @@ export const UserAvatar = ({
     }
   }, [isModalOpen]);
 
-  const handleOverlay = (
-    event: React.MouseEvent<HTMLDivElement>,
-    visible: boolean,
-  ) => {
-    const overlay = event.currentTarget.lastElementChild as HTMLElement | null;
-    if (overlay) overlay.style.opacity = visible ? "1" : "0";
+  const resetModalState = () => {
+    setSelectedImage(null);
+    setPreviewUrl(null);
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
+    try {
+      const result = await readFileAsDataUrl(file);
       setSelectedImage(result);
       setPreviewUrl(result);
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error al leer la imagen:", error);
+    }
   };
 
   const updatePreviewFromCropper = () => {
@@ -90,14 +127,45 @@ export const UserAvatar = ({
     setPreviewUrl(canvas.toDataURL("image/jpeg", 0.9));
   };
 
-  const handleCropSave = () => {
+  const handleCropSave = async () => {
     const cropper = cropperRef.current?.cropper;
-    if (!cropper) return;
+    if (!cropper || !userId) return;
 
-    const croppedDataUrl = cropper.getCroppedCanvas().toDataURL();
-    console.log("Base64 image:", croppedDataUrl);
-    setPreviewUrl(croppedDataUrl);
-    setSelectedImage(croppedDataUrl);
+    const canvas = cropper.getCroppedCanvas({
+      width: 180,
+      height: 180,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: "high",
+    });
+
+    if (!canvas) return;
+
+    const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.9);
+
+    try {
+      const updatedUser = await uploadProfileImage({
+        id: userId,
+        base64Data: croppedDataUrl,
+        type: "PROFILE_IMAGE",
+      }).unwrap();
+
+      const shouldUpdateAuthState = currentUser?.id === updatedUser.id;
+      if (shouldUpdateAuthState) {
+        dispatch(updateAuthUser(updatedUser));
+      }
+
+      const refreshedUser = await triggerGetUserById(userId).unwrap();
+
+      if (shouldUpdateAuthState && currentUser?.id === refreshedUser.id) {
+        dispatch(updateAuthUser(refreshedUser));
+      }
+
+      setPreviewUrl(croppedDataUrl);
+      setSelectedImage(croppedDataUrl);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error al guardar foto:", error);
+    }
   };
 
   return (
@@ -112,15 +180,15 @@ export const UserAvatar = ({
         }}
         title={name}
         aria-label={`Foto de perfil de ${name}`}
-        onMouseEnter={(event) => handleOverlay(event, true)}
-        onMouseLeave={(event) => handleOverlay(event, false)}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
         onClick={() => setIsModalOpen(true)}
       >
         {shouldShowPlaceholder ? (
           <i className="fa fa-camera" aria-hidden="true" />
         ) : (
           <img
-            src={resolvedImageUrl}
+            src={resolvedImageUrl ?? undefined}
             alt={`Foto de perfil de ${name}`}
             className="img-fluid w-100 h-100"
             style={{ objectFit: "cover" }}
@@ -132,7 +200,7 @@ export const UserAvatar = ({
           className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-circle"
           style={{
             backgroundColor: "rgba(0, 0, 0, 0.35)",
-            opacity: 0,
+            opacity: isHovering ? 1 : 0,
             transition: "opacity 0.2s ease-in-out",
             pointerEvents: "none",
           }}
@@ -214,10 +282,7 @@ export const UserAvatar = ({
                 <div className="d-flex justify-content-end gap-2 mt-3">
                   <button
                     className="btn btn-secondary"
-                    onClick={() => {
-                      setSelectedImage(null);
-                      setPreviewUrl(null);
-                    }}
+                    onClick={resetModalState}
                   >
                     Volver a elegir
                   </button>

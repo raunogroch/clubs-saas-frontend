@@ -51,6 +51,60 @@ export const UserRoleBox = ({
       roleLabel
     );
 
+  const renderUserRow = (user: User, index: number) => {
+    const fullName = `${user.name} ${user.lastname}`.trim();
+    const profileFile = user.files?.find(
+      (file) => file.type === "PROFILE_IMAGE",
+    );
+    const rowNumber = (page - 1) * pageSize + index + 1;
+
+    return (
+      <tr key={user.id}>
+        <td className="align-middle">
+          <UserAvatar
+            imageUrl={profileFile?.url}
+            name={fullName}
+            size={36}
+            userId={user.id}
+          />
+        </td>
+
+        <td className="align-middle">{rowNumber}</td>
+
+        <td className="align-middle">
+          <strong>{fullName}</strong>
+        </td>
+
+        <td className="align-middle">{user.username}</td>
+
+        <td className="align-middle">{user.dni ?? "-"}</td>
+
+        <td className="align-middle">{getGenderLabel(user.gender)}</td>
+
+        <td className="align-middle">
+          {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : "-"}
+        </td>
+
+        <td className="align-middle">{user.phone ?? "-"}</td>
+
+        <td className="align-middle">{user.address ?? "-"}</td>
+
+        <td className="align-middle">{getStatusLabel(user.status)}</td>
+
+        <td className="align-middle">
+          <button
+            type="button"
+            className="btn btn-sm btn-rounded btn-primary"
+            onClick={() => onEdit(user)}
+            aria-label={`Editar usuario ${fullName}`}
+          >
+            <i className="fa fa-edit" /> Editar
+          </button>
+        </td>
+      </tr>
+    );
+  };
+
   return (
     <IBox title={boxTitle} initialCollapsed={isMultipleRoles}>
       {isLoading && <p className="text-info mb-0">Cargando usuarios...</p>}
@@ -96,68 +150,7 @@ export const UserRoleBox = ({
               </thead>
 
               <tbody>
-                {users.map((user, index) => (
-                  <tr key={user.id}>
-                    <td className="align-middle">
-                      {(() => {
-                        const profileFile = user.files?.find(
-                          (file) => file.type === "PROFILE_IMAGE",
-                        );
-
-                        return (
-                          <UserAvatar
-                            imageUrl={profileFile?.url}
-                            name={`${user.name} ${user.lastname} ${profileFile?.url}`.trim()}
-                            size={36}
-                          />
-                        );
-                      })()}
-                    </td>
-
-                    <td className="align-middle">
-                      {(page - 1) * pageSize + index + 1}
-                    </td>
-
-                    <td className="align-middle">
-                      <strong>
-                        {user.name} {user.lastname}
-                      </strong>
-                    </td>
-
-                    <td className="align-middle">{user.username}</td>
-
-                    <td className="align-middle">{user.dni ?? "-"}</td>
-
-                    <td className="align-middle">
-                      {getGenderLabel(user.gender)}
-                    </td>
-
-                    <td className="align-middle">
-                      {user.birthDate
-                        ? new Date(user.birthDate).toLocaleDateString()
-                        : "-"}
-                    </td>
-
-                    <td className="align-middle">{user.phone ?? "-"}</td>
-
-                    <td className="align-middle">{user.address ?? "-"}</td>
-
-                    <td className="align-middle">
-                      {getStatusLabel(user.status)}
-                    </td>
-
-                    <td className="align-middle">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-rounded btn-primary"
-                        onClick={() => onEdit(user)}
-                        aria-label={`Editar usuario ${user.name} ${user.lastname}`}
-                      >
-                        <i className="fa fa-edit" /> Editar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {users.map((user, index) => renderUserRow(user, index))}
               </tbody>
             </table>
           </div>
