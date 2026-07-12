@@ -59,7 +59,6 @@ export const buildMembershipPayload = ({
       (activeRole === "ADMIN" && activeAssignmentId ? activeAssignmentId : "");
 
     return {
-      ...(existingMembership?.id ? { id: existingMembership.id } : {}),
       role,
       assignmentId,
       status: existingMembership?.status ?? "ACTIVE",

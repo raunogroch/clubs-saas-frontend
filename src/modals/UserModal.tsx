@@ -268,15 +268,17 @@ export const UserModal = (props: UserModalProps) => {
               disabled={isSaving}
             />
 
-            <InputForm<UserFormInputs>
-              title="Estado"
-              name="status"
-              register={register}
-              errors={errors}
-              type="select"
-              options={statusOptions}
-              disabled={isSaving}
-            />
+            {isEdit && (
+              <InputForm<UserFormInputs>
+                title="Estado"
+                name="status"
+                register={register}
+                errors={errors}
+                type="select"
+                options={statusOptions}
+                disabled={isSaving}
+              />
+            )}
 
             <RolesFieldArray
               fields={fields}
