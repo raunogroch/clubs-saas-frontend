@@ -32,6 +32,15 @@ export interface Membership {
   updatedAt?: string;
 }
 
+export interface UserFile {
+  id?: string;
+  type?: string;
+  url?: string;
+  mimeType?: string;
+  size?: number;
+  createdAt?: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -40,12 +49,14 @@ export interface User {
   username: string;
   password?: string;
   imageProfile?: string;
+  profile_image?: string | null;
   gender?: Gender;
   birthDate?: Date;
   phone?: string;
   address?: string;
   status?: Status;
   memberships?: Membership[];
+  files?: UserFile[];
 }
 
 export interface CreateUserDto {

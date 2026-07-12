@@ -1,6 +1,7 @@
 import React from "react";
 import { getGenderLabel, getStatusLabel, Roles, getRoleLabel } from "../common";
 import { IBox, PaginationOptions, PaginationTable } from "./index";
+import { UserAvatar } from "./UserAvatar";
 import type { User } from "../core/interfaces";
 
 interface UserRoleBoxProps {
@@ -80,6 +81,7 @@ export const UserRoleBox = ({
             <table className="table table-striped table-hover align-middle">
               <thead className="table-light">
                 <tr>
+                  <th>Foto</th>
                   <th>N°</th>
                   <th>Nombre</th>
                   <th>Usuario</th>
@@ -96,6 +98,22 @@ export const UserRoleBox = ({
               <tbody>
                 {users.map((user, index) => (
                   <tr key={user.id}>
+                    <td className="align-middle">
+                      {(() => {
+                        const profileFile = user.files?.find(
+                          (file) => file.type === "PROFILE_IMAGE",
+                        );
+
+                        return (
+                          <UserAvatar
+                            imageUrl={profileFile?.url}
+                            name={`${user.name} ${user.lastname} ${profileFile?.url}`.trim()}
+                            size={36}
+                          />
+                        );
+                      })()}
+                    </td>
+
                     <td className="align-middle">
                       {(page - 1) * pageSize + index + 1}
                     </td>

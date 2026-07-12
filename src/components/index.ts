@@ -22,5 +22,6 @@ export * from "./RolesDropdown";
 export * from "./LabelHighlight";
 export * from "./RolesHighlight";
 export * from "./UserRoleBox";
+export * from "./UserAvatar";
 export * from "./MembershipsDebugger";
 export * from "./ReduxDebugger";
