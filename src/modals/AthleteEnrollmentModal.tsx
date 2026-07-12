@@ -17,7 +17,6 @@ import type {
   Membership,
   User,
 } from "../core/interfaces";
-import { useDebounce } from "../hooks/useDebounce";
 
 interface AthleteEnrollmentModalProps {
   open: boolean;
@@ -108,11 +107,11 @@ export const AthleteEnrollmentModal = ({
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [isUsernameManuallyEdited, setIsUsernameManuallyEdited] =
     useState(false);
-  const [usernameAvailability, setUsernameAvailability] = useState<
-    "idle" | "checking" | "available" | "taken"
+  const [dniLookupStatus, setDniLookupStatus] = useState<
+    "idle" | "checking" | "found" | "not-found"
   >("idle");
-  const [usernameAvailabilityMessage, setUsernameAvailabilityMessage] =
-    useState<string | null>(null);
+  const [existingAthleteLookup, setExistingAthleteLookup] =
+    useState<User | null>(null);
 
   const {
     createUser,
@@ -145,11 +144,62 @@ export const AthleteEnrollmentModal = ({
   const watchedLastname = useWatch({ control, name: "lastname" }) as
     | string
     | undefined;
+  const watchedDni = useWatch({ control, name: "dni" }) as string | undefined;
   const watchedUsername = useWatch({ control, name: "username" }) as
     | string
     | undefined;
-  const debouncedUsername = useDebounce(watchedUsername?.trim() ?? "", 400);
   const isEditMode = Boolean(athlete?.id);
+  const [hasPerformedLookup, setHasPerformedLookup] = useState(false);
+  const shouldShowProfileFields =
+    isEditMode ||
+    dniLookupStatus === "found" ||
+    dniLookupStatus === "not-found" ||
+    hasPerformedLookup;
+  const applyExistingAthleteToForm = (user?: User | null) => {
+    if (!user) {
+      return;
+    }
+
+    setIsUsernameManuallyEdited(true);
+    setValue("name", user.name ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("lastname", user.lastname ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("dni", user.dni ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("username", user.username ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("gender", user.gender ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue(
+      "birthDate",
+      user.birthDate
+        ? new Date(user.birthDate).toISOString().split("T")[0]
+        : "",
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+    setValue("phone", user.phone ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("address", user.address ?? "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -160,8 +210,9 @@ export const AthleteEnrollmentModal = ({
       setFormError(null);
       setFormSuccess(null);
       setIsUsernameManuallyEdited(Boolean(athlete?.id));
-      setUsernameAvailability("idle");
-      setUsernameAvailabilityMessage(null);
+      setDniLookupStatus("idle");
+      setExistingAthleteLookup(null);
+      setHasPerformedLookup(false);
     }, 0);
   }, [open, athlete, reset]);
 
@@ -193,62 +244,6 @@ export const AthleteEnrollmentModal = ({
     setValue,
   ]);
 
-  useEffect(() => {
-    const candidate = debouncedUsername.trim();
-
-    if (!candidate) {
-      // Deferir para evitar setState síncrono en el effect
-      setTimeout(() => {
-        setUsernameAvailability("idle");
-        setUsernameAvailabilityMessage(null);
-      }, 0);
-      return;
-    }
-
-    let ignore = false;
-
-    const checkAvailability = async () => {
-      setUsernameAvailability("checking");
-      setUsernameAvailabilityMessage("Verificando disponibilidad...");
-
-      try {
-        const response = await triggerGetUsers({
-          search: candidate,
-          page: 1,
-          limit: 10,
-        }).unwrap();
-
-        if (ignore) {
-          return;
-        }
-
-        const isTaken = response?.data?.some(
-          (user) =>
-            user.id !== athlete?.id &&
-            user.username?.trim().toLowerCase() === candidate.toLowerCase(),
-        );
-
-        setUsernameAvailability(isTaken ? "taken" : "available");
-        setUsernameAvailabilityMessage(
-          isTaken
-            ? "El nombre de usuario ya está en uso."
-            : "El nombre de usuario está disponible.",
-        );
-      } catch {
-        if (!ignore) {
-          setUsernameAvailability("idle");
-          setUsernameAvailabilityMessage(null);
-        }
-      }
-    };
-
-    checkAvailability();
-
-    return () => {
-      ignore = true;
-    };
-  }, [athlete?.id, debouncedUsername, triggerGetUsers]);
-
   const onSubmit = handleSubmit(async (formData) => {
     setFormError(null);
     setFormSuccess(null);
@@ -274,10 +269,6 @@ export const AthleteEnrollmentModal = ({
       const normalizedDni = formData.dni.trim();
       const normalizedUsername = formData.username.trim();
 
-      if (normalizedUsername && usernameAvailability === "taken") {
-        setFormError("El nombre de usuario no está disponible.");
-        return;
-      }
       const normalizedPhone = formData.phone?.trim() || undefined;
       const normalizedAddress = formData.address?.trim() || undefined;
       const normalizedBirthDate = formData.birthDate
@@ -302,24 +293,36 @@ export const AthleteEnrollmentModal = ({
         status: "ACTIVE",
       };
 
-      let resolvedUser: User | undefined;
-
-      if (isEditMode && athlete?.id) {
-        const existingMemberships = athlete.memberships ?? [];
+      const buildMembershipsForAssignment = (user?: User | null) => {
+        const existingMemberships = (user?.memberships ?? []).map(
+          (membership: Membership) => {
+            const nextMembership = { ...membership } as Membership & {
+              id?: string;
+            };
+            delete nextMembership.id;
+            return nextMembership;
+          },
+        );
         const hasAthleteMembership = existingMemberships.some(
           (membership: Membership) =>
             membership.role === Roles.ATHLETE &&
             membership.assignmentId === assignmentId,
         );
 
-        const nextMemberships = hasAthleteMembership
-          ? existingMemberships
-          : [...existingMemberships, initialMembership as Membership];
+        if (hasAthleteMembership) {
+          return existingMemberships;
+        }
 
+        return [...existingMemberships, initialMembership as Membership];
+      };
+
+      let resolvedUser: User | undefined;
+
+      if (isEditMode && athlete?.id) {
         const updatePayload: UpdateUserDto = {
           id: athlete.id,
           ...commonProfilePayload,
-          memberships: nextMemberships,
+          memberships: buildMembershipsForAssignment(athlete),
         };
 
         await updateUser(updatePayload);
@@ -327,24 +330,25 @@ export const AthleteEnrollmentModal = ({
           ...athlete,
           ...commonProfilePayload,
           id: athlete.id,
-          memberships: nextMemberships,
+          memberships: buildMembershipsForAssignment(athlete),
         };
       } else {
         const usersResponse = await triggerGetUsers({
-          role: Roles.ATHLETE,
-          assignmentId,
           page: 1,
           limit: 20,
           search: normalizedUsername || normalizedDni,
         }).unwrap();
 
-        const existingUser = usersResponse?.data?.find((user) => {
-          const matchesUsername =
-            user.username?.trim().toLowerCase() ===
-            normalizedUsername.toLowerCase();
-          const matchesDni = user.dni?.trim() === normalizedDni;
-          return matchesUsername || matchesDni;
-        });
+        const existingUser =
+          existingAthleteLookup ??
+          usersResponse?.data?.find((user) => {
+            const matchesUsername =
+              user.username?.trim().toLowerCase() ===
+              normalizedUsername.toLowerCase();
+            const matchesDni =
+              user.dni?.trim().toLowerCase() === normalizedDni.toLowerCase();
+            return matchesUsername || matchesDni;
+          });
 
         resolvedUser = existingUser;
 
@@ -363,34 +367,14 @@ export const AthleteEnrollmentModal = ({
 
           resolvedUser = createdUser as typeof createdUser & { id: string };
         } else {
-          const hasAthleteMembership = resolvedUser.memberships?.some(
-            (membership: Membership) =>
-              membership.role === Roles.ATHLETE &&
-              membership.assignmentId === assignmentId,
-          );
+          const nextMemberships = buildMembershipsForAssignment(resolvedUser);
+          const updatePayload: UpdateUserDto = {
+            id: resolvedUser.id,
+            ...commonProfilePayload,
+            memberships: nextMemberships,
+          };
 
-          if (!hasAthleteMembership) {
-            const nextMemberships = [
-              ...(resolvedUser.memberships ?? []),
-              initialMembership as Membership,
-            ];
-
-            const updatePayload: UpdateUserDto = {
-              id: resolvedUser.id,
-              ...commonProfilePayload,
-              memberships: nextMemberships,
-            };
-
-            await updateUser(updatePayload);
-          } else {
-            const updatePayload: UpdateUserDto = {
-              id: resolvedUser.id,
-              ...commonProfilePayload,
-              memberships: resolvedUser.memberships ?? [],
-            };
-
-            await updateUser(updatePayload);
-          }
+          await updateUser(updatePayload);
         }
       }
 
@@ -469,136 +453,208 @@ export const AthleteEnrollmentModal = ({
           </div>
         )}
 
-        <div className="row">
-          <div className="col-md-6">
-            <FormRow
-              label="Nombre"
-              className="mb-3"
-              error={errors.name?.message}
-            >
-              <input
-                className="form-control"
-                {...register("name", { required: "El nombre es obligatorio" })}
-                disabled={isSaving}
-              />
-            </FormRow>
-          </div>
-
-          <div className="col-md-6">
-            <FormRow
-              label="Apellido"
-              className="mb-3"
-              error={errors.lastname?.message}
-            >
-              <input
-                className="form-control"
-                {...register("lastname", {
-                  required: "El apellido es obligatorio",
-                })}
-                disabled={isSaving}
-              />
-            </FormRow>
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-md-6">
-            <FormRow
-              label="Carnet"
-              className="mb-3"
-              error={errors.dni?.message}
-            >
+        {!hasPerformedLookup && (
+          <FormRow
+            label="DNI / Carnet"
+            className="mb-3"
+            error={errors.dni?.message}
+          >
+            <div className="input-group">
               <input
                 className="form-control"
                 {...register("dni", { required: "El carnet es obligatorio" })}
+                placeholder="Ingrese el carnet para buscar"
                 disabled={isSaving}
               />
-            </FormRow>
-          </div>
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => {
+                  const candidate = watchedDni?.trim() ?? "";
 
-          <div className="col-md-6">
-            <FormRow
-              label="Usuario"
-              className="mb-3"
-              error={errors.username?.message}
-            >
-              <div className="position-relative">
-                <input
-                  className="form-control pe-5"
-                  {...register("username", {
-                    required: "El usuario es obligatorio",
-                  })}
-                  disabled={isSaving}
-                  onChange={(event) => {
-                    register("username").onChange(event);
-                    setIsUsernameManuallyEdited(true);
-                  }}
-                />
-                {usernameAvailability === "available" && (
-                  <span
-                    className="position-absolute top-50 end-0 translate-middle-y me-3 text-success"
-                    style={{ right: "10px" }}
-                    aria-label="Usuario disponible"
-                    title="Usuario disponible"
-                  >
-                    <i className="fa fa-check-circle" />
-                  </span>
-                )}
+                  if (!candidate) {
+                    setDniLookupStatus("idle");
+                    setExistingAthleteLookup(null);
+                    setHasPerformedLookup(false);
+                    return;
+                  }
+
+                  setHasPerformedLookup(true);
+                  setDniLookupStatus("checking");
+
+                  void triggerGetUsers({
+                    page: 1,
+                    limit: 20,
+                    search: candidate,
+                  })
+                    .unwrap()
+                    .then((response) => {
+                      const matchedUser = response?.data?.find((user) => {
+                        const normalizedCandidate = candidate.toLowerCase();
+                        const matchesDni =
+                          user.dni?.trim().toLowerCase() ===
+                          normalizedCandidate;
+                        const matchesUsername =
+                          user.username?.trim().toLowerCase() ===
+                          normalizedCandidate;
+                        return matchesDni || matchesUsername;
+                      });
+
+                      if (matchedUser) {
+                        applyExistingAthleteToForm(matchedUser);
+                        setExistingAthleteLookup(matchedUser);
+                        setDniLookupStatus("found");
+                      } else {
+                        setExistingAthleteLookup(null);
+                        setDniLookupStatus("not-found");
+                        setValue("name", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("lastname", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("dni", candidate, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("username", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("gender", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("birthDate", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("phone", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        setValue("address", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }
+                    })
+                    .catch(() => {
+                      setDniLookupStatus("idle");
+                      setExistingAthleteLookup(null);
+                      setHasPerformedLookup(false);
+                    });
+                }}
+                disabled={isSaving || !watchedDni?.trim()}
+              >
+                <i className="fa fa-search" /> Buscar
+              </button>
+            </div>
+          </FormRow>
+        )}
+
+        {shouldShowProfileFields && (
+          <>
+            <div className="row">
+              <div className="col-md-6">
+                <FormRow
+                  label="Nombre"
+                  className="mb-3"
+                  error={errors.name?.message}
+                >
+                  <input
+                    className="form-control"
+                    {...register("name", {
+                      required: "El nombre es obligatorio",
+                    })}
+                    disabled={isSaving}
+                  />
+                </FormRow>
               </div>
-              {usernameAvailability === "taken" &&
-                usernameAvailabilityMessage && (
-                  <small className="text-danger d-block mt-1">
-                    {usernameAvailabilityMessage}
-                  </small>
-                )}
-            </FormRow>
-          </div>
-        </div>
 
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Género</label>
-            <select
-              className="form-control"
-              {...register("gender")}
-              disabled={isSaving}
-            >
-              <option value="">No especificado</option>
-              <option value="MALE">Masculino</option>
-              <option value="FEMALE">Femenino</option>
-            </select>
-          </div>
+              <div className="col-md-6">
+                <FormRow
+                  label="Apellido"
+                  className="mb-3"
+                  error={errors.lastname?.message}
+                >
+                  <input
+                    className="form-control"
+                    {...register("lastname", {
+                      required: "El apellido es obligatorio",
+                    })}
+                    disabled={isSaving}
+                  />
+                </FormRow>
+              </div>
+            </div>
 
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Fecha de nacimiento</label>
-            <input
-              type="date"
-              className="form-control"
-              {...register("birthDate")}
-              disabled={isSaving}
-            />
-          </div>
-        </div>
+            <div className="row">
+              <div className="col-md-6">
+                <FormRow
+                  label="Carnet"
+                  className="mb-3"
+                  error={errors.dni?.message}
+                >
+                  <input
+                    className="form-control"
+                    {...register("dni", {
+                      required: "El carnet es obligatorio",
+                    })}
+                    disabled={isSaving || hasPerformedLookup}
+                  />
+                </FormRow>
+              </div>
+            </div>
 
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Teléfono</label>
-            <input
-              className="form-control"
-              {...register("phone")}
-              disabled={isSaving}
-            />
-          </div>
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Género</label>
+                <select
+                  className="form-control"
+                  {...register("gender")}
+                  disabled={isSaving}
+                >
+                  <option value="">No especificado</option>
+                  <option value="MALE">Masculino</option>
+                  <option value="FEMALE">Femenino</option>
+                </select>
+              </div>
 
-          <div className="col-md-6 mb-3">
-            <label className="form-label">Dirección</label>
-            <input
-              className="form-control"
-              {...register("address")}
-              disabled={isSaving}
-            />
-          </div>
-        </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Fecha de nacimiento</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  {...register("birthDate")}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Teléfono</label>
+                <input
+                  className="form-control"
+                  {...register("phone")}
+                  disabled={isSaving}
+                />
+              </div>
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Dirección</label>
+                <input
+                  className="form-control"
+                  {...register("address")}
+                  disabled={isSaving}
+                />
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="d-flex justify-content-end gap-2 mt-3">
           <button

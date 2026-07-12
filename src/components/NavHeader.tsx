@@ -68,7 +68,7 @@ export const NavHeader = () => {
           </li>
           <li>
             <Button
-              text="Log out"
+              text="Cerrar Sesión"
               icon={{ icon: "fa fa-sign-out" }}
               onClick={handleLogout}
             />
