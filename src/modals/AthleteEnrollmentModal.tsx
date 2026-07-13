@@ -396,7 +396,6 @@ export const AthleteEnrollmentModal = ({
               enrollmentDate: new Date().toISOString(),
               joinedAt: null,
               leftAt: null,
-              available: true,
             },
           ],
         });

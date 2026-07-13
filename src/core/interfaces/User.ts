@@ -11,9 +11,12 @@ export interface UserAssignments {
   userId: string;
   assignmentId: string;
   status: Status | string;
+  createdBy?: string;
+  updatedBy?: string;
+  deletedBy?: string | null;
   createdAt: string;
   updatedAt: string;
-  available?: boolean | null;
+  deletedAt?: string | null;
 }
 
 /**
@@ -57,6 +60,12 @@ export interface User {
   status?: Status;
   memberships?: Membership[];
   files?: UserFile[];
+  createdBy?: string;
+  updatedBy?: string;
+  deletedBy?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
 }
 
 export interface CreateUserDto {

@@ -44,7 +44,7 @@ export const AssignmentPage = () => {
     limit: pageSize,
   });
 
-  const { getOwnerNames } = useAssignmentOwners();
+  const { getAdministratorNames } = useAssignmentOwners();
 
   const handleCreateAssignment = useCallback(() => {
     setModalMode("name");
@@ -59,9 +59,9 @@ export const AssignmentPage = () => {
     [handleEdit],
   );
 
-  const handleManageOwners = useCallback(
+  const handleManageAdministrators = useCallback(
     (assignment: Assignment) => {
-      setModalMode("owners");
+      setModalMode("administrators");
       handleEdit(assignment);
     },
     [handleEdit],
@@ -134,9 +134,9 @@ export const AssignmentPage = () => {
                 assignments={assignments}
                 page={page}
                 pageSize={pageSize}
-                getOwnerNames={getOwnerNames}
+                getAdministratorNames={getAdministratorNames}
                 onEdit={handleEditName}
-                onManageOwners={handleManageOwners}
+                onManageAdministrators={handleManageAdministrators}
               />
 
               <PaginationTable

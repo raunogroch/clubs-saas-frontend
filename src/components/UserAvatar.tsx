@@ -68,6 +68,7 @@ export const UserAvatar = ({
   const [isSaving, setIsSaving] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageCacheVersion, setImageCacheVersion] = useState(() => Date.now());
   const cropperRef = useRef<ReactCropperElement>(null);
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.auth.user);
@@ -81,6 +82,12 @@ export const UserAvatar = ({
     () => !resolvedImageUrl || hasImageError,
     [resolvedImageUrl, hasImageError],
   );
+  const displayImageUrl = useMemo(() => {
+    if (!resolvedImageUrl) return null;
+
+    const separator = resolvedImageUrl.includes("?") ? "&" : "?";
+    return `${resolvedImageUrl}${separator}t=${imageCacheVersion}`;
+  }, [resolvedImageUrl, imageCacheVersion]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -164,6 +171,8 @@ export const UserAvatar = ({
 
       setPreviewUrl(croppedDataUrl);
       setSelectedImage(croppedDataUrl);
+      setImageCacheVersion(Date.now());
+      setHasImageError(false);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error al guardar foto:", error);
@@ -192,7 +201,8 @@ export const UserAvatar = ({
           <i className="fa fa-camera" aria-hidden="true" />
         ) : (
           <img
-            src={resolvedImageUrl ?? undefined}
+            key={displayImageUrl ?? `avatar-${userId ?? "default"}`}
+            src={displayImageUrl ?? undefined}
             alt={`Foto de perfil de ${name}`}
             className="img-fluid w-100 h-100"
             style={{ objectFit: "cover" }}

@@ -119,7 +119,6 @@ export interface GroupEnrollmentPayload {
     enrollmentDate?: string;
     joinedAt?: string | null;
     leftAt?: string | null;
-    available?: boolean;
   }>;
 }
 
@@ -141,8 +140,12 @@ export interface Group {
   coaches?: GroupCoach[];
   schedules?: GroupSchedule[];
   enrollments?: Enrollment[];
+  createdBy?: string;
+  updatedBy?: string;
+  deletedBy?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  deletedAt?: string | null;
 }
 
 export interface GroupListResponse {

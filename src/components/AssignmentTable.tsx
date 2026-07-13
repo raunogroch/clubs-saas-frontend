@@ -1,7 +1,7 @@
 import type { AssignmentTableProps } from "../core/interfaces";
 
 export const AssignmentTable = (props: AssignmentTableProps) => {
-  const { assignments, page, pageSize, onEdit, onManageOwners } = props;
+  const { assignments, page, pageSize, onEdit, onManageAdministrators } = props;
 
   return (
     <div className="table-responsive">
@@ -10,17 +10,17 @@ export const AssignmentTable = (props: AssignmentTableProps) => {
           <tr>
             <th>N°</th>
             <th>Nombre</th>
-            <th>Propietarios</th>
+            <th>Administradores</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {assignments.map((assignment, index) => {
-            const ownerCount = assignment.owners?.length ?? 0;
-            const ownerLabel =
-              ownerCount === 0
+            const administratorCount = assignment.administrators?.length ?? 0;
+            const administratorLabel =
+              administratorCount === 0
                 ? "0 asignados"
-                : `${ownerCount} ${ownerCount === 1 ? "propietario" : "propietarios"}`;
+                : `${administratorCount} ${administratorCount === 1 ? "administrador" : "administradores"}`;
 
             return (
               <tr key={assignment.id}>
@@ -32,12 +32,12 @@ export const AssignmentTable = (props: AssignmentTableProps) => {
                   <div className="d-flex align-items-center gap-2 flex-wrap">
                     <button
                       className="btn btn-rounded btn-sm btn-outline-primary"
-                      onClick={() => onManageOwners(assignment)}
-                      aria-label={`Gestionar propietarios de ${assignment.name}`}
+                      onClick={() => onManageAdministrators(assignment)}
+                      aria-label={`Gestionar administradores de ${assignment.name}`}
                     >
                       <i className="fa fa-user-plus me-1" />
                     </button>
-                    <span>{ownerLabel}</span>
+                    <span>{administratorLabel}</span>
                   </div>
                 </td>
                 <td className="align-middle">

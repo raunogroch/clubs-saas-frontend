@@ -2,7 +2,6 @@ import type {
   AdministratorSearchInputProps,
   AdministratorSearchResultsProps,
   AdministratorSelectionTableProps,
-  User,
 } from "../core/interfaces";
 
 export const OwnerSearchInput = (props: AdministratorSearchInputProps) => {
@@ -62,28 +61,36 @@ export const OwnerSearchResults = (props: AdministratorSearchResultsProps) => {
         </div>
       ) : (
         <div>
-          {filteredUsers.map((user: User) => (
-            <button
-              key={user.id}
-              type="button"
-              className="w-100 text-start p-2 border-0 bg-white owner-search-button"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                onSelectUser(user.id, user);
-              }}
-              disabled={isSaving}
-            >
-              <div className="d-flex align-items-center">
-                <div className="flex-grow-1">
-                  <div className="fw-500 small">
-                    {user.lastname}, {user.name}
+          {filteredUsers.map(
+            (user: {
+              id: string;
+              username: string;
+              lastname: string;
+              name: string;
+              dni?: string;
+            }) => (
+              <button
+                key={user.id}
+                type="button"
+                className="w-100 text-start p-2 border-0 bg-white owner-search-button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onSelectUser(user.id, user as never);
+                }}
+                disabled={isSaving}
+              >
+                <div className="d-flex align-items-center">
+                  <div className="flex-grow-1">
+                    <div className="fw-500 small">
+                      {user.lastname}, {user.name}
+                    </div>
+                    <small className="text-muted">{user.dni}</small>
                   </div>
-                  <small className="text-muted">{user.dni}</small>
+                  <span className="fa fa-plus text-primary ms-2" />
                 </div>
-                <span className="fa fa-plus text-primary ms-2" />
-              </div>
-            </button>
-          ))}
+              </button>
+            ),
+          )}
         </div>
       )}
     </div>
@@ -111,27 +118,35 @@ export const OwnerSelectionTable = (
               </tr>
             </thead>
             <tbody>
-              {selectedUsers.map((user: User) => (
-                <tr key={user.id}>
-                  <td className="align-middle">
-                    <div className="fw-600">
-                      {user.lastname}, {user.name}
-                    </div>
-                  </td>
-                  <td className="align-middle">{user.dni}</td>
-                  <td className="text-center">
-                    <button
-                      type="button"
-                      className="btn btn-rounded btn-sm btn-danger"
-                      onClick={() => onRemove(user.id)}
-                      disabled={isSaving}
-                      title="Remover"
-                    >
-                      <span className="fa fa-trash" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {selectedUsers.map(
+                (user: {
+                  id: string;
+                  username: string;
+                  lastname: string;
+                  name: string;
+                  dni?: string;
+                }) => (
+                  <tr key={user.id}>
+                    <td className="align-middle">
+                      <div className="fw-600">
+                        {user.lastname}, {user.name}
+                      </div>
+                    </td>
+                    <td className="align-middle">{user.dni}</td>
+                    <td className="text-center">
+                      <button
+                        type="button"
+                        className="btn btn-rounded btn-sm btn-danger"
+                        onClick={() => onRemove(user.id)}
+                        disabled={isSaving}
+                        title="Remover"
+                      >
+                        <span className="fa fa-trash" />
+                      </button>
+                    </td>
+                  </tr>
+                ),
+              )}
             </tbody>
           </table>
         </div>

@@ -4,7 +4,7 @@ import type { AssignmentModalProps } from "../core/interfaces";
 
 type Inputs = {
   name: string;
-  owners: string[];
+  administrators: string[];
 };
 
 interface UseAssignmentModalFormReturn {
@@ -24,7 +24,7 @@ export const useAssignmentModalForm = (
     mode: "onBlur",
     defaultValues: {
       name: "",
-      owners: [],
+      administrators: [],
     },
   });
 
@@ -35,11 +35,15 @@ export const useAssignmentModalForm = (
     if (open) {
       reset({
         name: data?.name ?? "",
-        owners: data?.owners ?? [],
+        administrators: (data?.administrators ?? []).map((administrator) =>
+          typeof administrator === "string"
+            ? administrator
+            : (administrator.userId ?? ""),
+        ),
       });
       clearErrors();
     }
-  }, [open, data?.id, data?.name, data?.owners, reset, clearErrors]);
+  }, [open, data?.id, data?.name, data?.administrators, reset, clearErrors]);
 
   const onClearErrors = useCallback(() => {
     clearErrors();

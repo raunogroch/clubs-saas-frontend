@@ -9,14 +9,12 @@ export const useModalInitialization = (
   const ownerSearch = useOwnerSearch();
   const { initializeOwners, loadSelectedUsers, owners } = ownerSearch;
 
-  // Inicializa propietarios solo cuando se abre el modal o cambian los datos
   useEffect(() => {
     if (open) {
       initializeOwners(data);
     }
   }, [open, data, initializeOwners]);
 
-  // Carga usuarios seleccionados cuando cambian los IDs de propietarios
   useEffect(() => {
     if (owners.length > 0) {
       loadSelectedUsers();

@@ -18,9 +18,12 @@ export interface Club {
   country: string;
   assignmentId: string;
   status: ClubStatus;
-  available?: boolean;
+  createdBy?: string;
+  updatedBy?: string;
+  deletedBy?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  deletedAt?: string | null;
 }
 
 export interface ClubListResponse {
@@ -44,7 +47,6 @@ export interface CreateClubDto {
   country: string;
   assignmentId: string;
   status?: ClubStatus;
-  available?: boolean;
 }
 
 export interface UpdateClubDto extends CreateClubDto {

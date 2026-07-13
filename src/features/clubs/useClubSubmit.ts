@@ -41,7 +41,6 @@ export const useClubSubmit = (
         country: formData.country.trim(),
         assignmentId: formData.assignmentId.trim(),
         status: formData.status as ClubStatus,
-        available: true,
       };
 
       if (isEdit && data?.id) {

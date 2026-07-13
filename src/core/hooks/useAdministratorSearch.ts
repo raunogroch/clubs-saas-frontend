@@ -48,7 +48,7 @@ export const useOwnerSearch = () => {
     }
   }, [showSearchResults]);
 
-  const initializeOwners = useCallback(
+  const initializeAdministrators = useCallback(
     (data?: { administrators?: Array<string | { userId?: string }> }) => {
       let administratorUserIds: string[] = [];
       if (data?.administrators && data.administrators.length > 0) {
@@ -124,7 +124,7 @@ export const useOwnerSearch = () => {
       searchContainerRef,
       filteredUsers,
       isLoadingUsers,
-      initializeOwners,
+      initializeOwners: initializeAdministrators,
       loadSelectedUsers,
       handleAddOwner,
       handleRemoveOwner,
@@ -138,7 +138,7 @@ export const useOwnerSearch = () => {
       selectedUsers,
       filteredUsers,
       isLoadingUsers,
-      initializeOwners,
+      initializeAdministrators,
       loadSelectedUsers,
       handleAddOwner,
       handleRemoveOwner,

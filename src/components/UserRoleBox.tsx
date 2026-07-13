@@ -53,16 +53,13 @@ export const UserRoleBox = ({
 
   const renderUserRow = (user: User, index: number) => {
     const fullName = `${user.name} ${user.lastname}`.trim();
-    const profileFile = user.files?.find(
-      (file) => file.type === "PROFILE_IMAGE",
-    );
     const rowNumber = (page - 1) * pageSize + index + 1;
 
     return (
       <tr key={user.id}>
         <td className="align-middle">
           <UserAvatar
-            imageUrl={profileFile?.url}
+            imageUrl={`http://localhost:3000/api/files/${user?.id}/PROFILE_IMAGE/small`}
             name={fullName}
             size={36}
             userId={user.id}

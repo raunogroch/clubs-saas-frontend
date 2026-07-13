@@ -1,17 +1,21 @@
 import type { User } from "./User";
 
+export type AssignmentAdministratorReference = string | { userId?: string };
+
 export interface Assignment {
   id: string;
   name: string;
-  owners?: string[];
+  administrators?: AssignmentAdministratorReference[];
   clubs?: string[];
   createdBy?: string;
   updatedBy?: string;
+  deletedBy?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  deletedAt?: string | null;
 }
 
-export type AssignmentModalMode = "full" | "name" | "owners";
+export type AssignmentModalMode = "full" | "name" | "administrators";
 
 export interface AssignmentModalProps {
   open: boolean;
@@ -27,7 +31,7 @@ export interface AssignmentTableStateProps {
   isEmpty: boolean;
 }
 
-export interface OwnerSearchInputProps {
+export interface AdministratorSearchInputProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
   showResults: boolean;
@@ -40,18 +44,20 @@ export interface AssignmentTableProps {
   assignments: Assignment[];
   page: number;
   pageSize: number;
-  getOwnerNames: (owners?: Array<string | { userId?: string }>) => string[];
+  getAdministratorNames: (
+    administrators?: AssignmentAdministratorReference[],
+  ) => string[];
   onEdit: (assignment: Assignment) => void;
-  onManageOwners: (assignment: Assignment) => void;
+  onManageAdministrators: (assignment: Assignment) => void;
 }
 
-export interface OwnerSelectionTableProps {
+export interface AdministratorSelectionTableProps {
   selectedUsers: User[];
   isSaving: boolean;
   onRemove: (userId: string) => void;
 }
 
-export interface OwnerSearchResultsProps {
+export interface AdministratorSearchResultsProps {
   searchTerm: string;
   debouncedSearchTerm: string;
   isLoadingUsers: boolean;

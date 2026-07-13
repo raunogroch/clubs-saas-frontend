@@ -37,7 +37,10 @@ export const Sidenav = () => {
         <ul className="nav metismenu" id="side-menu">
           <li className="nav-header">
             <MenuProfile
-              imageUrl={user?.imageProfile || "assets/img/profile_empty.jpeg"}
+              imageUrl={
+                `http://localhost:3000/api/files/${user?.id}/PROFILE_IMAGE/small` ||
+                "assets/img/profile_empty.jpeg"
+              }
               name={
                 user?.name
                   ? `${user.name} ${user.lastname || ""}`.trim()

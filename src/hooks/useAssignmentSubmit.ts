@@ -10,14 +10,14 @@ import type {
 
 type Inputs = {
   name: string;
-  owners: string[];
+  administrators: string[];
 };
 
 import { error as logError } from "../app/logger";
 
 interface UseAssignmentSubmitOptions {
   data?: AssignmentModalProps["data"];
-  ownerIds: string[];
+  administratorIds: string[];
   mode?: AssignmentModalMode;
   onSaved?: () => void;
   onClose: () => void;
@@ -36,7 +36,7 @@ interface UseAssignmentSubmitReturn {
  */
 export const useAssignmentSubmit = ({
   data,
-  ownerIds,
+  administratorIds,
   mode = "full",
   onSaved,
   onClose,
@@ -65,25 +65,25 @@ export const useAssignmentSubmit = ({
           await updateAssignment({
             id: data.id,
             name: formData.name,
-            owners: data?.owners ?? ownerIds,
+            administrators: data?.administrators ?? administratorIds,
           });
-        } else if (mode === "owners") {
+        } else if (mode === "administrators") {
           await updateAssignment({
             id: data.id,
             name: data?.name ?? formData.name,
-            owners: ownerIds,
+            administrators: administratorIds,
           });
         } else {
           await updateAssignment({
             id: data.id,
             name: formData.name,
-            owners: ownerIds,
+            administrators: administratorIds,
           });
         }
       } else {
         await createAssignment({
           name: formData.name,
-          owners: ownerIds,
+          administrators: administratorIds,
         });
       }
 

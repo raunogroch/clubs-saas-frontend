@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useUsers } from "../../features/users";
 import { Roles } from "../../common/enums";
+import type { AssignmentAdministratorReference } from "../interfaces";
 
 export const useAssignmentOwners = () => {
   const { users: allAdminUsers } = useUsers({
@@ -17,7 +18,7 @@ export const useAssignmentOwners = () => {
   }, [allAdminUsers]);
 
   const getAdministratorNames = (
-    administrators?: Array<string | { userId?: string }>,
+    administrators?: AssignmentAdministratorReference[],
   ): string[] => {
     if (!administrators || administrators.length === 0) return [];
 
@@ -33,7 +34,7 @@ export const useAssignmentOwners = () => {
   };
 
   const hasAdministrators = (
-    administrators?: Array<string | { userId?: string }>,
+    administrators?: AssignmentAdministratorReference[],
   ): boolean => {
     return getAdministratorNames(administrators).length > 0;
   };

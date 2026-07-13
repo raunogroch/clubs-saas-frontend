@@ -41,12 +41,12 @@ export const AssignmentModal = ({
     clearSearch,
   } = ownerSearch;
 
-  const isOwnersMode = mode === "owners";
+  const isAdministratorsMode = mode === "administrators";
   const isNameMode = mode === "name";
 
   const { onSubmit, error, isSaving } = useAssignmentSubmit({
     data,
-    ownerIds: owners,
+    administratorIds: owners,
     mode,
     onSaved,
     onClose,
@@ -57,8 +57,8 @@ export const AssignmentModal = ({
   });
 
   const isEdit = Boolean(data?.id);
-  const modalTitle = isOwnersMode
-    ? "Actualizar propietarios"
+  const modalTitle = isAdministratorsMode
+    ? "Actualizar administradores"
     : isNameMode
       ? isEdit
         ? "Actualizar nombre"
@@ -67,8 +67,8 @@ export const AssignmentModal = ({
         ? "Actualizar asignación"
         : "Crear asignación";
 
-  const modalDescription = isOwnersMode
-    ? "Selecciona los administradores que serán propietarios"
+  const modalDescription = isAdministratorsMode
+    ? "Selecciona los administradores de la asignación"
     : isNameMode
       ? isEdit
         ? "Modifica únicamente el nombre de la asignación"
@@ -100,7 +100,7 @@ export const AssignmentModal = ({
           </div>
         )}
 
-        {mode !== "owners" && (
+        {mode !== "administrators" && (
           <InputForm
             title="Nombre"
             name="name"
@@ -115,14 +115,14 @@ export const AssignmentModal = ({
           <>
             <div className="form-group row" ref={searchContainerRef}>
               <label className="col-sm-2 col-form-label">
-                Propietarios
+                Administradores
                 <span className="text-danger">*</span>
               </label>
               <div className="col-sm-10">
                 <div className="position-relative">
                   <OwnerSearchInput
                     searchTerm={searchTerm}
-                    onSearchChange={(term) => {
+                    onSearchChange={(term: string) => {
                       setSearchTerm(term);
                       setShowSearchResults(true);
                     }}
@@ -155,7 +155,7 @@ export const AssignmentModal = ({
           </>
         )}
 
-        <input type="hidden" {...register("owners")} />
+        <input type="hidden" {...register("administrators")} />
 
         <div className="modal-footer mt-4">
           <button
@@ -179,7 +179,7 @@ export const AssignmentModal = ({
                 <span className="fa fa-spinner fa-spin me-2" />
                 Guardando...
               </>
-            ) : isOwnersMode ? (
+            ) : isAdministratorsMode ? (
               "Guardar"
             ) : isEdit ? (
               "Actualizar"
